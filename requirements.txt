@@ -1,0 +1,12 @@
+# Formatter for CMake
+cmake-format==0.6.10
+
+# Formatter for Python
+autopep8==1.5.3
+
+# Documentation
+sphinx==3.1.1
+breathe==4.19.2
+sphinx_rtd_theme==0.5.0
+sphinxcontrib-plantuml==0.18
+sphinx-autobuild==0.7.1

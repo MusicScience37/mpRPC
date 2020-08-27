@@ -17,6 +17,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $<1:${CMAKE_BINARY_DIR}/bin>)
 
 set(MPRPC_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)
+if(MPRPC_BUILD_DOC)
+    add_subdirectory(doc)
+endif()
+
 add_library(mprpc INTERFACE)
 target_include_directories(mprpc INTERFACE ${MPRPC_SOURCE_DIR}/include)
 
