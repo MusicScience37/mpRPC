@@ -37,6 +37,12 @@ public:
     explicit message_data(std::string data)
         : data_(std::make_shared<std::string>(std::move(data))) {}
 
+    /*!
+     * \brief construct
+     *
+     * \param data pointer to the message data
+     * \param size size of the message data
+     */
     message_data(const char* data, std::size_t size)
         : data_(std::make_shared<std::string>(data, size)) {}
 
