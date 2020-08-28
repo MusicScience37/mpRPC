@@ -31,6 +31,9 @@ set(MSGPACK_BUILD_EXAMPLES
     CACHE BOOL "don't build examples in msgpack" FORCE)
 add_subdirectory(extern/msgpack-c EXCLUDE_FROM_ALL)
 
+set(BUILD_SHARED_LIBS
+    ON
+    CACHE BOOL "build shared library")
 add_subdirectory(extern/fmt)
 
 option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)

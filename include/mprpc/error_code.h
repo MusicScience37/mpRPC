@@ -41,6 +41,13 @@ enum common_errors : error_code_t {
     unexpected_error  //!< unexpected error
 };
 
+/*!
+ * \brief enumeration of message-related error codes
+ */
+enum message_errors : error_code_t {
+    parse_error = 100  //!< parse error
+};
+
 }  // namespace error_code
 
 }  // namespace mprpc

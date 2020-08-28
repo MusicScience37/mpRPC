@@ -22,7 +22,7 @@
 #include <memory>
 #include <string>
 
-#include "mprpc/error_code_def.h"
+#include "mprpc/error_code.h"
 #include "mprpc/message_data.h"
 
 namespace mprpc {
