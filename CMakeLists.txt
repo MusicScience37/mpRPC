@@ -17,6 +17,22 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $<1:${CMAKE_BINARY_DIR}/bin>)
 
 set(MPRPC_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(MSGPACK_ENABLE_CXX
+    ON
+    CACHE BOOL "use C++ version of msgpack" FORCE)
+set(MSGPACK_CXX11
+    ON
+    CACHE BOOL "use C++ 11 version of msgpack" FORCE)
+set(MSGPACK_BUILD_TESTS
+    OFF
+    CACHE BOOL "don't test msgpack" FORCE)
+set(MSGPACK_BUILD_EXAMPLES
+    OFF
+    CACHE BOOL "don't build examples in msgpack" FORCE)
+add_subdirectory(extern/msgpack-c EXCLUDE_FROM_ALL)
+
+add_subdirectory(extern/fmt)
+
 option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)
 if(MPRPC_BUILD_DOC)
     add_subdirectory(doc)
@@ -24,6 +40,7 @@ endif()
 
 add_library(mprpc INTERFACE)
 target_include_directories(mprpc INTERFACE ${MPRPC_SOURCE_DIR}/include)
+target_link_libraries(mprpc INTERFACE msgpackc-cxx fmt)
 
 option(MPRPC_TESTING "enable testing of mpRPC" OFF)
 if(MPRPC_TESTING)
