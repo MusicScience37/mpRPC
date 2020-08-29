@@ -3,6 +3,7 @@ add_executable(
     logging/log_data_traits_test.cpp
     logging/format_log_data_test.cpp
     logging/logger_test.cpp
+    logging/logging_macros_test.cpp
     message_data_test.cpp
     error_info_test.cpp
     exception_test.cpp
