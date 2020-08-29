@@ -1,0 +1,3 @@
+add_executable(mprpc_logging_write_to_stdout write_to_stdout.cpp)
+target_link_libraries(mprpc_logging_write_to_stdout mprpc)
+target_check_clang_tidy(mprpc_logging_write_to_stdout)

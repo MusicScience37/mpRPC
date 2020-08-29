@@ -59,3 +59,8 @@ if(MPRPC_TESTING)
     enable_testing()
     add_subdirectory(test)
 endif()
+
+option(MPRPC_BUILD_EXAMPLE "build examples of mpRPC" OFF)
+if(MPRPC_TESTING)
+    add_subdirectory(example)
+endif()
