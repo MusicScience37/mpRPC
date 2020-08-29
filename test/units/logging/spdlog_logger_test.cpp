@@ -51,7 +51,7 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
         REQUIRE_THAT(log,
             Catch::Matches(
                 R"***(\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
-                R"***(\[info\] \(thread \d*\) value: 37 \(test.cpp:5\))***"));
+                R"***(\[info\]  \(thread \d*\) value: 37 \(test.cpp:5\))***"));
 
         stream.str("");
         logger->write(mprpc::logging::log_level::error, "message");
@@ -61,6 +61,51 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
             Catch::Matches(
                 R"***(\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
                 R"***(\[error\] \(thread \d*\) message)***"));
+    }
+
+    SECTION("log level string") {
+        using mprpc::logging::log_level;
+        std::ostringstream stream;
+        auto spdlog_logger = spdlog::synchronous_factory::template create<
+            spdlog::sinks::ostream_sink_mt>("test_spdlog_logger_log_level", stream);
+        auto logger = std::make_shared<mprpc::logging::spdlog_logger>(
+            spdlog_logger, log_level::trace);
+
+        stream.str("");
+        logger->write(log_level::trace, "message");
+        auto log = stream.str();
+        log.pop_back();
+        REQUIRE_THAT(log, Catch::Contains("] [trace] ("));
+
+        stream.str("");
+        logger->write(log_level::debug, "message");
+        log = stream.str();
+        log.pop_back();
+        REQUIRE_THAT(log, Catch::Contains("] [debug] ("));
+
+        stream.str("");
+        logger->write(log_level::info, "message");
+        log = stream.str();
+        log.pop_back();
+        REQUIRE_THAT(log, Catch::Contains("] [info]  ("));
+
+        stream.str("");
+        logger->write(log_level::warn, "message");
+        log = stream.str();
+        log.pop_back();
+        REQUIRE_THAT(log, Catch::Contains("] [warn]  ("));
+
+        stream.str("");
+        logger->write(log_level::error, "message");
+        log = stream.str();
+        log.pop_back();
+        REQUIRE_THAT(log, Catch::Contains("] [error] ("));
+
+        stream.str("");
+        logger->write(log_level::fatal, "message");
+        log = stream.str();
+        log.pop_back();
+        REQUIRE_THAT(log, Catch::Contains("] [fatal] ("));
     }
 
     SECTION("create logger to write to file") {

@@ -20,6 +20,7 @@
 #pragma once
 
 #include <spdlog/logger.h>
+#include <spdlog/pattern_formatter.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
@@ -55,6 +56,65 @@ spdlog::level::level_enum convert_log_level_to_spdlog(log_level level) {
     }
 }
 
+/*!
+ * \brief class to format log level
+ */
+class log_level_flag : public spdlog::custom_flag_formatter {
+public:
+    /*!
+     * \brief format log level
+     *
+     * \param msg log message
+     * \param dest destination
+     */
+    void format(const spdlog::details::log_msg& msg, const std::tm& /*time*/,
+        spdlog::memory_buf_t& dest) override {
+        // NOLINTNEXTLINE(clang-diagnostic-switch): prevent dead code
+        switch (msg.level) {
+        case spdlog::level::trace:
+            format_impl(dest, "[trace]");
+            break;
+        case spdlog::level::debug:
+            format_impl(dest, "[debug]");
+            break;
+        case spdlog::level::info:
+            format_impl(dest, "[info] ");
+            break;
+        case spdlog::level::warn:
+            format_impl(dest, "[warn] ");
+            break;
+        case spdlog::level::err:
+            format_impl(dest, "[error]");
+            break;
+        case spdlog::level::critical:
+            format_impl(dest, "[fatal]");
+            break;
+        }
+    }
+
+    /*!
+     * \brief clone this
+     *
+     * \return cloned object
+     */
+    std::unique_ptr<custom_flag_formatter> clone() const override {
+        return spdlog::details::make_unique<log_level_flag>();
+    }
+
+private:
+    /*!
+     * \brief format log level
+     *
+     * \param dest destination
+     * \param str log level string
+     */
+    static void format_impl(spdlog::memory_buf_t& dest, const char* str) {
+        constexpr std::size_t size = 7;
+        // NOLINTNEXTLINE: use of external library
+        dest.append(str, str + size);
+    }
+};
+
 }  // namespace impl
 
 /*!
@@ -73,8 +133,11 @@ public:
         : logger(log_output_level), spdlog_logger_(std::move(spdlog_logger)) {
         spdlog_logger_->set_level(spdlog::level::trace);
         spdlog_logger_->flush_on(spdlog::level::trace);
-        spdlog_logger_->set_pattern(
-            "[%Y-%m-%d %H:%M:%S.%f] %^[%l]%$ (thread %t) %v");
+
+        auto formatter = std::make_unique<spdlog::pattern_formatter>();
+        formatter->add_flag<impl::log_level_flag>('k');
+        formatter->set_pattern("[%Y-%m-%d %H:%M:%S.%f] %^%k%$ (thread %t) %v");
+        spdlog_logger_->set_formatter(std::move(formatter));
     }
 
     /*!
