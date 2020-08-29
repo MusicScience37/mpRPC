@@ -141,15 +141,6 @@ public:
     }
 
     /*!
-     * \brief get internal logger in spdlog
-     *
-     * \return logger in spdlog
-     */
-    std::shared_ptr<spdlog::logger> internal_logger() const noexcept {
-        return spdlog_logger_;
-    }
-
-    /*!
      * \brief write log
      *
      * \param filename file name
