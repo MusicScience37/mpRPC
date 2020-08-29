@@ -74,7 +74,7 @@ public:
         spdlog_logger_->set_level(spdlog::level::trace);
         spdlog_logger_->flush_on(spdlog::level::trace);
         spdlog_logger_->set_pattern(
-            "[%Y-%m-%d %H:%M:%S.%f] %^[%-5l]%$ (thread %t) %v");
+            "[%Y-%m-%d %H:%M:%S.%f] %^[%l]%$ (thread %t) %v");
     }
 
     /*!

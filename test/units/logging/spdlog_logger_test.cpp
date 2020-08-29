@@ -51,7 +51,7 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
         REQUIRE_THAT(log,
             Catch::Matches(
                 R"***(\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
-                R"***(\[info \] \(thread \d*\) value: 37 \(test.cpp:5\))***"));
+                R"***(\[info\] \(thread \d*\) value: 37 \(test.cpp:5\))***"));
 
         stream.str("");
         logger->write(mprpc::logging::log_level::error, "message");
