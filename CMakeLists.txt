@@ -36,6 +36,14 @@ set(BUILD_SHARED_LIBS
     CACHE BOOL "build shared library")
 add_subdirectory(extern/fmt)
 
+set(SPDLOG_FMT_EXTERNAL
+    ON
+    CACHE BOOL "use separate fmt library in spdlog" FORCE)
+set(SPDLOG_BUILD_SHARED
+    ON
+    CACHE BOOL "build shared library of spdlog" FORCE)
+add_subdirectory(extern/spdlog EXCLUDE_FROM_ALL)
+
 option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)
 if(MPRPC_BUILD_DOC)
     add_subdirectory(doc)
@@ -43,7 +51,7 @@ endif()
 
 add_library(mprpc INTERFACE)
 target_include_directories(mprpc INTERFACE ${MPRPC_SOURCE_DIR}/include)
-target_link_libraries(mprpc INTERFACE msgpackc-cxx fmt)
+target_link_libraries(mprpc INTERFACE msgpackc-cxx fmt spdlog)
 
 option(MPRPC_TESTING "enable testing of mpRPC" OFF)
 if(MPRPC_TESTING)

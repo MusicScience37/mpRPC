@@ -4,6 +4,7 @@ add_executable(
     logging/format_log_data_test.cpp
     logging/logger_test.cpp
     logging/logging_macros_test.cpp
+    logging/spdlog_logger_test.cpp
     message_data_test.cpp
     error_info_test.cpp
     exception_test.cpp
