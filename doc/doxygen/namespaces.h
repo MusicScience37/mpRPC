@@ -22,4 +22,21 @@
 /*!
  * \brief namespace of this project
  */
-namespace mprpc {}
+namespace mprpc {
+
+/*!
+ * \brief namespace of internal implementations
+ */
+namespace impl {}
+
+/*!
+ * \brief namespace of logging functions
+ */
+namespace logging {
+
+/*!
+ * \brief namespace of internal implementations
+ */
+namespace impl {}
+}  // namespace logging
+}  // namespace mprpc
