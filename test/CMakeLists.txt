@@ -33,3 +33,4 @@ macro(target_add_catch2 _TARGET)
 endmacro()
 
 add_subdirectory(units)
+add_subdirectory(integration)

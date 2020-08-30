@@ -1,0 +1,1 @@
+add_subdirectory(write_log_test)
