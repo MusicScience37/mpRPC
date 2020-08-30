@@ -36,6 +36,8 @@ set(BUILD_SHARED_LIBS
     CACHE BOOL "build shared library")
 add_subdirectory(extern/fmt)
 
+add_subdirectory(extern/lyra)
+
 set(SPDLOG_FMT_EXTERNAL
     ON
     CACHE BOOL "use separate fmt library in spdlog" FORCE)
