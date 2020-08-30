@@ -6,6 +6,7 @@ This project uses the following external library in source codes:
 - `msgpack-c <https://github.com/msgpack/msgpack-c>`_
 - `fmt <https://github.com/fmtlib/fmt>`_
 - `spdlog <https://github.com/gabime/spdlog>`_
+- `lyra <https://github.com/bfgroup/Lyra>`_
 
 This project uses the following formatters for source codes:
 
