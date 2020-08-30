@@ -24,6 +24,8 @@
 #include <catch2/catch.hpp>
 
 TEST_CASE("mprpc::error_info") {
+    using traits = mprpc::logging::log_data_traits<mprpc::error_info>;
+
     SECTION("default functions") {
         using test_type = mprpc::error_info;
         STATIC_REQUIRE(std::is_nothrow_default_constructible<test_type>::value);
@@ -41,6 +43,7 @@ TEST_CASE("mprpc::error_info") {
         REQUIRE(info.message() == "");  // NOLINT
         REQUIRE(info.has_data() == false);
         REQUIRE(info.data().str() == "");  // NOLINT
+        REQUIRE(traits::preprocess(info) == "no error");
     }
 
     SECTION("construct with error without data") {
@@ -53,12 +56,14 @@ TEST_CASE("mprpc::error_info") {
         REQUIRE(info.message() == message);
         REQUIRE(info.has_data() == false);
         REQUIRE(info.data().str() == "");  // NOLINT
+        REQUIRE(traits::preprocess(info) == "error 1 abc");
     }
 
     SECTION("construct with error without data") {
         constexpr auto code = mprpc::error_code::unexpected_error;
         const auto message = std::string("abc");
-        const auto data = mprpc::message_data("abc");
+        const auto data =
+            mprpc::message_data({char(0x92), char(0x01), char(0x02)});
         const auto info = mprpc::error_info(code, message, data);
         REQUIRE(info.has_error() == true);
         REQUIRE(info.operator bool() == true);
@@ -66,5 +71,6 @@ TEST_CASE("mprpc::error_info") {
         REQUIRE(info.message() == message);
         REQUIRE(info.has_data() == true);
         REQUIRE(info.data().str() == data.str());
+        REQUIRE(traits::preprocess(info) == "error 1 abc with data: [1,2]");
     }
 }
