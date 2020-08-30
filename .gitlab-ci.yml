@@ -65,6 +65,7 @@ static analysis:
   needs: ["line count"]
   dependencies: []
   before_script:
+    - pip3 install -r requirements.txt
     - pip3 install junitparser junit2html
     - chmod +xr /usr/local/bin/junitparser
   script:
