@@ -105,27 +105,11 @@ TEST_CASE("mprpc::format_message") {
     }
 
     SECTION("parse error") {
-        try {
-            // NOLINTNEXTLINE
-            format_data({char(0xC1)});
-            FAIL("require parse error");
-        } catch (const mprpc::exception& except) {
-            REQUIRE(except.info().code() == mprpc::error_code::parse_error);
-            REQUIRE(except.info().data().size() == 1);
-            REQUIRE(except.info().data().str().at(0) == char(0xC1));
-        }
+        REQUIRE(format_data({char(0xC1)}) == "invalid_data(C1)");
     }
 
     SECTION("insufficient bytes") {
-        try {
-            // NOLINTNEXTLINE
-            format_data({char(0x91)});
-            FAIL("require parse error");
-        } catch (const mprpc::exception& except) {
-            REQUIRE(except.info().code() == mprpc::error_code::parse_error);
-            REQUIRE(except.info().data().size() == 1);
-            REQUIRE(except.info().data().str().at(0) == char(0x91));
-        }
+        REQUIRE(format_data({char(0x91)}) == "invalid_data(91)");
     }
 
     SECTION("too long data") {
@@ -134,5 +118,16 @@ TEST_CASE("mprpc::format_message") {
             format_data(std::string({char(0xDC), char(0x00), char(size)}) +
                 std::string(size, char(0x01)))
                 .size() <= mprpc::impl::default_formatted_data_length_limit);
+    }
+}
+
+TEST_CASE("mprpc::logging::log_data_traits<mprpc::message_data>") {
+    SECTION("preprocess data") {
+        const auto data =
+            mprpc::message_data({char(0x92), char(0x01), char(0x02)});
+        const auto str =
+            mprpc::logging::log_data_traits<mprpc::message_data>::preprocess(
+                data);
+        REQUIRE(str == "[1,2]");
     }
 }

@@ -22,7 +22,11 @@
 #include <memory>
 #include <string>
 
+#include <fmt/core.h>
+
 #include "mprpc/error_code.h"
+#include "mprpc/format_message.h"
+#include "mprpc/logging/log_data_traits.h"
 #include "mprpc/message_data.h"
 
 namespace mprpc {
@@ -177,5 +181,33 @@ private:
     //! inner data
     std::shared_ptr<inner_data> data_{};
 };
+
+namespace logging {
+
+/*!
+ * \brief log_data_traits for error_info class
+ */
+template <>
+struct log_data_traits<error_info> {
+    /*!
+     * \brief preprocess data
+     *
+     * \param data data
+     * \return formatted data
+     */
+    static std::string preprocess(const error_info& data) noexcept {
+        if (!data) {
+            return "no error";
+        }
+        if (!data.has_data()) {
+            return fmt::format("error {} {}", data.code(), data.message());
+        }
+        return fmt::format("error {} {} with data: {}", data.code(),
+            data.message(),
+            log_data_traits<message_data>::preprocess(data.data()));
+    }
+};
+
+}  // namespace logging
 
 }  // namespace mprpc

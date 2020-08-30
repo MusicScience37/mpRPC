@@ -22,7 +22,8 @@
 #include <fmt/core.h>
 #include <msgpack.hpp>
 
-#include "mprpc/exception.h"
+#include "mprpc/logging/log_data_traits.h"
+#include "mprpc/message_data.h"
 
 namespace mprpc {
 namespace impl {
@@ -323,15 +324,41 @@ static constexpr std::size_t default_formatted_data_length_limit = 100;
  * \return formatted data
  */
 inline std::string format_message(const message_data& data,
-    std::size_t length_limit = impl::default_formatted_data_length_limit) {
+    std::size_t length_limit =
+        impl::default_formatted_data_length_limit) noexcept {
     try {
         std::string formatted_data;
         impl::formatting_visitor visitor(formatted_data, length_limit);
         msgpack::parse(data.data(), data.size(), visitor);
         return formatted_data;
-    } catch (const msgpack::parse_error& err) {
-        throw exception(error_info(error_code::parse_error, err.what(), data));
+    } catch (const msgpack::parse_error& /*error*/) {
+        constexpr std::size_t invalid_data_str_size = 14;
+        const std::size_t limit =
+            std::max(length_limit, std::size_t(invalid_data_str_size)) -
+            invalid_data_str_size;
+        return "invalid_data(" +
+            impl::format_hex(data.data(), data.size(), limit) + ")";
     }
 }
+
+namespace logging {
+
+/*!
+ * \brief log_data_traits for message_data class
+ */
+template <>
+struct log_data_traits<message_data> {
+    /*!
+     * \brief preprocess data
+     *
+     * \param data data
+     * \return formatted data
+     */
+    static std::string preprocess(const message_data& data) noexcept {
+        return format_message(data);
+    }
+};
+
+}  // namespace logging
 
 }  // namespace mprpc
