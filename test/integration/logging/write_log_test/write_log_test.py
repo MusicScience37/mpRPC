@@ -54,3 +54,25 @@ def test_write_log_default(writer: str):
         line = log_iterator.__next__()
         assert re.match(
             time_regex_str + R' \[info\]  \(thread \d*\) test logger in a thread \d \(test\.cpp:30\)', line)
+
+
+def test_write_log_verbose(writer: str):
+    """test of write_log with verbose configuration
+    """
+
+    log_lines = call_writer(writer, ['-v'])
+    log_iterator = log_lines.__iter__()
+
+    time_regex_str = R'\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d\d\d\d\]'
+
+    line = log_iterator.__next__()
+    assert re.match(
+        time_regex_str + R' \[trace\] \(thread \d*\) test trace \(test\.cpp:1\)', line)
+
+    line = log_iterator.__next__()
+    assert re.match(
+        time_regex_str + R' \[debug\] \(thread \d*\) test debug \(test\.cpp:2\)', line)
+
+    line = log_iterator.__next__()
+    assert re.match(
+        time_regex_str + R' \[info\]  \(thread \d*\) test info \(test\.cpp:3\)', line)
