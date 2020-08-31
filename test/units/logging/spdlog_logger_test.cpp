@@ -19,6 +19,7 @@
  */
 #include "mprpc/logging/spdlog_logger.h"
 
+#include <algorithm>
 #include <regex>
 #include <sstream>
 
@@ -35,6 +36,16 @@ void test_mprpc_log(const std::shared_ptr<mprpc::logging::logger>& logger_ptr) {
     MPRPC_INFO(logger_ptr, "value: {}", value);
 }
 
+template <typename T>
+void discard_forcefully(T&& /*unused*/) {}
+
+std::string remove_line_feed(std::string str) {
+    discard_forcefully(std::remove(str.begin(), str.end(), '\r'));
+    auto iter = std::remove(str.begin(), str.end(), '\n');
+    str.erase(iter, str.end());
+    return str;
+}
+
 }  // namespace
 
 TEST_CASE("mprpc::logging::spdlog_logger") {
@@ -46,8 +57,7 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
             spdlog_logger, mprpc::logging::log_level::info);
 
         test_mprpc_log(logger);
-        auto log = stream.str();
-        log.pop_back();
+        auto log = remove_line_feed(stream.str());
         REQUIRE_THAT(log,
             Catch::Matches(
                 R"***(\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
@@ -55,8 +65,7 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
 
         stream.str("");
         logger->write(mprpc::logging::log_level::error, "message");
-        log = stream.str();
-        log.pop_back();
+        log = remove_line_feed(stream.str());
         REQUIRE_THAT(log,
             Catch::Matches(
                 R"***(\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
@@ -67,7 +76,8 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
         using mprpc::logging::log_level;
         std::ostringstream stream;
         auto spdlog_logger = spdlog::synchronous_factory::template create<
-            spdlog::sinks::ostream_sink_mt>("test_spdlog_logger_log_level", stream);
+            spdlog::sinks::ostream_sink_mt>(
+            "test_spdlog_logger_log_level", stream);
         auto logger = std::make_shared<mprpc::logging::spdlog_logger>(
             spdlog_logger, log_level::trace);
 
