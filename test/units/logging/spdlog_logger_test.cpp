@@ -37,7 +37,7 @@ void test_mprpc_log(const std::shared_ptr<mprpc::logging::logger>& logger_ptr) {
 }
 
 template <typename T>
-void discard_forcefully(T&&) {}
+void discard_forcefully(T&& /*unused*/) {}
 
 std::string remove_line_feed(std::string str) {
     discard_forcefully(std::remove(str.begin(), str.end(), '\r'));
