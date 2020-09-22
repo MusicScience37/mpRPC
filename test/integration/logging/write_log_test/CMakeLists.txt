@@ -3,7 +3,8 @@ if(NOT PYTEST_BUILD_EXECUTABLE)
 endif()
 
 add_executable(mprpc_test_integ_logging_write_log write_log.cpp)
-target_link_libraries(mprpc_test_integ_logging_write_log mprpc lyra)
+target_link_libraries(mprpc_test_integ_logging_write_log mprpc lyra
+                      mprpc_cpp_warnings)
 target_check_clang_tidy(mprpc_test_integ_logging_write_log)
 
 add_test(

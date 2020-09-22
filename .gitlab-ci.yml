@@ -16,7 +16,7 @@ line count:
   extends: .retry setting
   stage: Check
   dependencies: []
-  image: registry.gitlab.com/musicscience37_ci/cloc-docker:v1-0
+  image: registry.gitlab.com/musicscience37_ci/cloc-docker:v1-1
   script:
     - mkdir -p line_count
     - cloc ./
@@ -32,7 +32,7 @@ static analysis:
   extends: .retry setting
   stage: Check
   dependencies: []
-  image: musicscience37/clang-ci:clang9-v2.0
+  image: musicscience37/clang-ci:clang10-v2.1
   before_script:
     - pip3 install junit2html
     - mkdir build_static_analysis
@@ -43,6 +43,7 @@ static analysis:
     - cmake -S ./ -B build_static_analysis
       -DMPRPC_ENABLE_CLANG_TIDY:BOOL=ON
       -DMPRPC_TESTING:BOOL=ON
+      -DMPRPC_ENABLE_CPP_WARNINGS:BOOL=ON
     - cmake --build build_static_analysis
       --target mprpc_clang_tidy
     - scripts/check_clang_tidy.sh build_static_analysis/clang_tidy
@@ -91,7 +92,7 @@ static analysis:
 clang coverage:
   extends: .release-test-base
   stage: Test with Clang
-  image: musicscience37/clang-ci:clang9-v2.0
+  image: musicscience37/clang-ci:clang10-v2.1
   variables:
     BUILD_DIR: build_clang_coverage
   script:
@@ -114,7 +115,7 @@ clang coverage:
 gcc coverage:
   extends: .release-test-base
   stage: Test with GCC
-  image: musicscience37/gcc-ci:gcc9-v2.0
+  image: musicscience37/gcc-ci:gcc10-v2.1
   variables:
     BUILD_DIR: build_gcc_coverage
   script:
@@ -132,19 +133,19 @@ gcc coverage:
     - scripts/collect_gcc_coverage.sh build_gcc_coverage
   coverage: '/Total:\|\s*(\d+\.?\d+?)%/'
 
-gcc-9:
+gcc-10:
   extends: .release-test-base
   stage: Test with GCC
-  image: musicscience37/gcc-ci:gcc9-v2.0
+  image: musicscience37/gcc-ci:gcc10-v2.1
   variables:
-    BUILD_DIR: build_gcc9
+    BUILD_DIR: build_gcc10
 
 doc:
   extends: .retry setting
   stage: Build Documentation
   needs: ["line count"]
   dependencies: []
-  image: musicscience37/sphinx-doxygen:v-2.0
+  image: musicscience37/sphinx-doxygen:v-2.1
   before_script:
     - pip3 install -r requirements.txt
   script:
@@ -162,8 +163,8 @@ doc:
 pages:
   extends: .retry setting
   stage: Publish
-  #only:
-  #  - develop
+  only:
+    - develop
   needs:
     - doc
     - gcc coverage
