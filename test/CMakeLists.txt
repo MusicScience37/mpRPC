@@ -2,6 +2,8 @@ add_library(mprpc_catch2_main OBJECT catch2_main.cpp)
 target_link_system_library(mprpc_catch2_main PUBLIC Catch2::Catch2)
 target_check_clang_tidy(mprpc_catch2_main)
 
+add_subdirectory(utils)
+
 option(MPRPC_WRITE_JUNIT "write JUnit XML files in tests" OFF)
 if(MPRPC_WRITE_JUNIT)
     set(MPRPC_JUNIT_DIR
@@ -16,8 +18,9 @@ set(MPRPC_TEMP_TEST_DIR
 file(MAKE_DIRECTORY ${MPRPC_TEMP_TEST_DIR})
 
 macro(target_add_catch2 _TARGET)
-    target_link_libraries(${_TARGET} PRIVATE mprpc_catch2_main mprpc
-                                             mprpc_cpp_warnings)
+    target_link_libraries(
+        ${_TARGET} PRIVATE mprpc_catch2_main mprpc mprpc_test_utils
+                           mprpc_cpp_warnings)
     target_check_clang_tidy(${_TARGET})
 
     if(MPRPC_WRITE_JUNIT)
