@@ -54,6 +54,17 @@ public:
      */
     virtual void async_write(
         const message_data& data, on_write_handler_type handler) = 0;
+
+    //! construct
+    session() noexcept = default;
+
+    //! destruct
+    virtual ~session() = default;
+
+    session(const session&) = delete;
+    session(session&&) = delete;
+    session& operator=(const session&) = delete;
+    session& operator=(session&&) = delete;
 };
 
 }  // namespace transport
