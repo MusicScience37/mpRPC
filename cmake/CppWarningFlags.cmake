@@ -29,7 +29,7 @@ option(${UPPER_PROJECT_NAME}_ENABLE_CPP_WARNINGS
        "enable compiler warnings of C++" OFF)
 
 if(${UPPER_PROJECT_NAME}_ENABLE_CPP_WARNINGS)
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         target_compile_options(${PROJECT_NAME}_cpp_warnings INTERFACE -Wall
                                                                       -Wextra)
     endif()
