@@ -33,13 +33,6 @@ TEST_CASE("mprpc::message_data") {
         STATIC_REQUIRE(std::is_nothrow_move_assignable<test_type>::value);
     }
 
-    SECTION("construct and get with string") {
-        // NOLINTNEXTLINE: for test
-        const std::string test_data = "a\0c";
-        const auto data = mprpc::message_data(test_data);
-        REQUIRE(data.str() == test_data);
-    }
-
     SECTION("construct and get with pointer and size") {
         // NOLINTNEXTLINE: for test
         const char test_data[] = "a\0c";

@@ -114,7 +114,7 @@ public:
         if (data_ && data_->data()) {
             return *(data_->data());
         }
-        static const auto empty_data = message_data(std::string());
+        static const auto empty_data = message_data("", 0);
         return empty_data;
     }
 
