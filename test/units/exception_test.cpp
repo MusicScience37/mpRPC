@@ -36,7 +36,8 @@ TEST_CASE("mprpc::exception") {
     SECTION("throw an exception") {
         constexpr auto code = mprpc::error_code::unexpected_error;
         const auto message = std::string("abc");
-        const auto data = mprpc::message_data("abc");
+        const auto data_str = std::string("abc");
+        const auto data = mprpc::message_data(data_str.data(), data_str.size());
         auto func = [&message, &data] {
             throw mprpc::exception(mprpc::error_info(code, message, data));
         };
@@ -50,7 +51,7 @@ TEST_CASE("mprpc::exception") {
             REQUIRE(info.code() == code);
             REQUIRE(info.message() == message);
             REQUIRE(info.has_data() == true);
-            REQUIRE(info.data().str() == data.str());
+            REQUIRE(std::string(data.data(), data.size()) == data_str);
         }
 
         REQUIRE_THROWS_AS(func(), mprpc::exception);

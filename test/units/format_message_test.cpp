@@ -19,15 +19,18 @@
  */
 #include "mprpc/format_message.h"
 
-#include <sstream>
 #include <type_traits>
 
 #include <catch2/catch.hpp>
 
 namespace {
 
-std::string format_data(std::string data) {
-    return mprpc::format_message(mprpc::message_data(std::move(data)));
+std::string format_data(const std::string& data) {
+    return mprpc::format_message(mprpc::message_data(data.data(), data.size()));
+}
+
+std::string format_data(const char* data, std::size_t size) {
+    return mprpc::format_message(mprpc::message_data(data, size));
 }
 
 }  // namespace
@@ -46,15 +49,15 @@ TEST_CASE("mprpc::format_message") {
     }
 
     SECTION("format float32") {
-        std::ostringstream buffer;
+        msgpack::sbuffer buffer;
         msgpack::pack(buffer, 1.0F);
-        REQUIRE(format_data(buffer.str()) == "1.00000F");
+        REQUIRE(format_data(buffer.data(), buffer.size()) == "1.00000F");
     }
 
     SECTION("format float64") {
-        std::ostringstream buffer;
+        msgpack::sbuffer buffer;
         msgpack::pack(buffer, 1.0);
-        REQUIRE(format_data(buffer.str()) == "1.00000000000");
+        REQUIRE(format_data(buffer.data(), buffer.size()) == "1.00000000000");
     }
 
     SECTION("format string") {
@@ -123,8 +126,8 @@ TEST_CASE("mprpc::format_message") {
 
 TEST_CASE("mprpc::logging::log_data_traits<mprpc::message_data>") {
     SECTION("preprocess data") {
-        const auto data =
-            mprpc::message_data({char(0x92), char(0x01), char(0x02)});
+        const auto data_str = std::string({char(0x92), char(0x01), char(0x02)});
+        const auto data = mprpc::message_data(data_str.data(), data_str.size());
         const auto str =
             mprpc::logging::log_data_traits<mprpc::message_data>::preprocess(
                 data);

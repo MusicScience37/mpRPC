@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <future>
 #include <iostream>
-#include <sstream>
 #include <utility>
 #include <vector>
 
@@ -31,13 +30,13 @@ void write_with_data(const std::shared_ptr<mprpc::logging::logger>& logger) {
 }
 
 void write_error(const std::shared_ptr<mprpc::logging::logger>& logger) {
-    std::ostringstream stream;
+    msgpack::sbuffer stream;
     msgpack::pack(stream,
         std::make_tuple(std::string("abc"),
             2.5F,                                                  // NOLINT
             std::vector<char>{char(0xA9), char(0xF1), char(0x3C)}  // NOLINT
             ));
-    const auto data = mprpc::message_data(stream.str());
+    const auto data = mprpc::message_data(stream.data(), stream.size());
 
     constexpr mprpc::error_code_t code = 37;
     const auto info = mprpc::error_info(code, "test error", data);

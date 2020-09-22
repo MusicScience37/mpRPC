@@ -32,26 +32,11 @@ public:
     /*!
      * \brief construct
      *
-     * \param data message data
-     */
-    explicit message_data(std::string data)
-        : data_(std::make_shared<std::string>(std::move(data))) {}
-
-    /*!
-     * \brief construct
-     *
      * \param data pointer to the message data
      * \param size size of the message data
      */
     message_data(const char* data, std::size_t size)
         : data_(std::make_shared<std::string>(data, size)) {}
-
-    /*!
-     * \brief get message data
-     *
-     * \return message data
-     */
-    const std::string& str() const noexcept { return *data_; }
 
     /*!
      * \brief get pointer to the message data

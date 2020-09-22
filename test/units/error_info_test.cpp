@@ -42,7 +42,7 @@ TEST_CASE("mprpc::error_info") {
         REQUIRE(info.code() == mprpc::error_code::success);
         REQUIRE(info.message() == "");  // NOLINT
         REQUIRE(info.has_data() == false);
-        REQUIRE(info.data().str() == "");  // NOLINT
+        REQUIRE(info.data().size() == 0);
         REQUIRE(traits::preprocess(info) == "no error");
     }
 
@@ -55,22 +55,23 @@ TEST_CASE("mprpc::error_info") {
         REQUIRE(info.code() == code);
         REQUIRE(info.message() == message);
         REQUIRE(info.has_data() == false);
-        REQUIRE(info.data().str() == "");  // NOLINT
+        REQUIRE(info.data().size() == 0);
         REQUIRE(traits::preprocess(info) == "error 1 abc");
     }
 
     SECTION("construct with error without data") {
         constexpr auto code = mprpc::error_code::unexpected_error;
         const auto message = std::string("abc");
-        const auto data =
-            mprpc::message_data({char(0x92), char(0x01), char(0x02)});
+        const std::string data_str = {char(0x92), char(0x01), char(0x02)};
+        const auto data = mprpc::message_data(data_str.data(), data_str.size());
         const auto info = mprpc::error_info(code, message, data);
         REQUIRE(info.has_error() == true);
         REQUIRE(info.operator bool() == true);
         REQUIRE(info.code() == code);
         REQUIRE(info.message() == message);
         REQUIRE(info.has_data() == true);
-        REQUIRE(info.data().str() == data.str());
+        REQUIRE(
+            std::string(info.data().data(), info.data().size()) == data_str);
         REQUIRE(traits::preprocess(info) == "error 1 abc with data: [1,2]");
     }
 }
