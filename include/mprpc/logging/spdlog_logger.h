@@ -145,12 +145,11 @@ public:
      *
      * \param filename file name
      * \param line line number
-     * \param function function name
      * \param level log level
      * \param message log message
      */
     void write_impl(const char* filename, std::uint32_t line,
-        const char* function, log_level level,
+        const char* /*function*/, log_level level,
         const char* message) noexcept final {
         write_impl(level,
             fmt::format(FMT_STRING("{} ({}:{})"), message, filename, line)
