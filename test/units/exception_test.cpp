@@ -37,7 +37,7 @@ TEST_CASE("mprpc::exception") {
         constexpr auto code = mprpc::error_code::unexpected_error;
         const auto message = std::string("abc");
         const auto data = mprpc::message_data("abc");
-        auto func = [code, &message, &data] {
+        auto func = [&message, &data] {
             throw mprpc::exception(mprpc::error_info(code, message, data));
         };
 
