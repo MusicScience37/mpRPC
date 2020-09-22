@@ -59,6 +59,8 @@ set(DOXYGEN_GENERATE_XML YES)
 # output directory
 set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
+set(DOXYGEN_PROJECT_NAME "mpRPC")
+
 doxygen_add_docs(
     mprpc_doc_doxygen "include" "doc/doxygen" "README.md"
     WORKING_DIRECTORY "${MPRPC_SOURCE_DIR}"
