@@ -8,5 +8,6 @@ add_executable(
     message_data_test.cpp
     error_info_test.cpp
     exception_test.cpp
-    format_message_test.cpp)
+    format_message_test.cpp
+    transport/mock/mock_session_test.cpp)
 target_add_catch2(mprpc_test_units)
