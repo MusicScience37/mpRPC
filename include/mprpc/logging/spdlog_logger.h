@@ -37,7 +37,7 @@ namespace impl {
  * \param level log level
  * \return log level in spdlog library
  */
-spdlog::level::level_enum convert_log_level_to_spdlog(log_level level) {
+inline spdlog::level::level_enum convert_log_level_to_spdlog(log_level level) {
     switch (level) {
     case log_level::trace:
         return spdlog::level::trace;
@@ -192,7 +192,7 @@ static constexpr std::size_t default_max_files = 10;
  * \param rotate_on_open whether rotate file on opening this logger
  * \return logger
  */
-std::shared_ptr<spdlog_logger> create_file_logger(
+inline std::shared_ptr<spdlog_logger> create_file_logger(
     const std::string& logger_name, const std::string& base_filename,
     log_level log_output_level = log_level::info,
     std::size_t max_file_size = impl::default_max_file_size,
@@ -211,7 +211,7 @@ std::shared_ptr<spdlog_logger> create_file_logger(
  * \param log_output_level log output level
  * \return logger
  */
-std::shared_ptr<spdlog_logger> create_stdout_logger(
+inline std::shared_ptr<spdlog_logger> create_stdout_logger(
     const std::string& logger_name,
     log_level log_output_level = log_level::info) {
     return std::make_shared<spdlog_logger>(
