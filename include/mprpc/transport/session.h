@@ -23,6 +23,7 @@
 
 #include "mprpc/error_info.h"
 #include "mprpc/message_data.h"
+#include "mprpc/transport/address.h"
 
 namespace mprpc {
 namespace transport {
@@ -54,6 +55,13 @@ public:
      */
     virtual void async_write(
         const message_data& data, on_write_handler_type handler) = 0;
+
+    /*!
+     * \brief get the address of remote endpoint
+     *
+     * \return address of remote endpoint
+     */
+    virtual std::shared_ptr<address> remote_address() const = 0;
 
     //! construct
     session() noexcept = default;

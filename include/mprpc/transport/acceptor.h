@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "mprpc/error_info.h"
+#include "mprpc/transport/address.h"
 #include "mprpc/transport/session.h"
 
 namespace mprpc {
@@ -43,6 +44,13 @@ public:
      * \param handler handler
      */
     virtual void async_accept(on_accept_handler_type handler) = 0;
+
+    /*!
+     * \brief get the address of local endpoint
+     *
+     * \return address of local endpoint
+     */
+    virtual std::shared_ptr<address> local_address() const = 0;
 
     //! construct
     acceptor() noexcept = default;

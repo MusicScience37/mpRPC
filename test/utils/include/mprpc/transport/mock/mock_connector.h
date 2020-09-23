@@ -24,6 +24,7 @@
 #include <asio.hpp>
 
 #include "mprpc/transport/connector.h"
+#include "mprpc/transport/mock/mock_address.h"
 
 namespace mprpc {
 namespace transport {
@@ -83,6 +84,16 @@ public:
         std::unique_lock<std::mutex> lock(mutex_);
         message_data data = written_data_;
         return data;
+    }
+
+    //! \copydoc mprpc::transport::connector::local_address
+    std::shared_ptr<address> local_address() const override {
+        return std::make_shared<mock_address>();
+    }
+
+    //! \copydoc mprpc::transport::connector::remote_address
+    std::shared_ptr<address> remote_address() const override {
+        return std::make_shared<mock_address>();
     }
 
 private:
