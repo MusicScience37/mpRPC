@@ -21,10 +21,12 @@
 
 #include <functional>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include <asio/executor_work_guard.hpp>
 #include <asio/io_context.hpp>
+#include <asio/post.hpp>
 
 #include "mprpc/error_info.h"
 #include "mprpc/exception.h"
@@ -104,6 +106,20 @@ public:
      * \return io_context object
      */
     asio::io_context& context() { return context_; }
+
+    /*!
+     * \brief add a function to be executed
+     *
+     * \tparam Function type of function
+     * \tparam Args types of arguments
+     * \param function function
+     * \param args arguments
+     */
+    template <typename Function, typename... Args>
+    void post(Function&& function, Args&&... args) {
+        asio::post(context_, std::forward<Function>(function),
+            std::forward<Args>(args)...);
+    }
 
     /*!
      * \brief destruct
