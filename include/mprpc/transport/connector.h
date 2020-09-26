@@ -23,6 +23,7 @@
 
 #include "mprpc/error_info.h"
 #include "mprpc/message_data.h"
+#include "mprpc/transport/address.h"
 
 namespace mprpc {
 namespace transport {
@@ -32,12 +33,22 @@ namespace transport {
  */
 class connector {
 public:
+    //! type of handlers on connecting to a server
+    using on_connect_handler_type = std::function<void(const error_info&)>;
+
     //! type of handlers on reading a message
     using on_read_handler_type =
         std::function<void(const error_info&, const message_data&)>;
 
     //! type of handlers on writing a message
     using on_write_handler_type = std::function<void(const error_info&)>;
+
+    /*!
+     * \brief asynchronously connect to a server
+     *
+     * \param handler handler
+     */
+    virtual void async_connect(on_connect_handler_type handler) = 0;
 
     /*!
      * \brief asynchronously read a message
@@ -54,6 +65,20 @@ public:
      */
     virtual void async_write(
         const message_data& data, on_write_handler_type handler) = 0;
+
+    /*!
+     * \brief get the address of local endpoint
+     *
+     * \return address of local endpoint
+     */
+    virtual std::shared_ptr<address> local_address() const = 0;
+
+    /*!
+     * \brief get the address of remote endpoint
+     *
+     * \return address of remote endpoint
+     */
+    virtual std::shared_ptr<address> remote_address() const = 0;
 
     //! construct
     connector() noexcept = default;

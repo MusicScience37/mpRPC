@@ -24,6 +24,7 @@
 #include <asio.hpp>
 
 #include "mprpc/transport/acceptor.h"
+#include "mprpc/transport/mock/mock_address.h"
 #include "mprpc/transport/mock/mock_session.h"
 
 namespace mprpc {
@@ -65,6 +66,11 @@ public:
                 [handler, session] { handler(error_info(), session); });
         }
         return session;
+    }
+
+    //! \copydoc mprpc::transport::acceptor::local_address
+    std::shared_ptr<address> local_address() const override {
+        return std::make_shared<mock_address>();
     }
 
 private:
