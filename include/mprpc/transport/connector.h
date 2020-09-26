@@ -33,12 +33,22 @@ namespace transport {
  */
 class connector {
 public:
+    //! type of handlers on connecting to a server
+    using on_connect_handler_type = std::function<void(const error_info&)>;
+
     //! type of handlers on reading a message
     using on_read_handler_type =
         std::function<void(const error_info&, const message_data&)>;
 
     //! type of handlers on writing a message
     using on_write_handler_type = std::function<void(const error_info&)>;
+
+    /*!
+     * \brief asynchronously connect to a server
+     *
+     * \param handler handler
+     */
+    virtual void async_connect(on_connect_handler_type handler) = 0;
 
     /*!
      * \brief asynchronously read a message
