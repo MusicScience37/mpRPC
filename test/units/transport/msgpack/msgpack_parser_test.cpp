@@ -37,8 +37,7 @@ TEST_CASE("mprpc::transport::msgpack::msgpack_parser") {
 
         mprpc::message_data parsed_data("", 0);
         REQUIRE_NOTHROW(parsed_data = parser.parse(data.data(), data.size()));
-        REQUIRE(
-            std::string(parsed_data.data(), parsed_data.size()) == data_str);
+        REQUIRE(parsed_data == data);
     }
 
     SECTION("parse error") {

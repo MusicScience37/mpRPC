@@ -19,6 +19,8 @@
  */
 #pragma once
 
+#include <ostream>
+
 #include <fmt/core.h>
 #include <msgpack.hpp>
 
@@ -360,5 +362,18 @@ struct log_data_traits<message_data> {
 };
 
 }  // namespace logging
+
+/*!
+ * \brief output data to a stream
+ *
+ * \param stream stream
+ * \param data data
+ * \return stream
+ */
+inline std::ostream& operator<<(
+    std::ostream& stream, const message_data& data) {
+    stream << format_message(data);
+    return stream;
+}
 
 }  // namespace mprpc

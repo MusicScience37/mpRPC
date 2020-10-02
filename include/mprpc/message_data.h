@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -56,5 +57,30 @@ private:
     //! message data
     std::shared_ptr<std::string> data_;
 };
+
+/*!
+ * \brief compare two messages
+ *
+ * \param left left-hand-side object
+ * \param right right-hand-side object
+ * \return whether two messages are same
+ */
+inline bool operator==(const message_data& left, const message_data& right) {
+    // NOLINTNEXTLINE: no iterator other than pointer exists
+    return std::equal(left.data(), left.data() + left.size(),
+        // NOLINTNEXTLINE: no iterator other than pointer exists
+        right.data(), right.data() + right.size());
+}
+
+/*!
+ * \brief compare two messages
+ *
+ * \param left left-hand-side object
+ * \param right right-hand-side object
+ * \return whether two messages are distinct
+ */
+inline bool operator!=(const message_data& left, const message_data& right) {
+    return !operator==(left, right);
+}
 
 }  // namespace mprpc
