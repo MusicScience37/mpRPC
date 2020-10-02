@@ -66,10 +66,8 @@ private:
  * \return whether two messages are same
  */
 inline bool operator==(const message_data& left, const message_data& right) {
-    // NOLINTNEXTLINE: no iterator other than pointer exists
-    return std::equal(left.data(), left.data() + left.size(),
-        // NOLINTNEXTLINE: no iterator other than pointer exists
-        right.data(), right.data() + right.size());
+    return std::equal(left.data(), left.data() + left.size(), right.data(),
+        right.data() + right.size());
 }
 
 /*!
