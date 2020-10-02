@@ -70,16 +70,17 @@ public:
      *
      * \return pointer to the buffer
      */
-    virtual char* buffer() const = 0;
+    virtual char* buffer() = 0;
 
     /*!
      * \brief parse next message
      *
+     * \param consumed_buf_size size of consumed buffer
      * \return whether a message is parsed
      *
      * \throw mprpc::exception on parse error
      */
-    virtual bool parse_next() = 0;
+    virtual bool parse_next(std::size_t consumed_buf_size) = 0;
 
     /*!
      * \brief get parsed message

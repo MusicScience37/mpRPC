@@ -54,3 +54,38 @@ TEST_CASE("mprpc::transport::msgpack::msgpack_parser") {
             parser.parse(data.data(), data.size()), mprpc::exception);
     }
 }
+
+TEST_CASE("mprpc::transport::msgpack::msgpack_streaming_parser") {
+    auto logger =
+        create_logger("mprpc::transport::msgpack::msgpack_streaming_parser");
+
+    mprpc::transport::msgpack::msgpack_streaming_parser parser(logger);
+
+    SECTION("parse a message") {
+        const auto data_str = std::string({char(0x92), char(0x01), char(0x02)});
+        const auto data = mprpc::message_data(data_str.data(), data_str.size());
+
+        parser.prepare_buffer(data.size() + 2);
+        std::copy(data.data(), data.data() + data.size(), parser.buffer());
+        REQUIRE(parser.parse_next(data.size() + 1));
+        REQUIRE(parser.get() == data);
+    }
+
+    SECTION("parse error") {
+        const auto data_str = std::string({char(0xC1)});
+        const auto data = mprpc::message_data(data_str.data(), data_str.size());
+
+        parser.prepare_buffer(data.size() + 2);
+        std::copy(data.data(), data.data() + data.size(), parser.buffer());
+        REQUIRE_THROWS_AS(parser.parse_next(data.size() + 1), mprpc::exception);
+    }
+
+    SECTION("insufficient bytes") {
+        const auto data_str = std::string({char(0x92), char(0x01)});
+        const auto data = mprpc::message_data(data_str.data(), data_str.size());
+
+        parser.prepare_buffer(data.size() + 2);
+        std::copy(data.data(), data.data() + data.size(), parser.buffer());
+        REQUIRE_FALSE(parser.parse_next(data.size()));
+    }
+}
