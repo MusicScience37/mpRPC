@@ -68,7 +68,7 @@ target_link_libraries(mprpc INTERFACE msgpackc-cxx fmt spdlog asio)
 option(MPRPC_TESTING "enable testing of mpRPC" OFF)
 if(MPRPC_TESTING)
     add_subdirectory(extern/Catch2)
-    enable_testing()
+    include(CTest)
     add_subdirectory(test)
 endif()
 
