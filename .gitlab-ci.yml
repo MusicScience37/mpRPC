@@ -78,7 +78,7 @@ static analysis:
       -DMPRPC_TESTING:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
     - cd $BUILD_DIR
-    - ctest -M Experimental -T Configure -T Build -T Test -T MemCheck
+    - ctest -V -M Experimental -T Configure -T Build -T Test -T MemCheck
     - ctest -M Experimental -T Submit
   after_script:
     - scripts/collect_test_results.sh $BUILD_DIR/junit
