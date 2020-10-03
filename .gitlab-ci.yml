@@ -108,7 +108,9 @@ clang coverage:
     - cd $BUILD_DIR
     - mkdir coverage
     - export LLVM_PROFILE_FILE=$(pwd)/coverage/coverage_%p.profraw
-    - ctest -M Experimental -T Build -T Test -T MemCheck -T Submit
+    - ctest -V -M Experimental -T Configure -T Build -T Test -T MemCheck
+    - ctest -M Experimental -T Coverage || true
+    - ctest -M Experimental -T Submit
     - cd ../
     - scripts/collect_llvm_coverage.sh build_clang_coverage
   coverage: '/Line Coverage: \d+\.\d+/'
