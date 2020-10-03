@@ -128,7 +128,9 @@ gcc coverage:
       "-DCMAKE_CXX_FLAGS=--coverage"
       "-DCMAKE_MODULE_LINKER_FLAGS=--coverage"
     - cd $BUILD_DIR
-    - ctest -M Experimental -T Build -T Test -T MemCheck -T Submit
+    - ctest -V -M Experimental -T Configure -T Build -T Test -T MemCheck
+    - ctest -V -M Experimental -T Coverage || true
+    - ctest -V -M Experimental -T Submit
     - cd ../
     - scripts/collect_gcc_coverage.sh build_gcc_coverage
   coverage: '/Total:\|\s*(\d+\.?\d+?)%/'
