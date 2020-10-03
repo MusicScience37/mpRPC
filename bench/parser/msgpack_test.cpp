@@ -6,8 +6,8 @@
 #include "mprpc/transport/msgpack/msgpack_parser.h"
 
 static void parse_msgpack(benchmark::State& state) {
-    static auto logger = mprpc::logging::create_file_logger(
-        "mprpc_bench_parser", "mprpc_bench_parser.log");
+    static auto logger =
+        mprpc::logging::create_stdout_logger("mprpc_bench_parser_msgpack");
     auto parser =
         std::make_shared<mprpc::transport::msgpack::msgpack_parser>(logger);
 
