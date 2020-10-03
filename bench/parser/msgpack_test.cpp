@@ -1,6 +1,7 @@
 #include <msgpack.hpp>
 
 #include "common.h"
+#include "mprpc/generate_string_data.h"
 #include "mprpc/logging/spdlog_logger.h"
 #include "mprpc/transport/msgpack/msgpack_parser.h"
 
@@ -11,10 +12,7 @@ static void parse_msgpack(benchmark::State& state) {
         std::make_shared<mprpc::transport::msgpack::msgpack_parser>(logger);
 
     auto size = static_cast<std::size_t>(state.range());
-    auto str = std::string(size, 'a');
-    auto buffer = msgpack::sbuffer();
-    msgpack::pack(buffer, str);
-    auto data = mprpc::message_data(buffer.data(), buffer.size());
+    auto data = mprpc::generate_string_data(size);
 
     for (auto _ : state) {
         parser->parse(data.data(), data.size());
