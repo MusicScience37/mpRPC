@@ -74,6 +74,15 @@ if(MPRPC_TESTING)
     add_subdirectory(test)
 endif()
 
+option(MPRPC_ENABLE_BENCH "enable benchmarks of mpRPC" OFF)
+if(MPRPC_ENABLE_BENCH)
+    set(BENCHMARK_ENABLE_TESTING
+        OFF
+        CACHE BOOL "disable test of benchmark" FORCE)
+    add_subdirectory(extern/benchmark)
+    add_subdirectory(bench)
+endif()
+
 option(MPRPC_BUILD_EXAMPLE "build examples of mpRPC" OFF)
 if(MPRPC_TESTING)
     add_subdirectory(example)
