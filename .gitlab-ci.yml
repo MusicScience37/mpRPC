@@ -75,9 +75,8 @@ static analysis:
       -DCMAKE_BUILD_TYPE=Release
       -DMPRPC_TESTING:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
-    - cmake --build $BUILD_DIR
     - cd $BUILD_DIR
-    - ctest -V .
+    - ctest -V -M Experimental -T Build -T Test -T Submit
   after_script:
     - scripts/collect_test_results.sh $BUILD_DIR/junit
   artifacts:
