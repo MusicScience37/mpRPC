@@ -104,11 +104,10 @@ clang coverage:
       -DMPRPC_WRITE_JUNIT:BOOL=ON
       "-DCMAKE_CXX_FLAGS=-fprofile-instr-generate -fcoverage-mapping"
       "-DCMAKE_MODULE_LINKER_FLAGS=-fprofile-instr-generate -fcoverage-mapping"
-    - cmake --build $BUILD_DIR
     - cd $BUILD_DIR
     - mkdir coverage
     - export LLVM_PROFILE_FILE=$(pwd)/coverage/coverage_%p.profraw
-    - ctest -V .
+    - ctest -M Experimental -T Build -T Test -T MemCheck -T Submit
     - cd ../
     - scripts/collect_llvm_coverage.sh build_clang_coverage
   coverage: '/Line Coverage: \d+\.\d+/'
@@ -127,9 +126,8 @@ gcc coverage:
       -DMPRPC_WRITE_JUNIT:BOOL=ON
       "-DCMAKE_CXX_FLAGS=--coverage"
       "-DCMAKE_MODULE_LINKER_FLAGS=--coverage"
-    - cmake --build $BUILD_DIR
     - cd $BUILD_DIR
-    - ctest -V .
+    - ctest -M Experimental -T Build -T Test -T MemCheck -T Submit
     - cd ../
     - scripts/collect_gcc_coverage.sh build_gcc_coverage
   coverage: '/Total:\|\s*(\d+\.?\d+?)%/'
