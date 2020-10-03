@@ -69,6 +69,8 @@ option(MPRPC_TESTING "enable testing of mpRPC" OFF)
 if(MPRPC_TESTING)
     add_subdirectory(extern/Catch2)
     include(CTest)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.cmake
+                   ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
     add_subdirectory(test)
 endif()
 
