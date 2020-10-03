@@ -69,6 +69,8 @@ static analysis:
     - pip3 install -r requirements.txt
     - pip3 install junitparser junit2html
     - chmod +xr /usr/local/bin/junitparser
+    - apt update
+    - apt install -y valgrind
   script:
     - mkdir $BUILD_DIR
     - cmake -S ./ -B $BUILD_DIR
@@ -76,7 +78,7 @@ static analysis:
       -DMPRPC_TESTING:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
     - cd $BUILD_DIR
-    - ctest -V -M Experimental -T Build -T Test -T Submit
+    - ctest -M Experimental -T Build -T Test -T MemCheck -T Submit
   after_script:
     - scripts/collect_test_results.sh $BUILD_DIR/junit
   artifacts:
