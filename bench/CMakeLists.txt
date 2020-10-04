@@ -25,3 +25,4 @@ macro(add_mprpc_bench _TARGET)
 endmacro()
 
 add_subdirectory(parser)
+add_subdirectory(transport)
