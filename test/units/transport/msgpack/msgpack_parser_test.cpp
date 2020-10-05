@@ -71,6 +71,32 @@ TEST_CASE("mprpc::transport::msgpack::msgpack_streaming_parser") {
         REQUIRE(parser.get() == data);
     }
 
+    SECTION("parse two messages") {
+        auto data_str =  // NOLINTNEXTLINE: for test
+            std::string({char(0x92), char(0x01), char(0x02), char(0x92)});
+        auto data = mprpc::message_data(data_str.data(), data_str.size());
+        parser.prepare_buffer(data.size() + 2);
+        std::copy(data.data(), data.data() + data.size(), parser.buffer());
+        REQUIRE(parser.parse_next(data.size()));
+
+        // NOLINTNEXTLINE: for test
+        data_str = std::string({char(0x92), char(0x01), char(0x02)});
+        data = mprpc::message_data(data_str.data(), data_str.size());
+        REQUIRE(parser.get() == data);
+
+        // NOLINTNEXTLINE: for test
+        data_str = std::string({char(0x03), char(0x04)});
+        data = mprpc::message_data(data_str.data(), data_str.size());
+        parser.prepare_buffer(data.size());
+        std::copy(data.data(), data.data() + data.size(), parser.buffer());
+        REQUIRE(parser.parse_next(data.size()));
+
+        // NOLINTNEXTLINE: for test
+        data_str = std::string({char(0x92), char(0x03), char(0x04)});
+        data = mprpc::message_data(data_str.data(), data_str.size());
+        REQUIRE(parser.get() == data);
+    }
+
     SECTION("parse error") {
         const auto data_str = std::string({char(0xC1)});
         const auto data = mprpc::message_data(data_str.data(), data_str.size());

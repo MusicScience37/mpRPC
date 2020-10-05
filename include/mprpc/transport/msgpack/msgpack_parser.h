@@ -120,6 +120,8 @@ public:
     message_data get() override {
         auto data = message_data(buffer_.data(), parsed_buf_size_);
         buffer_.erase(buffer_.begin(), buffer_.begin() + parsed_buf_size_);
+        consumed_buf_size_ -= parsed_buf_size_;
+        parsed_buf_size_ = 0;
         return data;
     }
 
