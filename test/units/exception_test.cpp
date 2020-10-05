@@ -34,7 +34,7 @@ TEST_CASE("mprpc::exception") {
     }
 
     SECTION("throw an exception") {
-        constexpr auto code = mprpc::error_code::unexpected_error;
+        static constexpr auto code = mprpc::error_code::unexpected_error;
         const auto message = std::string("abc");
         const auto data_str = std::string("abc");
         const auto data = mprpc::message_data(data_str.data(), data_str.size());
