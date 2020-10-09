@@ -21,7 +21,7 @@
 
 #include <algorithm>
 #include <memory>
-#include <string>
+#include <vector>
 
 namespace mprpc {
 
@@ -37,7 +37,7 @@ public:
      * \param size size of the message data
      */
     message_data(const char* data, std::size_t size)
-        : data_(std::make_shared<std::string>(data, size)) {}
+        : data_(std::make_shared<std::vector<char>>(data, data + size)) {}
 
     /*!
      * \brief get pointer to the message data
@@ -55,7 +55,7 @@ public:
 
 private:
     //! message data
-    std::shared_ptr<std::string> data_;
+    std::shared_ptr<std::vector<char>> data_;
 };
 
 /*!
