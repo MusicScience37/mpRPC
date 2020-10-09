@@ -155,8 +155,7 @@ public:
 
     //! \copydoc mprpc::transport::session::remote_address
     std::shared_ptr<const address> remote_address() const override {
-        //! \todo implementation
-        return nullptr;
+        return std::make_shared<tcp_address>(socket_.remote_endpoint());
     }
 
 private:

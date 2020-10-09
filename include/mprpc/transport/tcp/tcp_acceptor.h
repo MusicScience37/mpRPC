@@ -31,6 +31,7 @@
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
 #include "mprpc/transport/parser.h"
+#include "mprpc/transport/tcp/tcp_address.h"
 #include "mprpc/transport/tcp/tcp_session.h"
 
 namespace mprpc {
@@ -100,8 +101,7 @@ public:
 
     //! \copydoc mprpc::transport::acceptor::local_address
     std::shared_ptr<const address> local_address() const override {
-        //! \todo implementation
-        return nullptr;
+        return std::make_shared<tcp_address>(socket_.local_endpoint());
     }
 
 private:

@@ -28,6 +28,7 @@
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/connector.h"
 #include "mprpc/transport/parser.h"
+#include "mprpc/transport/tcp/tcp_address.h"
 
 namespace mprpc {
 namespace transport {
@@ -176,14 +177,12 @@ public:
 
     //! \copydoc mprpc::transport::connector::local_address
     std::shared_ptr<const address> local_address() const override {
-        //! \todo implementation
-        return nullptr;
+        return std::make_shared<tcp_address>(socket_.local_endpoint());
     }
 
     //! \copydoc mprpc::transport::connector::remote_address
     std::shared_ptr<const address> remote_address() const override {
-        //! \todo implementation
-        return nullptr;
+        return std::make_shared<tcp_address>(socket_.remote_endpoint());
     }
 
 private:

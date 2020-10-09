@@ -74,6 +74,11 @@ TEST_CASE("mprpc::transport::tcp") {
         std::shared_ptr<mprpc::transport::session> session;
         REQUIRE_NOTHROW(session = session_future.get());
 
+        REQUIRE(connector->remote_address()->full_address() ==
+            acceptor->local_address()->full_address());
+        REQUIRE(connector->local_address()->full_address() ==
+            session->remote_address()->full_address());
+
         SECTION("client to server transport") {
             auto message_promise = std::promise<mprpc::message_data>();
             auto message_future = message_promise.get_future();
