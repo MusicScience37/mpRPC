@@ -148,13 +148,13 @@ private:
             if (err == asio::error::eof) {
                 MPRPC_INFO(logger_, "connection closed");
                 handler(error_info(error_code::eof, "connection closed"),
-                    message_data("", 0));
+                    message_data());
                 return;
             }
             MPRPC_ERROR(
                 logger_, "error reading from socket: {}", err.message());
             handler(error_info(error_code::failed_to_read, err.message()),
-                message_data("", 0));
+                message_data());
             return;
         }
 
@@ -194,7 +194,7 @@ private:
             }
         } catch (const exception& e) {
             MPRPC_ERROR(logger_, "{}", e.info());
-            handler(e.info(), message_data("", 0));
+            handler(e.info(), message_data());
             return true;
         }
         return false;
