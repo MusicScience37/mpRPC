@@ -125,7 +125,7 @@ private:
      * \param handler handler
      */
     void do_read_bytes(on_read_handler_type handler) {
-        static constexpr std::size_t buf_size = 128;
+        static constexpr std::size_t buf_size = 1024;
         parser_->prepare_buffer(buf_size);
         socket_.async_read_some(asio::buffer(parser_->buffer(), buf_size),
             [this, moved_handler = std::move(handler)](
