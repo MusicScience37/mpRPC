@@ -29,7 +29,7 @@
 
 namespace mprpc {
 namespace transport {
-namespace msgpack {
+namespace parsers {
 
 /*!
  * \brief class of parsers of messages with msgpack only
@@ -153,6 +153,6 @@ private:
     visitor visitor_{};
 };
 
-}  // namespace msgpack
+}  // namespace parsers
 }  // namespace transport
 }  // namespace mprpc
