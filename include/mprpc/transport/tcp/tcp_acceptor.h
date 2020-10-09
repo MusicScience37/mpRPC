@@ -43,26 +43,22 @@ namespace tcp {
  */
 class tcp_acceptor : public acceptor {
 public:
-    //! type of factories of parsers
-    using parser_factory_type =
-        std::function<std::shared_ptr<streaming_parser>()>;
-
     /*!
      * \brief construct
      *
      * \param logger logger
      * \param endpoint server endpoint
      * \param threads thread pool
-     * \param parser_factory factory of parsers
+     * \param parser_factory_ptr factory of parsers
      */
     tcp_acceptor(std::shared_ptr<mprpc::logging::logger> logger,
         const asio::ip::tcp::endpoint& endpoint,
         std::shared_ptr<mprpc::thread_pool> threads,
-        parser_factory_type parser_factory)
+        std::shared_ptr<parser_factory> parser_factory_ptr)
         : logger_(std::move(logger)),
           socket_(threads->context(), endpoint),
           threads_(std::move(threads)),
-          parser_factory_(std::move(parser_factory)) {
+          parser_factory_(std::move(parser_factory_ptr)) {
         MPRPC_INFO(logger_, "server started");
     }
 
@@ -95,8 +91,8 @@ public:
         }
 
         handler(error_info(),
-            std::make_shared<tcp_session>(
-                logger_, std::move(socket), threads_, parser_factory_()));
+            std::make_shared<tcp_session>(logger_, std::move(socket), threads_,
+                parser_factory_->create_streaming_parser(logger_)));
     }
 
     //! \copydoc mprpc::transport::acceptor::local_address
@@ -115,7 +111,7 @@ private:
     std::shared_ptr<mprpc::thread_pool> threads_;
 
     //! factory of parsers
-    parser_factory_type parser_factory_;
+    std::shared_ptr<parser_factory> parser_factory_;
 };
 
 }  // namespace tcp

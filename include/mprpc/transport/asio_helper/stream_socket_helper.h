@@ -110,7 +110,8 @@ private:
      *
      * \param handler handler
      */
-    void do_read_message(on_read_handler_type handler) {
+    void do_read_message(
+        on_read_handler_type handler) {  // NOLINT: false positive
         if (parse_next(handler, 0)) {
             return;
         }
@@ -141,7 +142,7 @@ private:
      * \param handler handler
      */
     void on_read_bytes(const asio::error_code& err, std::size_t num_bytes,
-        on_read_handler_type handler) {
+        on_read_handler_type handler) {  // NOLINT: false positive
         if (err) {
             if (err == asio::error::eof) {
                 MPRPC_INFO(logger_, "connection closed");

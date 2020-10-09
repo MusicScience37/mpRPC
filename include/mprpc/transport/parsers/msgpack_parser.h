@@ -153,6 +153,27 @@ private:
     visitor visitor_{};
 };
 
+/*!
+ * \brief class of factories of parsers using msgpack
+ */
+class msgpack_parser_factory : public parser_factory {
+public:
+    //! \copydoc mprpc::transport::parser_factory::create_parser
+    std::unique_ptr<parser> create_parser(
+        std::shared_ptr<logging::logger> logger) override {
+        return std::make_unique<msgpack_parser>(logger);
+    }
+
+    //! \copydoc mprpc::transport::parser_factory::create_streaming_parser
+    std::unique_ptr<streaming_parser> create_streaming_parser(
+        std::shared_ptr<logging::logger> logger) override {
+        return std::make_unique<msgpack_streaming_parser>(logger);
+    }
+
+    //! construct
+    msgpack_parser_factory() = default;
+};
+
 }  // namespace parsers
 }  // namespace transport
 }  // namespace mprpc

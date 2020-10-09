@@ -34,10 +34,8 @@ TEST_CASE("mprpc::transport::tcp") {
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 2);
     threads->start();
 
-    const auto parser_factory = [logger] {
-        return std::make_shared<
-            mprpc::transport::parsers::msgpack_streaming_parser>(logger);
-    };
+    const auto parser_factory =
+        std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
 
     // 127.0.0.1:3780
     constexpr std::uint16_t port = 3780;
@@ -67,7 +65,8 @@ TEST_CASE("mprpc::transport::tcp") {
         auto connector_socket = asio::ip::tcp::socket(threads->context());
         REQUIRE_NOTHROW(connector_socket.connect(endpoint));
         auto connector = std::make_shared<mprpc::transport::tcp::tcp_connector>(
-            logger, std::move(connector_socket), threads, parser_factory());
+            logger, std::move(connector_socket), threads,
+            parser_factory->create_streaming_parser(logger));
 
         REQUIRE(session_future.wait_for(wait_duration) ==
             std::future_status::ready);
