@@ -20,6 +20,7 @@
 #pragma once
 
 #include <cstdlib>
+#include <cstring>
 #include <limits>
 #include <new>
 
@@ -112,6 +113,21 @@ public:
         const std::size_t capacity = calculate_next_capacity(capacity_, size);
         data_ = reallocate(data_, capacity);
         capacity_ = capacity;
+    }
+
+    /*!
+     * \brief remove size bytes from beggining of the data
+     *
+     * \param size number of bytes removed
+     */
+    void consume(std::size_t size) noexcept {
+        if (size >= size_) {
+            size_ = 0;
+            return;
+        }
+        const std::size_t moved_size = size_ - size;
+        std::memmove(data_, data_ + size, moved_size);
+        size_ = moved_size;
     }
 
     /*!

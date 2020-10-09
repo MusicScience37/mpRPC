@@ -101,4 +101,21 @@ TEST_CASE("mprpc::buffer") {
         REQUIRE(buf.size() == 0);
         REQUIRE(buf.capacity() == capacity1);
     }
+
+    SECTION("consume") {
+        constexpr std::size_t size1 = 128;
+        mprpc::buffer buf{size1};
+        REQUIRE(buf.size() == size1);
+        for (std::size_t i = 0; i < size1; ++i) {
+            buf.data()[i] = static_cast<char>(i);
+        }
+        constexpr std::size_t consumed_size = 37;
+        constexpr std::size_t size2 = size1 - consumed_size;
+        buf.consume(consumed_size);
+        REQUIRE(buf.size() == size2);
+        for (std::size_t i = 0; i < size2; ++i) {
+            INFO("i = " << i);
+            REQUIRE(buf.data()[i] == static_cast<char>(i + consumed_size));
+        }
+    }
 }
