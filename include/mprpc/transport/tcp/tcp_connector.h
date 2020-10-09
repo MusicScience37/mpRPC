@@ -175,13 +175,13 @@ public:
     }
 
     //! \copydoc mprpc::transport::connector::local_address
-    std::shared_ptr<address> local_address() const override {
+    std::shared_ptr<const address> local_address() const override {
         //! \todo implementation
         return nullptr;
     }
 
     //! \copydoc mprpc::transport::connector::remote_address
-    std::shared_ptr<address> remote_address() const override {
+    std::shared_ptr<const address> remote_address() const override {
         //! \todo implementation
         return nullptr;
     }

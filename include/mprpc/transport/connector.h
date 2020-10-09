@@ -64,14 +64,14 @@ public:
      *
      * \return address of local endpoint
      */
-    virtual std::shared_ptr<address> local_address() const = 0;
+    virtual std::shared_ptr<const address> local_address() const = 0;
 
     /*!
      * \brief get the address of remote endpoint
      *
      * \return address of remote endpoint
      */
-    virtual std::shared_ptr<address> remote_address() const = 0;
+    virtual std::shared_ptr<const address> remote_address() const = 0;
 
     //! construct
     connector() noexcept = default;

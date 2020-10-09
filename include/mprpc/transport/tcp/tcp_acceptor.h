@@ -99,7 +99,7 @@ public:
     }
 
     //! \copydoc mprpc::transport::acceptor::local_address
-    std::shared_ptr<address> local_address() const override {
+    std::shared_ptr<const address> local_address() const override {
         //! \todo implementation
         return nullptr;
     }
