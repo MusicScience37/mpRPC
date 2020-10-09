@@ -32,7 +32,7 @@ namespace transport {
 /*!
  * \brief base class of sessions
  */
-class session : public std::enable_shared_from_this<session> {
+class session {
 public:
     //! type of handlers on reading a message
     using on_read_handler_type =

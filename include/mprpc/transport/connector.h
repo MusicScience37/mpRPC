@@ -33,9 +33,6 @@ namespace transport {
  */
 class connector {
 public:
-    //! type of handlers on connecting to a server
-    using on_connect_handler_type = std::function<void(const error_info&)>;
-
     //! type of handlers on reading a message
     using on_read_handler_type =
         std::function<void(const error_info&, const message_data&)>;
