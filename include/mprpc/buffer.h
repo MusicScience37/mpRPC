@@ -49,6 +49,16 @@ public:
     }
 
     /*!
+     * \brief construct
+     *
+     * \param data data to copy
+     * \param size data size
+     */
+    buffer(const char* data, std::size_t size) : buffer(size) {
+        std::memcpy(data_, data, size);
+    }
+
+    /*!
      * \brief get pointer
      *
      * \return pointer

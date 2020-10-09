@@ -63,6 +63,23 @@ TEST_CASE("mprpc::buffer") {
         REQUIRE(buf->capacity() == capacity);
     }
 
+    SECTION("construct with existing data") {
+        constexpr std::size_t size = 10000;
+        auto data_str = std::string(size, 'a');
+        data_str.back() = 'b';
+
+        std::shared_ptr<mprpc::buffer> buf;
+        REQUIRE_NOTHROW(buf = std::make_shared<mprpc::buffer>(
+                            data_str.data(), data_str.size()));
+        REQUIRE(buf->size() == size);
+        REQUIRE(buf->capacity() >= size);
+        for (std::size_t i = 0; i < size - 1; ++i) {
+            INFO("i = " << i);
+            REQUIRE(buf->data()[i] == 'a');
+        }
+        REQUIRE(buf->data()[size - 1] == 'b');
+    }
+
     SECTION("resize") {
         mprpc::buffer buf;
 
