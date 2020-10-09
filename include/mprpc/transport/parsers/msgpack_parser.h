@@ -56,6 +56,14 @@ public:
         }
     }
 
+    //! destruct
+    ~msgpack_parser() override = default;
+
+    msgpack_parser(const msgpack_parser&) = delete;
+    msgpack_parser(msgpack_parser&&) = delete;
+    msgpack_parser& operator=(const msgpack_parser&) = delete;
+    msgpack_parser& operator=(msgpack_parser&&) = delete;
+
 private:
     //! visitor
     class visitor : public ::msgpack::null_visitor {
@@ -124,6 +132,15 @@ public:
         parsed_buf_size_ = 0;
         return data;
     }
+
+    //! destruct
+    ~msgpack_streaming_parser() override = default;
+
+    msgpack_streaming_parser(const msgpack_streaming_parser&) = delete;
+    msgpack_streaming_parser(msgpack_streaming_parser&&) = delete;
+    msgpack_streaming_parser& operator=(
+        const msgpack_streaming_parser&) = delete;
+    msgpack_streaming_parser& operator=(msgpack_streaming_parser&&) = delete;
 
 private:
     //! visitor
