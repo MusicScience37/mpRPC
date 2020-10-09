@@ -24,6 +24,7 @@
 #include "mprpc/logging/logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/thread_pool.h"
+#include "mprpc/transport/asio_helper/basic_endpoint.h"
 #include "mprpc/transport/asio_helper/stream_socket_helper.h"
 #include "mprpc/transport/connector.h"
 #include "mprpc/transport/parser.h"
@@ -51,7 +52,9 @@ public:
         std::shared_ptr<streaming_parser> parser)
         : socket_helper_(logger, std::move(socket), std::move(threads),
               std::move(parser)) {
-        MPRPC_INFO(logger, "session created");
+        MPRPC_INFO(logger, "conencted {} to {}",
+            socket_helper_.socket().local_endpoint(),
+            socket_helper_.socket().remote_endpoint());
     }
 
     //! \copydoc mprpc::transport::connector::async_read

@@ -144,18 +144,19 @@ private:
         on_read_handler_type handler) {
         if (err) {
             if (err == asio::error::eof) {
-                MPRPC_INFO(logger_, "session closed");
-                handler(error_info(error_code::eof, "session closed"),
+                MPRPC_INFO(logger_, "connection closed");
+                handler(error_info(error_code::eof, "connection closed"),
                     message_data("", 0));
                 return;
             }
-            MPRPC_ERROR(logger_, err.message());
+            MPRPC_ERROR(
+                logger_, "error reading from socket: {}", err.message());
             handler(error_info(error_code::failed_to_read, err.message()),
                 message_data("", 0));
             return;
         }
 
-        MPRPC_TRACE(logger_, "read {} bytes", num_bytes);
+        MPRPC_TRACE(logger_, "received {} bytes", num_bytes);
 
         if (parse_next(handler, num_bytes)) {
             return;
@@ -175,8 +176,11 @@ private:
         const on_read_handler_type& handler, std::size_t num_bytes) {
         try {
             if (parser_->parse_next(num_bytes)) {
-                MPRPC_DEBUG(logger_, "parsed a message");
-                handler(error_info(), parser_->get());
+                auto message = parser_->get();
+                MPRPC_DEBUG(logger_, "received a message with {} bytes",
+                    message.size());
+                MPRPC_TRACE(logger_, "received message: {}", message);
+                handler(error_info(), message);
                 return true;
             }
         } catch (const exception& e) {
@@ -203,6 +207,7 @@ private:
         }
 
         MPRPC_DEBUG(logger_, "wrote a message with {} bytes", data.size());
+        MPRPC_TRACE(logger_, "written message: {}", data);
         handler(error_info());
     }
 
