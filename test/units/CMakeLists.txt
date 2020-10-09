@@ -15,5 +15,8 @@ add_executable(
     transport/mock/mock_acceptor_test.cpp
     transport/mock/mock_connector_test.cpp
     transport/mock/mock_address_test.cpp
-    transport/msgpack/msgpack_parser_test.cpp)
+    transport/parsers/msgpack_parser_test.cpp
+    transport/asio_helper/basic_endpoint_test.cpp
+    transport/tcp/tcp_address_test.cpp
+    transport/tcp/tcp_test.cpp)
 target_add_catch2(mprpc_test_units)

@@ -42,11 +42,6 @@ public:
      */
     explicit mock_connector(asio::io_context& context) : context_(context) {}
 
-    //! \copydoc mprpc::transport::connector::async_connect
-    void async_connect(on_connect_handler_type handler) final {
-        asio::post(context_, [handler] { handler(error_info()); });
-    }
-
     //! \copydoc mprpc::transport::session::async_read
     void async_read(on_read_handler_type handler) final {
         std::unique_lock<std::mutex> lock(mutex_);
@@ -92,12 +87,12 @@ public:
     }
 
     //! \copydoc mprpc::transport::connector::local_address
-    std::shared_ptr<address> local_address() const override {
+    std::shared_ptr<const address> local_address() const override {
         return std::make_shared<mock_address>();
     }
 
     //! \copydoc mprpc::transport::connector::remote_address
-    std::shared_ptr<address> remote_address() const override {
+    std::shared_ptr<const address> remote_address() const override {
         return std::make_shared<mock_address>();
     }
 

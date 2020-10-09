@@ -20,6 +20,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "mprpc/error_info.h"
 #include "mprpc/message_data.h"
@@ -61,7 +62,7 @@ public:
      *
      * \return address of remote endpoint
      */
-    virtual std::shared_ptr<address> remote_address() const = 0;
+    virtual std::shared_ptr<const address> remote_address() const = 0;
 
     //! construct
     session() noexcept = default;

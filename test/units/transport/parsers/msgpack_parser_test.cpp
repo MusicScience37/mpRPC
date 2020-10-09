@@ -17,7 +17,7 @@
  * \file
  * \brief test of msgpack_parser class
  */
-#include "mprpc/transport/msgpack/msgpack_parser.h"
+#include "mprpc/transport/parsers/msgpack_parser.h"
 
 #include <string>
 
@@ -25,10 +25,10 @@
 
 #include "../../create_logger.h"
 
-TEST_CASE("mprpc::transport::msgpack::msgpack_parser") {
-    auto logger = create_logger("mprpc::transport::msgpack::msgpack_parser");
+TEST_CASE("mprpc::transport::parsers::msgpack_parser") {
+    auto logger = create_logger("mprpc::transport::parsers::msgpack_parser");
 
-    using mprpc::transport::msgpack::msgpack_parser;
+    using mprpc::transport::parsers::msgpack_parser;
     msgpack_parser parser(logger);
 
     SECTION("parse a message") {
@@ -55,11 +55,11 @@ TEST_CASE("mprpc::transport::msgpack::msgpack_parser") {
     }
 }
 
-TEST_CASE("mprpc::transport::msgpack::msgpack_streaming_parser") {
+TEST_CASE("mprpc::transport::parsers::msgpack_streaming_parser") {
     auto logger =
-        create_logger("mprpc::transport::msgpack::msgpack_streaming_parser");
+        create_logger("mprpc::transport::parsers::msgpack_streaming_parser");
 
-    mprpc::transport::msgpack::msgpack_streaming_parser parser(logger);
+    mprpc::transport::parsers::msgpack_streaming_parser parser(logger);
 
     SECTION("parse a message") {
         const auto data_str = std::string({char(0x92), char(0x01), char(0x02)});

@@ -87,7 +87,7 @@ public:
     }
 
     //! \copydoc mprpc::transport::connector::remote_address
-    std::shared_ptr<address> remote_address() const override {
+    std::shared_ptr<const address> remote_address() const override {
         return std::make_shared<mock_address>();
     }
 

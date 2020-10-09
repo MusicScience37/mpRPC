@@ -1,5 +1,7 @@
 #pragma once
 
+#include <msgpack.hpp>
+
 #include "mprpc/generate_string.h"
 #include "mprpc/message_data.h"
 

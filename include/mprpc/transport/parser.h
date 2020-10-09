@@ -19,6 +19,8 @@
  */
 #pragma once
 
+#include <memory>
+
 #include "mprpc/exception.h"
 #include "mprpc/message_data.h"
 
@@ -99,6 +101,41 @@ public:
     streaming_parser(streaming_parser&&) = delete;
     streaming_parser& operator=(const streaming_parser&) = delete;
     streaming_parser& operator=(streaming_parser&&) = delete;
+};
+
+/*!
+ * \brief base class of factories of parsers
+ */
+class parser_factory {
+public:
+    /*!
+     * \brief create a parser without streaming
+     *
+     * \param logger logger
+     * \return parser
+     */
+    virtual std::unique_ptr<parser> create_parser(
+        std::shared_ptr<logging::logger> logger) = 0;
+
+    /*!
+     * \brief create a parser with streaming
+     *
+     * \param logger logger
+     * \return parser
+     */
+    virtual std::unique_ptr<streaming_parser> create_streaming_parser(
+        std::shared_ptr<logging::logger> logger) = 0;
+
+    //! construct
+    parser_factory() noexcept = default;
+
+    //! destruct
+    virtual ~parser_factory() = default;
+
+    parser_factory(const parser_factory&) = delete;
+    parser_factory(parser_factory&&) = delete;
+    parser_factory& operator=(const parser_factory&) = delete;
+    parser_factory& operator=(parser_factory&&) = delete;
 };
 
 }  // namespace transport

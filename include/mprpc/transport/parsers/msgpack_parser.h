@@ -29,7 +29,7 @@
 
 namespace mprpc {
 namespace transport {
-namespace msgpack {
+namespace parsers {
 
 /*!
  * \brief class of parsers of messages with msgpack only
@@ -55,6 +55,14 @@ public:
             throw;
         }
     }
+
+    //! destruct
+    ~msgpack_parser() override = default;
+
+    msgpack_parser(const msgpack_parser&) = delete;
+    msgpack_parser(msgpack_parser&&) = delete;
+    msgpack_parser& operator=(const msgpack_parser&) = delete;
+    msgpack_parser& operator=(msgpack_parser&&) = delete;
 
 private:
     //! visitor
@@ -125,6 +133,15 @@ public:
         return data;
     }
 
+    //! destruct
+    ~msgpack_streaming_parser() override = default;
+
+    msgpack_streaming_parser(const msgpack_streaming_parser&) = delete;
+    msgpack_streaming_parser(msgpack_streaming_parser&&) = delete;
+    msgpack_streaming_parser& operator=(
+        const msgpack_streaming_parser&) = delete;
+    msgpack_streaming_parser& operator=(msgpack_streaming_parser&&) = delete;
+
 private:
     //! visitor
     class visitor : public ::msgpack::null_visitor {
@@ -153,6 +170,27 @@ private:
     visitor visitor_{};
 };
 
-}  // namespace msgpack
+/*!
+ * \brief class of factories of parsers using msgpack
+ */
+class msgpack_parser_factory : public parser_factory {
+public:
+    //! \copydoc mprpc::transport::parser_factory::create_parser
+    std::unique_ptr<parser> create_parser(
+        std::shared_ptr<logging::logger> logger) override {
+        return std::make_unique<msgpack_parser>(logger);
+    }
+
+    //! \copydoc mprpc::transport::parser_factory::create_streaming_parser
+    std::unique_ptr<streaming_parser> create_streaming_parser(
+        std::shared_ptr<logging::logger> logger) override {
+        return std::make_unique<msgpack_streaming_parser>(logger);
+    }
+
+    //! construct
+    msgpack_parser_factory() = default;
+};
+
+}  // namespace parsers
 }  // namespace transport
 }  // namespace mprpc
