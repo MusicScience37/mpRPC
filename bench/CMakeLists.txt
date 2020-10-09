@@ -26,3 +26,4 @@ endmacro()
 
 add_subdirectory(parser)
 add_subdirectory(transport)
+add_subdirectory(buffer)

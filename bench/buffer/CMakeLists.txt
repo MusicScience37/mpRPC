@@ -1,0 +1,2 @@
+add_executable(mprpc_bench_buffer buffer_test.cpp)
+add_mprpc_bench(mprpc_bench_buffer)

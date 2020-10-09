@@ -75,6 +75,13 @@ public:
     virtual char* buffer() = 0;
 
     /*!
+     * \brief set some bytes in the buffer to be consumed
+     *
+     * \param consumed_buf_size consumed buffer size
+     */
+    virtual void consumed(std::size_t consumed_buf_size) = 0;
+
+    /*!
      * \brief parse next message
      *
      * \param consumed_buf_size size of consumed buffer

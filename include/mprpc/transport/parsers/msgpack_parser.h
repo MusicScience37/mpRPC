@@ -19,10 +19,9 @@
  */
 #pragma once
 
-#include <vector>
-
 #include <msgpack.hpp>
 
+#include "mprpc/buffer.h"
 #include "mprpc/logging/logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/transport/parser.h"
@@ -105,12 +104,17 @@ public:
     }
 
     //! \copydoc mprpc::transport::streaming_parser::buffer
-    char* buffer() override { return &buffer_[consumed_buf_size_]; }
+    char* buffer() override { return buffer_.data() + consumed_buf_size_; }
+
+    //! \copydoc mprpc::transport::streaming_parser::consumed
+    void consumed(std::size_t consumed_buf_size) override {
+        consumed_buf_size_ += consumed_buf_size;
+    }
 
     //! \copydoc mprpc::transport::streaming_parser::parse_next
     bool parse_next(std::size_t consumed_buf_size) override {
+        consumed(consumed_buf_size);
         try {
-            consumed_buf_size_ += consumed_buf_size;
             std::size_t offset = 0;
             bool parse_result = ::msgpack::parse(
                 buffer_.data(), consumed_buf_size_, offset, visitor_);
@@ -127,7 +131,7 @@ public:
     //! \copydoc mprpc::transport::streaming_parser::get
     message_data get() override {
         auto data = message_data(buffer_.data(), parsed_buf_size_);
-        buffer_.erase(buffer_.begin(), buffer_.begin() + parsed_buf_size_);
+        buffer_.consume(parsed_buf_size_);
         consumed_buf_size_ -= parsed_buf_size_;
         parsed_buf_size_ = 0;
         return data;
@@ -158,7 +162,7 @@ private:
     std::shared_ptr<logging::logger> logger_;
 
     //! buffer
-    std::vector<char> buffer_{};
+    mprpc::buffer buffer_{};
 
     //! size of consumed buffer
     std::size_t consumed_buf_size_{0};

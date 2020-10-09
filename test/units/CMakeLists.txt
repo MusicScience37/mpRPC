@@ -6,6 +6,7 @@ add_executable(
     logging/logging_macros_test.cpp
     logging/spdlog_logger_test.cpp
     create_logger.cpp
+    buffer_test.cpp
     message_data_test.cpp
     error_info_test.cpp
     exception_test.cpp

@@ -97,6 +97,17 @@ TEST_CASE("mprpc::transport::parsers::msgpack_streaming_parser") {
         REQUIRE(parser.get() == data);
     }
 
+    SECTION("parse a message using consumed()") {
+        const auto data_str = std::string({char(0x92), char(0x01), char(0x02)});
+        const auto data = mprpc::message_data(data_str.data(), data_str.size());
+
+        parser.prepare_buffer(data.size() + 2);
+        std::copy(data.data(), data.data() + data.size(), parser.buffer());
+        REQUIRE_NOTHROW(parser.consumed(data.size() + 1));
+        REQUIRE(parser.parse_next(0));
+        REQUIRE(parser.get() == data);
+    }
+
     SECTION("parse error") {
         const auto data_str = std::string({char(0xC1)});
         const auto data = mprpc::message_data(data_str.data(), data_str.size());
