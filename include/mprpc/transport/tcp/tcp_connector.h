@@ -20,12 +20,11 @@
 #pragma once
 
 #include <asio/ip/tcp.hpp>
-#include <asio/write.hpp>
 
-#include "mprpc/exception.h"
 #include "mprpc/logging/logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/thread_pool.h"
+#include "mprpc/transport/asio_helper/stream_socket_helper.h"
 #include "mprpc/transport/connector.h"
 #include "mprpc/transport/parser.h"
 #include "mprpc/transport/tcp/tcp_address.h"
@@ -47,156 +46,40 @@ public:
      * \param threads thread pool
      * \param parser parser
      */
-    tcp_connector(std::shared_ptr<logging::logger> logger,
+    tcp_connector(const std::shared_ptr<logging::logger>& logger,
         asio::ip::tcp::socket socket, std::shared_ptr<thread_pool> threads,
         std::shared_ptr<streaming_parser> parser)
-        : logger_(std::move(logger)),
-          socket_(std::move(socket)),
-          threads_(std::move(threads)),
-          parser_(std::move(parser)) {
-        MPRPC_INFO(logger_, "session created");
+        : socket_helper_(logger, std::move(socket), std::move(threads),
+              std::move(parser)) {
+        MPRPC_INFO(logger, "session created");
     }
 
     //! \copydoc mprpc::transport::connector::async_read
     void async_read(on_read_handler_type handler) override {
-        threads_->post([this, moved_handler = std::move(handler)]() mutable {
-            this->do_read_message(std::move(moved_handler));
-        });
-    }
-
-    /*!
-     * \brief read a message
-     *
-     * \param handler handler
-     */
-    void do_read_message(on_read_handler_type handler) {
-        if (parse_next(handler, 0)) {
-            return;
-        }
-
-        do_read_bytes(std::move(handler));
-    }
-
-    /*!
-     * \brief read some bytes
-     *
-     * \param handler handler
-     */
-    void do_read_bytes(on_read_handler_type handler) {
-        static constexpr std::size_t buf_size = 128;
-        parser_->prepare_buffer(buf_size);
-        socket_.async_read_some(asio::buffer(parser_->buffer(), buf_size),
-            [this, moved_handler = std::move(handler)](
-                const asio::error_code& err, std::size_t num_bytes) mutable {
-                this->on_read_bytes(err, num_bytes, std::move(moved_handler));
-            });
-    }
-
-    /*!
-     * \brief process on read some bytes
-     *
-     * \param err error code
-     * \param num_bytes number of bytes read
-     * \param handler handler
-     */
-    void on_read_bytes(const asio::error_code& err, std::size_t num_bytes,
-        on_read_handler_type handler) {
-        if (err) {
-            if (err == asio::error::eof) {
-                MPRPC_INFO(logger_, "session closed");
-                handler(error_info(error_code::eof, "session closed"),
-                    message_data("", 0));
-                return;
-            }
-            MPRPC_ERROR(logger_, err.message());
-            handler(error_info(error_code::failed_to_read, err.message()),
-                message_data("", 0));
-            return;
-        }
-
-        MPRPC_TRACE(logger_, "read {} bytes", num_bytes);
-
-        if (parse_next(handler, num_bytes)) {
-            return;
-        }
-
-        do_read_bytes(std::move(handler));
-    }
-
-    /*!
-     * \brief parse next message
-     *
-     * \param handler handler
-     * \param num_bytes number of bytes
-     * \return whether to finish the process
-     */
-    bool parse_next(
-        const on_read_handler_type& handler, std::size_t num_bytes) {
-        try {
-            if (parser_->parse_next(num_bytes)) {
-                MPRPC_DEBUG(logger_, "parsed a message");
-                handler(error_info(), parser_->get());
-                return true;
-            }
-        } catch (const exception& e) {
-            MPRPC_ERROR(logger_, "{}", e.info());
-            handler(e.info(), message_data("", 0));
-            return true;
-        }
-        return false;
+        socket_helper_.async_read(std::move(handler));
     }
 
     //! \copydoc mprpc::transport::connector::async_write
     void async_write(
         const message_data& data, on_write_handler_type handler) override {
-        asio::async_write(socket_, asio::buffer(data.data(), data.size()),
-            [this, data, moved_handler = std::move(handler)](
-                const asio::error_code& error, std::size_t /*num_bytes*/) {
-                this->on_write(error, data, moved_handler);
-            });
-    }
-
-    /*!
-     * \brief process on a message written
-     *
-     * \param error error
-     * \param data data
-     * \param handler handler
-     */
-    void on_write(const asio::error_code& error, const message_data& data,
-        const on_write_handler_type& handler) {
-        if (error) {
-            MPRPC_ERROR(logger_, error.message());
-            handler(error_info(error_code::failed_to_write, error.message()));
-            return;
-        }
-
-        MPRPC_DEBUG(logger_, "wrote a message with {} bytes", data.size());
-        handler(error_info());
+        socket_helper_.async_write(data, std::move(handler));
     }
 
     //! \copydoc mprpc::transport::connector::local_address
     std::shared_ptr<const address> local_address() const override {
-        return std::make_shared<tcp_address>(socket_.local_endpoint());
+        return std::make_shared<tcp_address>(
+            socket_helper_.socket().local_endpoint());
     }
 
     //! \copydoc mprpc::transport::connector::remote_address
     std::shared_ptr<const address> remote_address() const override {
-        return std::make_shared<tcp_address>(socket_.remote_endpoint());
+        return std::make_shared<tcp_address>(
+            socket_helper_.socket().remote_endpoint());
     }
 
 private:
-    //! logger
-    std::shared_ptr<logging::logger> logger_;
-
-    //! socket
-    asio::ip::tcp::socket socket_;
-
-    //! thread pool
-    std::shared_ptr<thread_pool> threads_;
-
-    //! parser of messages
-    std::shared_ptr<streaming_parser> parser_;
+    //! socket helper
+    asio_helper::stream_socket_helper<asio::ip::tcp::socket> socket_helper_;
 };
 
 }  // namespace tcp
