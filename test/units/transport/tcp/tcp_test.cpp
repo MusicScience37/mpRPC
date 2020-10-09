@@ -112,4 +112,6 @@ TEST_CASE("mprpc::transport::tcp") {
             REQUIRE_NOTHROW(result_future.get());
         }
     }
+
+    REQUIRE_NOTHROW(threads->stop());
 }
