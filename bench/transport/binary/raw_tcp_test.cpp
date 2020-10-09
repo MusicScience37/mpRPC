@@ -130,8 +130,9 @@ static void transport_binary_raw_tcp(benchmark::State& state) {
 
     try {
         auto server = tcp_server(logger, endpoint, threads, size);
-        const auto wait_duration = std::chrono::milliseconds(100);
         server.start();
+
+        const auto wait_duration = std::chrono::milliseconds(100);
         std::this_thread::sleep_for(wait_duration);
 
         auto client = asio::ip::tcp::socket(threads->context());
