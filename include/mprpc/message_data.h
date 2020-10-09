@@ -32,6 +32,11 @@ class message_data {
 public:
     /*!
      * \brief construct
+     */
+    message_data() = default;
+
+    /*!
+     * \brief construct
      *
      * \param data pointer to the message data
      * \param size size of the message data
@@ -55,7 +60,8 @@ public:
 
 private:
     //! message data
-    std::shared_ptr<std::vector<char>> data_;
+    std::shared_ptr<std::vector<char>> data_{
+        std::make_shared<std::vector<char>>()};
 };
 
 /*!

@@ -29,11 +29,16 @@
 TEST_CASE("mprpc::message_data") {
     SECTION("default functions") {
         using test_type = mprpc::message_data;
-        STATIC_REQUIRE_FALSE(std::is_default_constructible<test_type>::value);
+        STATIC_REQUIRE(std::is_default_constructible<test_type>::value);
         STATIC_REQUIRE(std::is_nothrow_copy_constructible<test_type>::value);
         STATIC_REQUIRE(std::is_nothrow_copy_assignable<test_type>::value);
         STATIC_REQUIRE(std::is_nothrow_move_constructible<test_type>::value);
         STATIC_REQUIRE(std::is_nothrow_move_assignable<test_type>::value);
+    }
+
+    SECTION("default construct") {
+        const auto data = mprpc::message_data();
+        REQUIRE(data.size() == 0);
     }
 
     SECTION("construct and get with pointer and size") {
