@@ -79,15 +79,26 @@ TEST_CASE("mprpc::buffer") {
         REQUIRE(buf.size() == size2);
         REQUIRE(buf.capacity() == capacity2);
         REQUIRE(buf.data()[size1 - 1] == test_byte);
+
+        constexpr std::size_t size3 = 1000;
+        buf.resize(size3);
+        REQUIRE(buf.size() == size3);
+        REQUIRE(buf.capacity() == capacity2);
+        REQUIRE(buf.data()[size1 - 1] == test_byte);
     }
 
     SECTION("reserve") {
         mprpc::buffer buf;
 
-        constexpr std::size_t required_capacity = 10000;
-        constexpr std::size_t capacity = 16384;
-        buf.reserve(required_capacity);
+        constexpr std::size_t required_capacity1 = 10000;
+        constexpr std::size_t capacity1 = 16384;
+        buf.reserve(required_capacity1);
         REQUIRE(buf.size() == 0);
-        REQUIRE(buf.capacity() == capacity);
+        REQUIRE(buf.capacity() == capacity1);
+
+        constexpr std::size_t required_capacity2 = 1000;
+        buf.reserve(required_capacity2);
+        REQUIRE(buf.size() == 0);
+        REQUIRE(buf.capacity() == capacity1);
     }
 }
