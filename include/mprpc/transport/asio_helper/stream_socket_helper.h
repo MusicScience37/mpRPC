@@ -125,7 +125,8 @@ private:
      * \param handler handler
      */
     void do_read_bytes(on_read_handler_type handler) {
-        static constexpr std::size_t buf_size = 1024;
+        static constexpr std::size_t min_buf_size = 1024;
+        const auto buf_size = std::max(min_buf_size, socket_.available());
         parser_->prepare_buffer(buf_size);
         socket_.async_read_some(asio::buffer(parser_->buffer(), buf_size),
             [this, moved_handler = std::move(handler)](
@@ -159,9 +160,16 @@ private:
 
         MPRPC_TRACE(logger_, "received {} bytes", num_bytes);
 
-        if (parse_next(handler, num_bytes)) {
-            return;
+        if (socket_.available() == 0) {
+            MPRPC_TRACE(
+                logger_, "no data available currently, so prase data once");
+            if (parse_next(handler, num_bytes)) {
+                return;
+            }
+        } else {
+            parser_->consumed(num_bytes);
         }
+        MPRPC_TRACE(logger_, "read more bytes");
 
         do_read_bytes(std::move(handler));
     }

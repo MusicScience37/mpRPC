@@ -106,10 +106,15 @@ public:
     //! \copydoc mprpc::transport::streaming_parser::buffer
     char* buffer() override { return buffer_.data() + consumed_buf_size_; }
 
+    //! \copydoc mprpc::transport::streaming_parser::consumed
+    void consumed(std::size_t consumed_buf_size) override {
+        consumed_buf_size_ += consumed_buf_size;
+    }
+
     //! \copydoc mprpc::transport::streaming_parser::parse_next
     bool parse_next(std::size_t consumed_buf_size) override {
+        consumed(consumed_buf_size);
         try {
-            consumed_buf_size_ += consumed_buf_size;
             std::size_t offset = 0;
             bool parse_result = ::msgpack::parse(
                 buffer_.data(), consumed_buf_size_, offset, visitor_);
