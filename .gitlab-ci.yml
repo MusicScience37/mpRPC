@@ -16,7 +16,7 @@ line count:
   extends: .retry setting
   stage: Check
   dependencies: []
-  image: registry.gitlab.com/musicscience37_ci/cloc-docker:v1-1
+  image: registry.gitlab.com/musicscience37_ci/cloc-docker:v1-2
   script:
     - mkdir -p line_count
     - cloc ./
@@ -32,7 +32,7 @@ static analysis:
   extends: .retry setting
   stage: Check
   dependencies: []
-  image: musicscience37/clang-ci:clang10-v2.1
+  image: musicscience37/clang-ci:clang10-v2.2
   before_script:
     - pip3 install junit2html
     - mkdir build_static_analysis
@@ -69,8 +69,6 @@ static analysis:
     - pip3 install -r requirements.txt
     - pip3 install junitparser junit2html
     - chmod +xr /usr/local/bin/junitparser
-    - apt update
-    - apt install -y valgrind
   script:
     - mkdir $BUILD_DIR
     - cmake -S ./ -B $BUILD_DIR
@@ -94,7 +92,7 @@ static analysis:
 clang coverage:
   extends: .release-test-base
   stage: Test with Clang
-  image: musicscience37/clang-ci:clang10-v2.1
+  image: musicscience37/clang-ci:clang10-v2.2
   variables:
     BUILD_DIR: build_clang_coverage
   script:
@@ -117,7 +115,7 @@ clang coverage:
 gcc coverage:
   extends: .release-test-base
   stage: Test with GCC
-  image: musicscience37/gcc-ci:gcc10-v2.1
+  image: musicscience37/gcc-ci:gcc10-v2.2
   variables:
     BUILD_DIR: build_gcc_coverage
   script:
@@ -139,7 +137,7 @@ gcc coverage:
 gcc-10:
   extends: .release-test-base
   stage: Test with GCC
-  image: musicscience37/gcc-ci:gcc10-v2.1
+  image: musicscience37/gcc-ci:gcc10-v2.2
   variables:
     BUILD_DIR: build_gcc10
 
@@ -148,7 +146,7 @@ doc:
   stage: Build Documentation
   needs: ["line count"]
   dependencies: []
-  image: musicscience37/sphinx-doxygen:v-2.1
+  image: musicscience37/sphinx-doxygen:v-2.2
   before_script:
     - pip3 install -r requirements.txt
   script:
