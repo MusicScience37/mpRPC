@@ -77,6 +77,35 @@ public:
     }
 
     /*!
+     * \brief asynchronously write a message
+     *
+     * \param data message data
+     * \param handler handler
+     */
+    void async_write(const message_data& data, on_write_handler_type handler) {
+        asio::async_write(socket_, asio::buffer(data.data(), data.size()),
+            [this, data, moved_handler = std::move(handler)](
+                const asio::error_code& error, std::size_t /*num_bytes*/) {
+                this->on_write(error, data, moved_handler);
+            });
+    }
+
+    /*!
+     * \brief access to socket
+     *
+     * \return socket
+     */
+    socket_type& socket() { return socket_; }
+
+    /*!
+     * \brief access to socket
+     *
+     * \return socket
+     */
+    const socket_type& socket() const { return socket_; }
+
+private:
+    /*!
      * \brief read a message
      *
      * \param handler handler
@@ -159,20 +188,6 @@ public:
     }
 
     /*!
-     * \brief asynchronously write a message
-     *
-     * \param data message data
-     * \param handler handler
-     */
-    void async_write(const message_data& data, on_write_handler_type handler) {
-        asio::async_write(socket_, asio::buffer(data.data(), data.size()),
-            [this, data, moved_handler = std::move(handler)](
-                const asio::error_code& error, std::size_t /*num_bytes*/) {
-                this->on_write(error, data, moved_handler);
-            });
-    }
-
-    /*!
      * \brief process on a message written
      *
      * \param error error
@@ -191,21 +206,6 @@ public:
         handler(error_info());
     }
 
-    /*!
-     * \brief access to socket
-     *
-     * \return socket
-     */
-    socket_type& socket() { return socket_; }
-
-    /*!
-     * \brief access to socket
-     *
-     * \return socket
-     */
-    const socket_type& socket() const { return socket_; }
-
-private:
     //! logger
     std::shared_ptr<logging::logger> logger_;
 
