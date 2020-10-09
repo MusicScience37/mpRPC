@@ -137,7 +137,7 @@ gcc coverage:
 gcc-10:
   extends: .release-test-base
   stage: Test with GCC
-  image: musicscience37/gcc-ci:gcc10-v2.1
+  image: musicscience37/gcc-ci:gcc10-v2.2
   variables:
     BUILD_DIR: build_gcc10
 
