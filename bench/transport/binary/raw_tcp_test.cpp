@@ -123,7 +123,7 @@ static void transport_binary_raw_tcp(benchmark::State& state) {
     const auto data = mprpc::generate_binary(size);
     auto read_data = std::vector<char>(size);
 
-    // server address: 0.0.0.0:3780
+    // server address: 127.0.0.1:3780
     constexpr std::uint16_t port = 3780;
     const auto endpoint =
         asio::ip::tcp::endpoint(asio::ip::address_v4::loopback(), port);

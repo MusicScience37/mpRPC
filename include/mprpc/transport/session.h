@@ -20,6 +20,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "mprpc/error_info.h"
 #include "mprpc/message_data.h"
@@ -31,7 +32,7 @@ namespace transport {
 /*!
  * \brief base class of sessions
  */
-class session {
+class session : public std::enable_shared_from_this<session> {
 public:
     //! type of handlers on reading a message
     using on_read_handler_type =

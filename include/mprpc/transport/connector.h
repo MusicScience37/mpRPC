@@ -44,13 +44,6 @@ public:
     using on_write_handler_type = std::function<void(const error_info&)>;
 
     /*!
-     * \brief asynchronously connect to a server
-     *
-     * \param handler handler
-     */
-    virtual void async_connect(on_connect_handler_type handler) = 0;
-
-    /*!
      * \brief asynchronously read a message
      *
      * \param handler handler

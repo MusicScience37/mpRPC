@@ -48,6 +48,15 @@ enum message_errors : error_code_t {
     parse_error = 100  //!< parse error
 };
 
+/*!
+ * \brief enumeration of network-related error codes
+ */
+enum network_errors : error_code_t {
+    eof = 200,       //!< end of file
+    failed_to_read,  //!< failed to read data
+    failed_to_write  //!< failed to write data
+};
+
 }  // namespace error_code
 
 }  // namespace mprpc
