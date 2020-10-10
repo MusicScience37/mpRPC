@@ -82,4 +82,6 @@ TEST_CASE("mprpc::server") {
         REQUIRE(response.has_error() == false);
         REQUIRE(response.result_as<int>() == integer);
     }
+
+    threads->stop();
 }

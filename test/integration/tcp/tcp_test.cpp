@@ -111,4 +111,6 @@ TEST_CASE("RPC on TCP") {
         REQUIRE(response.has_error() == false);
         REQUIRE(response.result_as<std::string>() == str);
     }
+
+    threads->stop();
 }
