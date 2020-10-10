@@ -25,6 +25,8 @@
 #include <msgpack.hpp>
 
 #include "mprpc/exception.h"
+#include "mprpc/format_message.h"
+#include "mprpc/logging/log_data_traits.h"
 #include "mprpc/message_def.h"
 #include "mprpc/pack_data.h"
 
@@ -194,6 +196,13 @@ public:
         }
     }
 
+    /*!
+     * \brief get object
+     *
+     * \return object
+     */
+    const msgpack::object& object() const noexcept { return *(data_->handle); }
+
 private:
     /*!
      * \brief parse an object
@@ -350,5 +359,53 @@ private:
     //! data
     std::shared_ptr<inner_data> data_{std::make_shared<inner_data>()};
 };
+
+namespace logging {
+
+/*!
+ * \brief log_data_traits for msgpack::object class
+ */
+template <>
+struct log_data_traits<msgpack::object> {
+    /*!
+     * \brief preprocess data
+     *
+     * \param data data
+     * \return formatted data
+     */
+    static std::string preprocess(const msgpack::object& data) noexcept {
+        return format_message(pack_data(data));
+    }
+};
+
+/*!
+ * \brief log_data_traits for message class
+ */
+template <>
+struct log_data_traits<message> {
+    /*!
+     * \brief preprocess data
+     *
+     * \param data data
+     * \return formatted data
+     */
+    static std::string preprocess(const message& data) noexcept {
+        return format_message(pack_data(data.object()));
+    }
+};
+
+}  // namespace logging
+
+/*!
+ * \brief output data to a stream
+ *
+ * \param stream stream
+ * \param data data
+ * \return stream
+ */
+inline std::ostream& operator<<(std::ostream& stream, const message& data) {
+    stream << logging::log_data_traits<message>::preprocess(data);
+    return stream;
+}
 
 }  // namespace mprpc
