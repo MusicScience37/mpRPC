@@ -45,7 +45,8 @@ enum common_errors : error_code_t {
  * \brief enumeration of message-related error codes
  */
 enum message_errors : error_code_t {
-    parse_error = 100  //!< parse error
+    parse_error = 100,  //!< parse error
+    invalid_message     //!< invalid message
 };
 
 /*!
