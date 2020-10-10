@@ -19,6 +19,11 @@
  */
 #pragma once
 
+#include <queue>
+
+#include <asio/bind_executor.hpp>
+#include <asio/post.hpp>
+#include <asio/strand.hpp>
 #include <asio/write.hpp>
 
 #include "mprpc/exception.h"
@@ -58,11 +63,12 @@ public:
      * \param parser parser
      */
     stream_socket_helper(std::shared_ptr<logging::logger> logger,
-        socket_type socket, std::shared_ptr<thread_pool> threads,
+        socket_type socket, const std::shared_ptr<thread_pool>& threads,
         std::shared_ptr<streaming_parser> parser)
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
-          threads_(std::move(threads)),
+          threads_(threads),
+          strand_(asio::make_strand(threads->context())),
           parser_(std::move(parser)) {}
 
     /*!
@@ -71,9 +77,10 @@ public:
      * \param handler handler
      */
     void async_read(on_read_handler_type handler) {
-        threads_->post([this, moved_handler = std::move(handler)]() mutable {
-            this->do_read_message(std::move(moved_handler));
-        });
+        asio::post(
+            strand_, [this, moved_handler = std::move(handler)]() mutable {
+                this->do_read_message(std::move(moved_handler));
+            });
     }
 
     /*!
@@ -83,19 +90,11 @@ public:
      * \param handler handler
      */
     void async_write(const message_data& data, on_write_handler_type handler) {
-        asio::async_write(socket_, asio::buffer(data.data(), data.size()),
-            [this, data, moved_handler = std::move(handler)](
-                const asio::error_code& error, std::size_t /*num_bytes*/) {
-                this->on_write(error, data, moved_handler);
+        asio::post(
+            strand_, [this, data, move_handler = std::move(handler)]() mutable {
+                this->add_message_to_write(data, std::move(move_handler));
             });
     }
-
-    /*!
-     * \brief access to socket
-     *
-     * \return socket
-     */
-    socket_type& socket() { return socket_; }
 
     /*!
      * \brief access to socket
@@ -129,10 +128,13 @@ private:
         const auto buf_size = std::max(min_buf_size, socket_.available());
         parser_->prepare_buffer(buf_size);
         socket_.async_read_some(asio::buffer(parser_->buffer(), buf_size),
-            [this, moved_handler = std::move(handler)](
-                const asio::error_code& err, std::size_t num_bytes) mutable {
-                this->on_read_bytes(err, num_bytes, std::move(moved_handler));
-            });
+            asio::bind_executor(strand_,
+                [this, moved_handler = std::move(handler)](
+                    const asio::error_code& err,
+                    std::size_t num_bytes) mutable {
+                    this->on_read_bytes(
+                        err, num_bytes, std::move(moved_handler));
+                }));
     }
 
     /*!
@@ -201,14 +203,41 @@ private:
     }
 
     /*!
-     * \brief process on a message written
+     * \brief add a message to write
      *
-     * \param error error
      * \param data data
      * \param handler handler
      */
-    void on_write(const asio::error_code& error, const message_data& data,
-        const on_write_handler_type& handler) {
+    void add_message_to_write(
+        const message_data& data, on_write_handler_type handler) {
+        MPRPC_TRACE(logger_, "add a message to write");
+        bool start_writing = writing_queue_.empty();
+        writing_queue_.emplace(data, std::move(handler));
+        if (start_writing) {
+            do_write();
+        }
+    }
+
+    /*!
+     * \brief write a message
+     */
+    void do_write() {
+        const auto& data = writing_queue_.front().first;
+        MPRPC_TRACE(logger_, "starting to write a message");
+        asio::async_write(socket_, asio::buffer(data.data(), data.size()),
+            asio::bind_executor(strand_,
+                [this](const asio::error_code& error,
+                    std::size_t /*num_bytes*/) { this->on_write(error); }));
+    }
+
+    /*!
+     * \brief process on a message written
+     *
+     * \param error error
+     */
+    void on_write(const asio::error_code& error) {
+        const auto& data = writing_queue_.front().first;
+        const auto& handler = writing_queue_.front().second;
         if (error) {
             MPRPC_ERROR(logger_, error.message());
             handler(error_info(error_code::failed_to_write, error.message()));
@@ -218,6 +247,12 @@ private:
         MPRPC_DEBUG(logger_, "wrote a message with {} bytes", data.size());
         MPRPC_TRACE(logger_, "written message: {}", data);
         handler(error_info());
+
+        writing_queue_.pop();
+        if (writing_queue_.empty()) {
+            return;
+        }
+        do_write();
     }
 
     //! logger
@@ -228,6 +263,12 @@ private:
 
     //! thread pool
     std::shared_ptr<thread_pool> threads_;
+
+    //! strand
+    asio::strand<asio::io_context::executor_type> strand_;
+
+    //! queue of messages to be written
+    std::queue<std::pair<message_data, on_write_handler_type>> writing_queue_{};
 
     //! parser of messages
     std::shared_ptr<streaming_parser> parser_;
