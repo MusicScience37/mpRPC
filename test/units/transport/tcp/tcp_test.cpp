@@ -68,7 +68,7 @@ TEST_CASE("mprpc::transport::tcp") {
             logger, std::move(connector_socket), threads,
             parser_factory->create_streaming_parser(logger));
 
-        const auto timeout = std::chrono::seconds(5);
+        const auto timeout = std::chrono::seconds(15);
         REQUIRE(session_future.wait_for(timeout) == std::future_status::ready);
         std::shared_ptr<mprpc::transport::session> session;
         REQUIRE_NOTHROW(session = session_future.get());
@@ -79,6 +79,7 @@ TEST_CASE("mprpc::transport::tcp") {
             session->remote_address()->full_address());
 
         SECTION("client to server transport") {
+            MPRPC_INFO(logger, "client to server transport");
             auto message_promise = std::promise<mprpc::message_data>();
             auto message_future = message_promise.get_future();
             session->async_read(
@@ -117,6 +118,7 @@ TEST_CASE("mprpc::transport::tcp") {
         }
 
         SECTION("client to server transport twice") {
+            MPRPC_INFO(logger, "client to server transport twice");
             auto message_promise = std::promise<mprpc::message_data>();
             auto message_future = message_promise.get_future();
             session->async_read(
@@ -147,6 +149,45 @@ TEST_CASE("mprpc::transport::tcp") {
             REQUIRE(
                 message_future.wait_for(timeout) == std::future_status::ready);
             REQUIRE(message_future.get() == data);
+        }
+
+        SECTION("server to client transport with large data") {
+            MPRPC_INFO(logger, "server to client transport with large data");
+            auto message_promise = std::promise<mprpc::message_data>();
+            auto message_future = message_promise.get_future();
+            connector->async_read(
+                [&message_promise](const mprpc::error_info& error,
+                    const mprpc::message_data& message) {
+                    if (error) {
+                        message_promise.set_exception(
+                            std::make_exception_ptr(mprpc::exception(error)));
+                    } else {
+                        message_promise.set_value(message);
+                    }
+                });
+
+            auto result_promise = std::promise<void>();
+            auto result_future = result_promise.get_future();
+            const auto str = std::string(1024 * 1024, 'a');
+            msgpack::sbuffer buf;
+            msgpack::pack(buf, str);
+            const auto data = mprpc::message_data(buf.data(), buf.size());
+            session->async_write(
+                data, [&result_promise](const mprpc::error_info& error) {
+                    if (error) {
+                        result_promise.set_exception(
+                            std::make_exception_ptr(mprpc::exception(error)));
+                    } else {
+                        result_promise.set_value();
+                    }
+                });
+
+            REQUIRE(
+                message_future.wait_for(timeout) == std::future_status::ready);
+            REQUIRE(
+                result_future.wait_for(timeout) == std::future_status::ready);
+            REQUIRE(message_future.get() == data);
+            REQUIRE_NOTHROW(result_future.get());
         }
     }
 
