@@ -299,7 +299,28 @@ private:
 
     //! parse notification
     void parse_notification() {
-        //
+        // NOLINTNEXTLINE: use of external library
+        const auto& array = data_->handle->via.array;
+
+        if (array.size != 3) {
+            throw exception(error_info(error_code::invalid_message,
+                "notification message must have 3 elements",
+                pack_data(data_->handle.get())));
+        }
+
+        try {
+            data_->method = array.ptr[1].as<std::string>();
+        } catch (const msgpack::type_error&) {
+            throw exception(error_info(error_code::invalid_message,
+                "method name must be a string",
+                pack_data(data_->handle.get())));
+        }
+
+        data_->params = array.ptr + 2;
+        if (data_->params->type != msgpack::type::ARRAY) {
+            throw exception(error_info(error_code::invalid_message,
+                "paramters must be an array", pack_data(data_->handle.get())));
+        }
     }
 
     //! struct of data

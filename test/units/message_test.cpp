@@ -79,4 +79,18 @@ TEST_CASE("mprpc::message") {
         REQUIRE(msg.has_error());
         REQUIRE(msg.error_as<std::string>() == error);
     }
+
+    SECTION("parse request") {
+        constexpr auto type = mprpc::msgtype::notification;
+        const auto method = std::string("abc");
+        const auto params = std::make_tuple(std::string("def"));
+        const auto data =
+            mprpc::pack_data(std::make_tuple(type, method, params));
+
+        mprpc::message msg;
+        REQUIRE_NOTHROW(msg = mprpc::message(data));
+        REQUIRE(msg.type() == type);
+        REQUIRE(msg.method() == method);
+        REQUIRE(msg.params_as<std::tuple<std::string>>() == params);
+    }
 }

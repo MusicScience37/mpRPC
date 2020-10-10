@@ -86,4 +86,19 @@ inline message_data pack_error_response(msgid_t id, const Error& error) {
         msgtype::response, id, error, msgpack::type::nil_t()));
 }
 
+/*!
+ * \brief pack notification
+ *
+ * \tparam Params type of parameters
+ * \param method method name
+ * \param params parameters
+ * \return message data
+ */
+template <typename Params>
+inline message_data pack_notification(
+    const std::string& method, const Params& params) {
+    return pack_data(
+        std::forward_as_tuple(msgtype::notification, method, params));
+}
+
 }  // namespace mprpc

@@ -103,3 +103,21 @@ TEST_CASE("mprpc::pack_error_response") {
         REQUIRE(std::get<2>(parsed_data) == error);
     }
 }
+
+TEST_CASE("mprpc::pack_notification") {
+    SECTION("pack a notification data") {
+        constexpr auto type = mprpc::msgtype::notification;
+        const auto method = std::string("abc");
+        const auto params = std::make_tuple(std::string("def"));
+        const auto data = mprpc::pack_notification(method, params);
+
+        msgpack::object_handle handle;
+        REQUIRE_NOTHROW(handle = msgpack::unpack(data.data(), data.size()));
+        std::tuple<mprpc::msgtype, std::string, std::tuple<std::string>>
+            parsed_data;
+        REQUIRE_NOTHROW(parsed_data = handle->as<decltype(parsed_data)>());
+        REQUIRE(std::get<0>(parsed_data) == type);
+        REQUIRE(std::get<1>(parsed_data) == method);
+        REQUIRE(std::get<2>(parsed_data) == params);
+    }
+}
