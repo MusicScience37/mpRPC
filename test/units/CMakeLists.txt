@@ -19,5 +19,7 @@ add_executable(
     transport/parsers/msgpack_parser_test.cpp
     transport/asio_helper/basic_endpoint_test.cpp
     transport/tcp/tcp_address_test.cpp
-    transport/tcp/tcp_test.cpp)
+    transport/tcp/tcp_test.cpp
+    pack_data_test.cpp
+    message_test.cpp)
 target_add_catch2(mprpc_test_units)
