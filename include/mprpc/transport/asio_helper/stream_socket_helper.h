@@ -19,6 +19,9 @@
  */
 #pragma once
 
+#include <asio/bind_executor.hpp>
+#include <asio/post.hpp>
+#include <asio/strand.hpp>
 #include <asio/write.hpp>
 
 #include "mprpc/exception.h"
@@ -58,11 +61,12 @@ public:
      * \param parser parser
      */
     stream_socket_helper(std::shared_ptr<logging::logger> logger,
-        socket_type socket, std::shared_ptr<thread_pool> threads,
+        socket_type socket, const std::shared_ptr<thread_pool>& threads,
         std::shared_ptr<streaming_parser> parser)
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
-          threads_(std::move(threads)),
+          threads_(threads),
+          strand_(asio::make_strand(threads->context())),
           parser_(std::move(parser)) {}
 
     /*!
@@ -71,9 +75,10 @@ public:
      * \param handler handler
      */
     void async_read(on_read_handler_type handler) {
-        threads_->post([this, moved_handler = std::move(handler)]() mutable {
-            this->do_read_message(std::move(moved_handler));
-        });
+        asio::post(
+            strand_, [this, moved_handler = std::move(handler)]() mutable {
+                this->do_read_message(std::move(moved_handler));
+            });
     }
 
     /*!
@@ -83,19 +88,11 @@ public:
      * \param handler handler
      */
     void async_write(const message_data& data, on_write_handler_type handler) {
-        asio::async_write(socket_, asio::buffer(data.data(), data.size()),
-            [this, data, moved_handler = std::move(handler)](
-                const asio::error_code& error, std::size_t /*num_bytes*/) {
-                this->on_write(error, data, moved_handler);
+        asio::post(
+            strand_, [this, data, move_handler = std::move(handler)]() mutable {
+                this->do_write(data, std::move(move_handler));
             });
     }
-
-    /*!
-     * \brief access to socket
-     *
-     * \return socket
-     */
-    socket_type& socket() { return socket_; }
 
     /*!
      * \brief access to socket
@@ -129,10 +126,13 @@ private:
         const auto buf_size = std::max(min_buf_size, socket_.available());
         parser_->prepare_buffer(buf_size);
         socket_.async_read_some(asio::buffer(parser_->buffer(), buf_size),
-            [this, moved_handler = std::move(handler)](
-                const asio::error_code& err, std::size_t num_bytes) mutable {
-                this->on_read_bytes(err, num_bytes, std::move(moved_handler));
-            });
+            asio::bind_executor(strand_,
+                [this, moved_handler = std::move(handler)](
+                    const asio::error_code& err,
+                    std::size_t num_bytes) mutable {
+                    this->on_read_bytes(
+                        err, num_bytes, std::move(moved_handler));
+                }));
     }
 
     /*!
@@ -201,6 +201,21 @@ private:
     }
 
     /*!
+     * \brief write a message
+     *
+     * \param data data
+     * \param handler handler
+     */
+    void do_write(const message_data& data, on_write_handler_type handler) {
+        asio::async_write(socket_, asio::buffer(data.data(), data.size()),
+            asio::bind_executor(strand_,
+                [this, data, moved_handler = std::move(handler)](
+                    const asio::error_code& error, std::size_t /*num_bytes*/) {
+                    this->on_write(error, data, moved_handler);
+                }));
+    }
+
+    /*!
      * \brief process on a message written
      *
      * \param error error
@@ -228,6 +243,9 @@ private:
 
     //! thread pool
     std::shared_ptr<thread_pool> threads_;
+
+    //! strand
+    asio::strand<asio::io_context::executor_type> strand_;
 
     //! parser of messages
     std::shared_ptr<streaming_parser> parser_;
