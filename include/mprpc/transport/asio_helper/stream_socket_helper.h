@@ -59,16 +59,15 @@ public:
      *
      * \param logger logger
      * \param socket socket
-     * \param threads thread pool
+     * \param io_context io_context
      * \param parser parser
      */
     stream_socket_helper(std::shared_ptr<logging::logger> logger,
-        socket_type socket, const std::shared_ptr<thread_pool>& threads,
+        socket_type socket, asio::io_context& io_context,
         std::shared_ptr<streaming_parser> parser)
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
-          threads_(threads),
-          strand_(asio::make_strand(threads->context())),
+          strand_(asio::make_strand(io_context)),
           parser_(std::move(parser)) {}
 
     /*!
@@ -147,6 +146,9 @@ private:
     void on_read_bytes(const asio::error_code& err, std::size_t num_bytes,
         on_read_handler_type handler) {  // NOLINT: false positive
         if (err) {
+            if (err == asio::error::operation_aborted) {
+                return;
+            }
             if (err == asio::error::eof) {
                 MPRPC_INFO(logger_, "connection closed");
                 handler(error_info(error_code::eof, "connection closed"),
@@ -236,6 +238,10 @@ private:
      * \param error error
      */
     void on_write(const asio::error_code& error) {
+        if (error == asio::error::operation_aborted) {
+            return;
+        }
+
         const auto& data = writing_queue_.front().first;
         const auto& handler = writing_queue_.front().second;
         if (error) {
@@ -260,9 +266,6 @@ private:
 
     //! socket
     socket_type socket_;
-
-    //! thread pool
-    std::shared_ptr<thread_pool> threads_;
 
     //! strand
     asio::strand<asio::io_context::executor_type> strand_;

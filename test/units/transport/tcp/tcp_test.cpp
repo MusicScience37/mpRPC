@@ -44,7 +44,7 @@ TEST_CASE("mprpc::transport::tcp") {
 
     SECTION("communicate") {
         auto acceptor = std::make_shared<mprpc::transport::tcp::tcp_acceptor>(
-            logger, endpoint, threads, parser_factory);
+            logger, endpoint, threads->context(), parser_factory);
         auto session_promise =
             std::promise<std::shared_ptr<mprpc::transport::session>>();
         auto session_future = session_promise.get_future();
@@ -65,7 +65,7 @@ TEST_CASE("mprpc::transport::tcp") {
         auto connector_socket = asio::ip::tcp::socket(threads->context());
         REQUIRE_NOTHROW(connector_socket.connect(endpoint));
         auto connector = std::make_shared<mprpc::transport::tcp::tcp_connector>(
-            logger, std::move(connector_socket), threads,
+            logger, std::move(connector_socket), threads->context(),
             parser_factory->create_streaming_parser(logger));
 
         const auto timeout = std::chrono::seconds(15);

@@ -47,7 +47,7 @@ TEST_CASE("RPC on TCP") {
 
     const auto method_server =
         std::make_shared<mprpc::execution::simple_method_server>(
-            logger, threads, methods);
+            logger, *threads, methods);
 
     const auto parser_factory =
         std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
@@ -58,7 +58,7 @@ TEST_CASE("RPC on TCP") {
         asio::ip::tcp::endpoint(asio::ip::address_v4::loopback(), port);
 
     auto acceptor = std::make_shared<mprpc::transport::tcp::tcp_acceptor>(
-        logger, endpoint, threads, parser_factory);
+        logger, endpoint, threads->context(), parser_factory);
 
     auto server = mprpc::server(logger, threads, {acceptor}, method_server);
     server.start();
@@ -69,7 +69,7 @@ TEST_CASE("RPC on TCP") {
     auto connector_socket = asio::ip::tcp::socket(threads->context());
     REQUIRE_NOTHROW(connector_socket.connect(endpoint));
     auto connector = std::make_shared<mprpc::transport::tcp::tcp_connector>(
-        logger, std::move(connector_socket), threads,
+        logger, std::move(connector_socket), threads->context(),
         parser_factory->create_streaming_parser(logger));
 
     SECTION("request") {
@@ -111,4 +111,6 @@ TEST_CASE("RPC on TCP") {
         REQUIRE(response.has_error() == false);
         REQUIRE(response.result_as<std::string>() == str);
     }
+
+    threads->stop();
 }

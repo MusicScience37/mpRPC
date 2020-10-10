@@ -41,7 +41,7 @@ TEST_CASE("mprpc::server") {
 
     const auto method_server =
         std::make_shared<mprpc::execution::simple_method_server>(
-            logger, threads, methods);
+            logger, *threads, methods);
 
     const auto acceptor =
         std::make_shared<mprpc::transport::mock::mock_acceptor>(
@@ -82,4 +82,6 @@ TEST_CASE("mprpc::server") {
         REQUIRE(response.has_error() == false);
         REQUIRE(response.result_as<int>() == integer);
     }
+
+    threads->stop();
 }

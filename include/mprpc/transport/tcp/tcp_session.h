@@ -44,15 +44,14 @@ public:
      *
      * \param logger logger
      * \param socket socket
-     * \param threads thread pool
+     * \param io_context io_context
      * \param parser parser
      */
     tcp_session(const std::shared_ptr<logging::logger>& logger,
-        asio::ip::tcp::socket socket,
-        const std::shared_ptr<thread_pool>& threads,
+        asio::ip::tcp::socket socket, asio::io_context& io_context,
         std::shared_ptr<streaming_parser> parser)
         : socket_helper_(
-              logger, std::move(socket), threads, std::move(parser)) {
+              logger, std::move(socket), io_context, std::move(parser)) {
         MPRPC_INFO(logger, "accepted connection from {} at {}",
             socket_helper_.socket().remote_endpoint(),
             socket_helper_.socket().local_endpoint());

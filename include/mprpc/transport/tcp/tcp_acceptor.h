@@ -48,16 +48,15 @@ public:
      *
      * \param logger logger
      * \param endpoint server endpoint
-     * \param threads thread pool
+     * \param io_context io_context
      * \param parser_factory_ptr factory of parsers
      */
     tcp_acceptor(std::shared_ptr<mprpc::logging::logger> logger,
-        const asio::ip::tcp::endpoint& endpoint,
-        std::shared_ptr<mprpc::thread_pool> threads,
+        const asio::ip::tcp::endpoint& endpoint, asio::io_context& io_context,
         std::shared_ptr<parser_factory> parser_factory_ptr)
         : logger_(std::move(logger)),
-          socket_(threads->context(), endpoint),
-          threads_(std::move(threads)),
+          socket_(io_context, endpoint),
+          io_context_(io_context),
           parser_factory_(std::move(parser_factory_ptr)) {
         MPRPC_INFO(logger_, "server started");
     }
@@ -91,7 +90,8 @@ public:
         }
 
         handler(error_info(),
-            std::make_shared<tcp_session>(logger_, std::move(socket), threads_,
+            std::make_shared<tcp_session>(logger_, std::move(socket),
+                io_context_,
                 parser_factory_->create_streaming_parser(logger_)));
     }
 
@@ -107,8 +107,8 @@ private:
     //! socket
     asio::ip::tcp::acceptor socket_;
 
-    //! thread pool
-    std::shared_ptr<mprpc::thread_pool> threads_;
+    //! io_context
+    asio::io_context& io_context_;
 
     //! factory of parsers
     std::shared_ptr<parser_factory> parser_factory_;

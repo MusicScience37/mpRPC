@@ -104,7 +104,7 @@ static void transport_binary_msgpack_tcp(benchmark::State& state) {
 
     try {
         auto acceptor = std::make_shared<mprpc::transport::tcp::tcp_acceptor>(
-            logger, endpoint, threads, parser_factory);
+            logger, endpoint, threads->context(), parser_factory);
         auto server = std::make_shared<mprpc_server>(acceptor);
         server->start();
 
@@ -114,7 +114,7 @@ static void transport_binary_msgpack_tcp(benchmark::State& state) {
         auto client_socket = asio::ip::tcp::socket(threads->context());
         client_socket.connect(endpoint);
         auto client = std::make_shared<mprpc::transport::tcp::tcp_connector>(
-            logger, std::move(client_socket), threads,
+            logger, std::move(client_socket), threads->context(),
             parser_factory->create_streaming_parser(logger));
 
         for (auto _ : state) {
