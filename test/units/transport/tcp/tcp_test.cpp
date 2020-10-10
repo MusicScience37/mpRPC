@@ -115,6 +115,39 @@ TEST_CASE("mprpc::transport::tcp") {
             REQUIRE(message_future.get() == data);
             REQUIRE_NOTHROW(result_future.get());
         }
+
+        SECTION("client to server transport twice") {
+            auto message_promise = std::promise<mprpc::message_data>();
+            auto message_future = message_promise.get_future();
+            session->async_read(
+                [&message_promise](const mprpc::error_info& error,
+                    const mprpc::message_data& message) {
+                    if (error) {
+                        message_promise.set_exception(
+                            std::make_exception_ptr(mprpc::exception(error)));
+                    } else {
+                        message_promise.set_value(message);
+                    }
+                });
+
+            const auto data_str1 = std::string({char(0x92), char(0x01)});
+            const auto data1 =
+                mprpc::message_data(data_str1.data(), data_str1.size());
+            const auto data_str2 = std::string({char(0x02)});
+            const auto data2 =
+                mprpc::message_data(data_str2.data(), data_str2.size());
+            auto empty_write_handler = [](const mprpc::error_info& error) {};
+            connector->async_write(data1, empty_write_handler);
+            connector->async_write(data2, empty_write_handler);
+
+            const auto data_str =
+                std::string({char(0x92), char(0x01), char(0x02)});
+            const auto data =
+                mprpc::message_data(data_str.data(), data_str.size());
+            REQUIRE(message_future.wait_for(wait_duration) ==
+                std::future_status::ready);
+            REQUIRE(message_future.get() == data);
+        }
     }
 
     REQUIRE_NOTHROW(threads->stop());
