@@ -22,5 +22,6 @@ add_executable(
     transport/tcp/tcp_test.cpp
     pack_data_test.cpp
     message_test.cpp
-    execution/function_method_executor_test.cpp)
+    execution/function_method_executor_test.cpp
+    execution/simple_method_server_test.cpp)
 target_add_catch2(mprpc_test_units)

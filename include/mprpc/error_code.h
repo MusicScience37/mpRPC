@@ -58,6 +58,13 @@ enum network_errors : error_code_t {
     failed_to_write  //!< failed to write data
 };
 
+/*!
+ * \brief enumeration of execution-related error codes
+ */
+enum execution_errors : error_code_t {
+    method_not_found = 300  //!< method not found
+};
+
 }  // namespace error_code
 
 }  // namespace mprpc
