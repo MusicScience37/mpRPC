@@ -48,4 +48,35 @@ TEST_CASE("mprpc::message") {
         REQUIRE(msg.method() == method);
         REQUIRE(msg.params_as<std::tuple<std::string>>() == params);
     }
+
+    SECTION("parse response") {
+        constexpr auto type = mprpc::msgtype::response;
+        constexpr auto msgid = static_cast<mprpc::msgid_t>(37);
+        const auto result = std::string("abc");
+        const auto data = mprpc::pack_data(
+            std::make_tuple(type, msgid, msgpack::type::nil_t(), result));
+
+        mprpc::message msg;
+        REQUIRE_NOTHROW(msg = mprpc::message(data));
+        REQUIRE(msg.type() == type);
+        REQUIRE(msg.msgid() == msgid);
+        REQUIRE(msg.has_error() == false);
+        REQUIRE(msg.error().is_nil());
+        REQUIRE(msg.result_as<std::string>() == result);
+    }
+
+    SECTION("parse response with error") {
+        constexpr auto type = mprpc::msgtype::response;
+        constexpr auto msgid = static_cast<mprpc::msgid_t>(37);
+        const auto error = std::string("abc");
+        const auto data = mprpc::pack_data(
+            std::make_tuple(type, msgid, error, msgpack::type::nil_t()));
+
+        mprpc::message msg;
+        REQUIRE_NOTHROW(msg = mprpc::message(data));
+        REQUIRE(msg.type() == type);
+        REQUIRE(msg.msgid() == msgid);
+        REQUIRE(msg.has_error());
+        REQUIRE(msg.error_as<std::string>() == error);
+    }
 }

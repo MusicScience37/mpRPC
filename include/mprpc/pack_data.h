@@ -58,4 +58,32 @@ inline message_data pack_request(
         std::forward_as_tuple(msgtype::request, id, method, params));
 }
 
+/*!
+ * \brief pack response
+ *
+ * \tparam Result type of result
+ * \param id message ID
+ * \param result result
+ * \return message data
+ */
+template <typename Result>
+inline message_data pack_response(msgid_t id, const Result& result) {
+    return pack_data(std::forward_as_tuple(
+        msgtype::response, id, msgpack::type::nil_t(), result));
+}
+
+/*!
+ * \brief pack response with error
+ *
+ * \tparam Error type of error data
+ * \param id message ID
+ * \param error error data
+ * \return message data
+ */
+template <typename Error>
+inline message_data pack_error_response(msgid_t id, const Error& error) {
+    return pack_data(std::forward_as_tuple(
+        msgtype::response, id, error, msgpack::type::nil_t()));
+}
+
 }  // namespace mprpc

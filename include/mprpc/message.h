@@ -120,6 +120,80 @@ public:
         }
     }
 
+    /*!
+     * \brief get error
+     *
+     * \return error
+     */
+    const msgpack::object& error() const {
+        if (data_->type != msgtype::response) {
+            throw exception(error_info(error_code::invalid_message,
+                "tried to access to error of message not a response",
+                pack_data(data_->handle.get())));
+        }
+        return *(data_->error);
+    }
+
+    /*!
+     * \brief check whether this message has error
+     *
+     * \return whether this message has error
+     */
+    bool has_error() const {
+        if (data_->type != msgtype::response) {
+            throw exception(error_info(error_code::invalid_message,
+                "tried to access to error of message not a response",
+                pack_data(data_->handle.get())));
+        }
+        return !(data_->error->is_nil());
+    }
+
+    /*!
+     * \brief get error as a type
+     *
+     * \tparam T type to convert to
+     * \return data
+     */
+    template <typename T>
+    T error_as() const {
+        try {
+            return error().as<T>();
+        } catch (const msgpack::type_error&) {
+            throw exception(error_info(error_code::invalid_message,
+                "failed to convert error", pack_data(data_->handle.get())));
+        }
+    }
+
+    /*!
+     * \brief get result
+     *
+     * \return result
+     */
+    const msgpack::object& result() const {
+        if (data_->type != msgtype::response) {
+            throw exception(error_info(error_code::invalid_message,
+                "tried to access to result of message not a response",
+                pack_data(data_->handle.get())));
+        }
+        return *(data_->result);
+    }
+
+    /*!
+     * \brief get result as a type
+     *
+     * \tparam T type to convert to
+     * \return data
+     */
+    template <typename T>
+    T result_as() const {
+        try {
+            return result().as<T>();
+        } catch (const msgpack::type_error&) {
+            throw exception(error_info(error_code::invalid_message,
+                "failed to convert result", pack_data(data_->handle.get())));
+        }
+    }
+
 private:
     /*!
      * \brief parse an object
@@ -202,7 +276,25 @@ private:
 
     //! parse response
     void parse_response() {
-        //
+        // NOLINTNEXTLINE: use of external library
+        const auto& array = data_->handle->via.array;
+
+        if (array.size != 4) {
+            throw exception(error_info(error_code::invalid_message,
+                "response message must have 4 elements",
+                pack_data(data_->handle.get())));
+        }
+
+        try {
+            data_->msgid = array.ptr[1].as<msgid_t>();
+        } catch (const msgpack::type_error&) {
+            throw exception(error_info(error_code::invalid_message,
+                "message ID must a 32-but unsigned integer",
+                pack_data(data_->handle.get())));
+        }
+
+        data_->error = array.ptr + 2;
+        data_->result = array.ptr + 3;
     }
 
     //! parse notification
@@ -226,6 +318,12 @@ private:
 
         //! parameters
         msgpack::object* params{nullptr};
+
+        //! error
+        msgpack::object* error{nullptr};
+
+        //! result
+        msgpack::object* result{nullptr};
     };
 
     //! data

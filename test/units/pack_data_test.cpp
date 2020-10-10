@@ -65,3 +65,41 @@ TEST_CASE("mprpc::pack_request") {
         REQUIRE(std::get<3>(parsed_data) == params);
     }
 }
+
+TEST_CASE("mprpc::pack_response") {
+    SECTION("pack a response data") {
+        constexpr auto type = mprpc::msgtype::response;
+        constexpr auto msgid = static_cast<mprpc::msgid_t>(37);
+        const auto result = std::string("abc");
+        const auto data = mprpc::pack_response(msgid, result);
+
+        msgpack::object_handle handle;
+        REQUIRE_NOTHROW(handle = msgpack::unpack(data.data(), data.size()));
+        std::tuple<mprpc::msgtype, mprpc::msgid_t, msgpack::type::nil_t,
+            std::string>
+            parsed_data;
+        REQUIRE_NOTHROW(parsed_data = handle->as<decltype(parsed_data)>());
+        REQUIRE(std::get<0>(parsed_data) == type);
+        REQUIRE(std::get<1>(parsed_data) == msgid);
+        REQUIRE(std::get<3>(parsed_data) == result);
+    }
+}
+
+TEST_CASE("mprpc::pack_error_response") {
+    SECTION("pack a response data") {
+        constexpr auto type = mprpc::msgtype::response;
+        constexpr auto msgid = static_cast<mprpc::msgid_t>(37);
+        const auto error = std::string("abc");
+        const auto data = mprpc::pack_error_response(msgid, error);
+
+        msgpack::object_handle handle;
+        REQUIRE_NOTHROW(handle = msgpack::unpack(data.data(), data.size()));
+        std::tuple<mprpc::msgtype, mprpc::msgid_t, std::string,
+            msgpack::type::nil_t>
+            parsed_data;
+        REQUIRE_NOTHROW(parsed_data = handle->as<decltype(parsed_data)>());
+        REQUIRE(std::get<0>(parsed_data) == type);
+        REQUIRE(std::get<1>(parsed_data) == msgid);
+        REQUIRE(std::get<2>(parsed_data) == error);
+    }
+}
