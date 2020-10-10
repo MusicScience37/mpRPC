@@ -68,8 +68,8 @@ TEST_CASE("mprpc::transport::tcp") {
             logger, std::move(connector_socket), threads,
             parser_factory->create_streaming_parser(logger));
 
-        REQUIRE(session_future.wait_for(wait_duration) ==
-            std::future_status::ready);
+        const auto timeout = std::chrono::seconds(5);
+        REQUIRE(session_future.wait_for(timeout) == std::future_status::ready);
         std::shared_ptr<mprpc::transport::session> session;
         REQUIRE_NOTHROW(session = session_future.get());
 
@@ -108,10 +108,10 @@ TEST_CASE("mprpc::transport::tcp") {
                     }
                 });
 
-            REQUIRE(message_future.wait_for(wait_duration) ==
-                std::future_status::ready);
-            REQUIRE(result_future.wait_for(wait_duration) ==
-                std::future_status::ready);
+            REQUIRE(
+                message_future.wait_for(timeout) == std::future_status::ready);
+            REQUIRE(
+                result_future.wait_for(timeout) == std::future_status::ready);
             REQUIRE(message_future.get() == data);
             REQUIRE_NOTHROW(result_future.get());
         }
@@ -144,8 +144,8 @@ TEST_CASE("mprpc::transport::tcp") {
                 std::string({char(0x92), char(0x01), char(0x02)});
             const auto data =
                 mprpc::message_data(data_str.data(), data_str.size());
-            REQUIRE(message_future.wait_for(wait_duration) ==
-                std::future_status::ready);
+            REQUIRE(
+                message_future.wait_for(timeout) == std::future_status::ready);
             REQUIRE(message_future.get() == data);
         }
     }
