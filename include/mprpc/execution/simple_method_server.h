@@ -77,6 +77,7 @@ private:
         case msgtype::request: {
             MPRPC_INFO(logger_, "{} request {}",
                 session->remote_address()->full_address(), msg.method());
+            MPRPC_DEBUG(logger_, "params: {}", msg.params());
             const auto method = find_method(msg.method(), handler);
             if (!method) {
                 return;
@@ -89,11 +90,13 @@ private:
         case msgtype::notification: {
             MPRPC_INFO(logger_, "{} notify {}",
                 session->remote_address()->full_address(), msg.method());
+            MPRPC_DEBUG(logger_, "params: {}", msg.params());
             const auto method = find_method(msg.method(), handler);
             if (!method) {
                 return;
             }
             method->process_notification(session, msg);
+            MPRPC_DEBUG(logger_, "executed method {}", msg.method());
             handler(error_info(), false, message_data());
             break;
         }
