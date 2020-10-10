@@ -45,9 +45,9 @@ public:
      * \param methods methods
      */
     simple_method_server(std::shared_ptr<mprpc::logging::logger> logger,
-        std::shared_ptr<mprpc::thread_pool> threads,
+        mprpc::thread_pool& threads,
         const std::vector<std::shared_ptr<method_executor>>& methods)
-        : logger_(std::move(logger)), threads_(std::move(threads)) {
+        : logger_(std::move(logger)), threads_(threads) {
         for (const auto& method : methods) {
             methods_.emplace(method->name(), method);
         }
@@ -57,10 +57,9 @@ public:
     void async_process_message(
         const std::shared_ptr<transport::session>& session, const message& msg,
         on_message_processed_handler handler) override {
-        threads_->post(
-            [this, session, msg, moved_handler = std::move(handler)] {
-                this->do_process_message(session, msg, moved_handler);
-            });
+        threads_.post([this, session, msg, moved_handler = std::move(handler)] {
+            this->do_process_message(session, msg, moved_handler);
+        });
     }
 
 private:
@@ -133,7 +132,7 @@ private:
     std::shared_ptr<mprpc::logging::logger> logger_;
 
     //! thread pool
-    std::shared_ptr<mprpc::thread_pool> threads_;
+    mprpc::thread_pool& threads_;
 
     //! map of methods
     std::unordered_map<std::string, std::shared_ptr<method_executor>>

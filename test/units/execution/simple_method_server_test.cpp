@@ -40,7 +40,7 @@ TEST_CASE("mprpc::execution::simple_method_server") {
 
     const auto server =
         std::make_shared<mprpc::execution::simple_method_server>(
-            logger, threads, methods);
+            logger, *threads, methods);
 
     const auto session = std::make_shared<mprpc::transport::mock::mock_session>(
         threads->context());

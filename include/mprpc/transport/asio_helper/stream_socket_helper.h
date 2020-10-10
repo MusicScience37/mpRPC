@@ -59,16 +59,15 @@ public:
      *
      * \param logger logger
      * \param socket socket
-     * \param threads thread pool
+     * \param io_context io_context
      * \param parser parser
      */
     stream_socket_helper(std::shared_ptr<logging::logger> logger,
-        socket_type socket, const std::shared_ptr<thread_pool>& threads,
+        socket_type socket, asio::io_context& io_context,
         std::shared_ptr<streaming_parser> parser)
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
-          threads_(threads),
-          strand_(asio::make_strand(threads->context())),
+          strand_(asio::make_strand(io_context)),
           parser_(std::move(parser)) {}
 
     /*!
@@ -267,9 +266,6 @@ private:
 
     //! socket
     socket_type socket_;
-
-    //! thread pool
-    std::shared_ptr<thread_pool> threads_;
 
     //! strand
     asio::strand<asio::io_context::executor_type> strand_;
