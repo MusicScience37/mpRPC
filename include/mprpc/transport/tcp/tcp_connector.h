@@ -48,10 +48,11 @@ public:
      * \param parser parser
      */
     tcp_connector(const std::shared_ptr<logging::logger>& logger,
-        asio::ip::tcp::socket socket, std::shared_ptr<thread_pool> threads,
+        asio::ip::tcp::socket socket,
+        const std::shared_ptr<thread_pool>& threads,
         std::shared_ptr<streaming_parser> parser)
-        : socket_helper_(logger, std::move(socket), std::move(threads),
-              std::move(parser)) {
+        : socket_helper_(
+              logger, std::move(socket), threads, std::move(parser)) {
         MPRPC_INFO(logger, "conencted {} to {}",
             socket_helper_.socket().local_endpoint(),
             socket_helper_.socket().remote_endpoint());
