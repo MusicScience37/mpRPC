@@ -61,9 +61,19 @@ if(MPRPC_BUILD_DOC)
     add_subdirectory(doc)
 endif()
 
-add_library(mprpc INTERFACE)
-target_include_directories(mprpc INTERFACE ${MPRPC_SOURCE_DIR}/include)
-target_link_libraries(mprpc INTERFACE msgpackc-cxx fmt spdlog asio)
+add_library(mprpc SHARED src/logging/spdlog_logger.cpp)
+target_include_directories(mprpc PUBLIC ${MPRPC_SOURCE_DIR}/include
+                                        ${CMAKE_BINARY_DIR}/include)
+set_target_properties(
+    mprpc
+    PROPERTIES CXX_VISIBILITY_PRESET hidden
+               VISIBILITY_INLINES_HIDDEN 1
+               POSITION_INDEPENDENT_CODE ON)
+include(GenerateExportHeader)
+generate_export_header(
+    mprpc EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/include/mprpc/mprpc_export.h")
+target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt spdlog asio)
+target_check_clang_tidy(mprpc)
 
 option(MPRPC_TESTING "enable testing of mpRPC" OFF)
 if(MPRPC_TESTING)

@@ -2,7 +2,7 @@ HeaderFilterRegex: "include/mprpc/|test/"
 Checks: >
   clang-diagnostic-*,
   clang-analyzer-*,
-  cppcoreguidelines-*,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory,
+  cppcoreguidelines-*,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory,-cppcoreguidelines-macro-usage,
   google-*,-google-runtime-references,
   performance-*,
   portability-*,
