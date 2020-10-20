@@ -50,6 +50,9 @@ function(target_check_clang_tidy _TARGET)
         if(CLANG_TIDY_PATH)
             # target name
             set(CLANG_TIDY_TARGET "${_TARGET}_clang_tidy")
+            if("${_TARGET}" STREQUAL "${PROJECT_NAME}")
+                set(CLANG_TIDY_TARGET "${PROJECT_NAME}_${_TARGET}_clang_tidy")
+            endif()
             # make the list of source codes
             get_target_property(TARGET_SOURCES ${_TARGET} SOURCES)
             list(FILTER TARGET_SOURCES INCLUDE REGEX ".[cpp|h]$")
