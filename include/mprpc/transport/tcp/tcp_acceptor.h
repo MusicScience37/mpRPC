@@ -66,6 +66,9 @@ public:
         socket_.async_accept([this, moved_handler = std::move(handler)](
                                  const asio::error_code& error,
                                  asio::ip::tcp::socket socket) mutable {
+            if (error == asio::error::operation_aborted) {
+                return;
+            }
             this->on_accept(error, std::move(socket), moved_handler);
         });
     }
@@ -80,9 +83,6 @@ public:
     void on_accept(const asio::error_code& error, asio::ip::tcp::socket socket,
         const on_accept_handler_type& handler) {
         if (error) {
-            if (error == asio::error::operation_aborted) {
-                return;
-            }
             MPRPC_ERROR(logger_, error.message());
             handler(error_info(error_code::failed_to_read, error.message()),
                 nullptr);

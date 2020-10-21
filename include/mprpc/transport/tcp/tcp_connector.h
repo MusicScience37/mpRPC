@@ -50,39 +50,43 @@ public:
     tcp_connector(const std::shared_ptr<logging::logger>& logger,
         asio::ip::tcp::socket socket, asio::io_context& io_context,
         std::shared_ptr<streaming_parser> parser)
-        : socket_helper_(
-              logger, std::move(socket), io_context, std::move(parser)) {
+        : socket_helper_(std::make_shared<socket_helper_type>(
+              logger, std::move(socket), io_context, std::move(parser))) {
         MPRPC_INFO(logger, "conencted {} to {}",
-            socket_helper_.socket().local_endpoint(),
-            socket_helper_.socket().remote_endpoint());
+            socket_helper_->socket().local_endpoint(),
+            socket_helper_->socket().remote_endpoint());
     }
 
     //! \copydoc mprpc::transport::connector::async_read
     void async_read(on_read_handler_type handler) override {
-        socket_helper_.async_read(std::move(handler));
+        socket_helper_->async_read(std::move(handler));
     }
 
     //! \copydoc mprpc::transport::connector::async_write
     void async_write(
         const message_data& data, on_write_handler_type handler) override {
-        socket_helper_.async_write(data, std::move(handler));
+        socket_helper_->async_write(data, std::move(handler));
     }
 
     //! \copydoc mprpc::transport::connector::local_address
     std::shared_ptr<const address> local_address() const override {
         return std::make_shared<tcp_address>(
-            socket_helper_.socket().local_endpoint());
+            socket_helper_->socket().local_endpoint());
     }
 
     //! \copydoc mprpc::transport::connector::remote_address
     std::shared_ptr<const address> remote_address() const override {
         return std::make_shared<tcp_address>(
-            socket_helper_.socket().remote_endpoint());
+            socket_helper_->socket().remote_endpoint());
     }
 
 private:
+    //! socket helper type
+    using socket_helper_type =
+        asio_helper::stream_socket_helper<asio::ip::tcp::socket>;
+
     //! socket helper
-    asio_helper::stream_socket_helper<asio::ip::tcp::socket> socket_helper_;
+    std::shared_ptr<socket_helper_type> socket_helper_;
 };
 
 }  // namespace tcp
