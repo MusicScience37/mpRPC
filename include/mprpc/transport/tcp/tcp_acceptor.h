@@ -58,6 +58,13 @@ public:
           socket_(io_context, endpoint),
           io_context_(io_context),
           parser_factory_(std::move(parser_factory_ptr)) {
+        try {
+            socket_ = std::move(asio::ip::tcp::acceptor(io_context, endpoint));
+        } catch (const std::system_error& e) {
+            MPRPC_ERROR(
+                logger_, "failed to listen to {} with {}", endpoint, e.what());
+            throw exception(error_info(error_code::failed_to_listen, e.what()));
+        }
         MPRPC_INFO(logger_, "server started");
     }
 
@@ -83,12 +90,15 @@ public:
     void on_accept(const asio::error_code& error, asio::ip::tcp::socket socket,
         const on_accept_handler_type& handler) {
         if (error) {
-            MPRPC_ERROR(logger_, error.message());
-            handler(error_info(error_code::failed_to_read, error.message()),
+            MPRPC_ERROR(
+                logger_, "failed to accept a connection: {}", error.message());
+            handler(error_info(error_code::failed_to_accept, error.message()),
                 nullptr);
             return;
         }
 
+        MPRPC_TRACE(
+            logger_, "accepted a connection from {}", socket.remote_endpoint());
         handler(error_info(),
             std::make_shared<tcp_session>(logger_, std::move(socket),
                 io_context_,
