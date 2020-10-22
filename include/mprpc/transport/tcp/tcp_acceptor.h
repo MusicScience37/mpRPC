@@ -55,7 +55,7 @@ public:
         const asio::ip::tcp::endpoint& endpoint, asio::io_context& io_context,
         std::shared_ptr<parser_factory> parser_factory_ptr)
         : logger_(std::move(logger)),
-          socket_(io_context, endpoint),
+          socket_(io_context),
           io_context_(io_context),
           parser_factory_(std::move(parser_factory_ptr)) {
         try {
