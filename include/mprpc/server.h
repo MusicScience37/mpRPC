@@ -19,6 +19,8 @@
  */
 #pragma once
 
+#include <mutex>
+#include <unordered_set>
 #include <vector>
 
 #include "mprpc/execution/method_server.h"
@@ -85,9 +87,14 @@ private:
      */
     void do_accept(const std::shared_ptr<transport::acceptor>& acceptor) {
         acceptor->async_accept(
-            [this, acceptor](const error_info& error,
+            [this,
+                weak_acceptor = std::weak_ptr<transport::acceptor>(acceptor)](
+                const error_info& error,
                 const std::shared_ptr<transport::session>& session) {
-                this->on_accept(acceptor, error, session);
+                auto acceptor = weak_acceptor.lock();
+                if (acceptor) {
+                    this->on_accept(acceptor, error, session);
+                }
             });
     }
 
@@ -102,6 +109,9 @@ private:
         const error_info& error,
         const std::shared_ptr<transport::session>& session) {
         if (!error) {
+            std::unique_lock<std::mutex> lock(*mutex_);
+            sessions_.insert(session);
+            lock.unlock();
             do_read(session);
         }
         do_accept(acceptor);
@@ -114,8 +124,12 @@ private:
      */
     void do_read(const std::shared_ptr<transport::session>& session) {
         session->async_read(
-            [this, session](const error_info& error, const message_data& data) {
-                this->on_read(session, error, data);
+            [this, weak_session = std::weak_ptr<transport::session>(session)](
+                const error_info& error, const message_data& data) {
+                auto session = weak_session.lock();
+                if (session) {
+                    this->on_read(session, error, data);
+                }
             });
     }
 
@@ -129,6 +143,8 @@ private:
     void on_read(const std::shared_ptr<transport::session>& session,
         const error_info& error, const message_data& data) {
         if (error) {
+            std::unique_lock<std::mutex> lock(*mutex_);
+            sessions_.erase(session);
             return;
         }
         try {
@@ -140,6 +156,8 @@ private:
                 });
         } catch (const exception& e) {
             MPRPC_ERROR(logger_, "{}", e.info());
+            std::unique_lock<std::mutex> lock(*mutex_);
+            sessions_.erase(session);
             return;
         }
         do_read(session);
@@ -173,6 +191,12 @@ private:
 
     //! acceptors
     std::vector<std::shared_ptr<transport::acceptor>> acceptors_;
+
+    //! session
+    std::unordered_set<std::shared_ptr<transport::session>> sessions_{};
+
+    //! mutex for session
+    std::unique_ptr<std::mutex> mutex_{std::make_unique<std::mutex>()};
 
     //! method server
     std::shared_ptr<execution::method_server> method_server_;

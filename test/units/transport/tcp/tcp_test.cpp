@@ -189,7 +189,7 @@ TEST_CASE("mprpc::transport::tcp") {
             REQUIRE(message_future.get() == data);
             REQUIRE_NOTHROW(result_future.get());
         }
-    }
 
-    REQUIRE_NOTHROW(threads->stop());
+        REQUIRE_NOTHROW(threads->stop());
+    }
 }

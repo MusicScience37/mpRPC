@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include <memory>
 #include <queue>
 
 #include <asio/bind_executor.hpp>
@@ -42,7 +43,8 @@ namespace asio_helper {
  * \tparam SocketType type of socket
  */
 template <typename SocketType>
-class stream_socket_helper {
+class stream_socket_helper
+    : public std::enable_shared_from_this<stream_socket_helper<SocketType>> {
 public:
     //! type of socket
     using socket_type = SocketType;
@@ -76,9 +78,14 @@ public:
      * \param handler handler
      */
     void async_read(on_read_handler_type handler) {
-        asio::post(
-            strand_, [this, moved_handler = std::move(handler)]() mutable {
-                this->do_read_message(std::move(moved_handler));
+        asio::post(strand_,
+            [weak_self = weak_from_this(),
+                moved_handler = std::move(handler)]() mutable {
+                auto self = weak_self.lock();
+                if (!self) {
+                    return;
+                }
+                self->do_read_message(std::move(moved_handler));
             });
     }
 
@@ -89,9 +96,14 @@ public:
      * \param handler handler
      */
     void async_write(const message_data& data, on_write_handler_type handler) {
-        asio::post(
-            strand_, [this, data, move_handler = std::move(handler)]() mutable {
-                this->add_message_to_write(data, std::move(move_handler));
+        asio::post(strand_,
+            [weak_self = weak_from_this(), data,
+                move_handler = std::move(handler)]() mutable {
+                auto self = weak_self.lock();
+                if (!self) {
+                    return;
+                }
+                self->add_message_to_write(data, std::move(move_handler));
             });
     }
 
@@ -128,10 +140,15 @@ private:
         parser_->prepare_buffer(buf_size);
         socket_.async_read_some(asio::buffer(parser_->buffer(), buf_size),
             asio::bind_executor(strand_,
-                [this, moved_handler = std::move(handler)](
+                [weak_self = weak_from_this(),
+                    moved_handler = std::move(handler)](
                     const asio::error_code& err,
                     std::size_t num_bytes) mutable {
-                    this->on_read_bytes(
+                    auto self = weak_self.lock();
+                    if (!self) {
+                        return;
+                    }
+                    self->on_read_bytes(
                         err, num_bytes, std::move(moved_handler));
                 }));
     }
@@ -228,8 +245,14 @@ private:
         MPRPC_TRACE(logger_, "starting to write a message");
         asio::async_write(socket_, asio::buffer(data.data(), data.size()),
             asio::bind_executor(strand_,
-                [this](const asio::error_code& error,
-                    std::size_t /*num_bytes*/) { this->on_write(error); }));
+                [weak_self = weak_from_this()](
+                    const asio::error_code& error, std::size_t /*num_bytes*/) {
+                    auto self = weak_self.lock();
+                    if (!self) {
+                        return;
+                    }
+                    self->on_write(error);
+                }));
     }
 
     /*!
@@ -259,6 +282,16 @@ private:
             return;
         }
         do_write();
+    }
+
+    /*!
+     * \brief get weak pointer to this
+     *
+     * \return weak pointer to this
+     */
+    std::weak_ptr<stream_socket_helper<socket_type>> weak_from_this() {
+        return std::enable_shared_from_this<
+            stream_socket_helper<SocketType>>::shared_from_this();
     }
 
     //! logger

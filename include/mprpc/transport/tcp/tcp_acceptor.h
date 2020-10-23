@@ -55,9 +55,16 @@ public:
         const asio::ip::tcp::endpoint& endpoint, asio::io_context& io_context,
         std::shared_ptr<parser_factory> parser_factory_ptr)
         : logger_(std::move(logger)),
-          socket_(io_context, endpoint),
+          socket_(io_context),
           io_context_(io_context),
           parser_factory_(std::move(parser_factory_ptr)) {
+        try {
+            socket_ = asio::ip::tcp::acceptor(io_context, endpoint);
+        } catch (const std::system_error& e) {
+            MPRPC_ERROR(
+                logger_, "failed to listen to {} with {}", endpoint, e.what());
+            throw exception(error_info(error_code::failed_to_listen, e.what()));
+        }
         MPRPC_INFO(logger_, "server started");
     }
 
@@ -66,6 +73,9 @@ public:
         socket_.async_accept([this, moved_handler = std::move(handler)](
                                  const asio::error_code& error,
                                  asio::ip::tcp::socket socket) mutable {
+            if (error == asio::error::operation_aborted) {
+                return;
+            }
             this->on_accept(error, std::move(socket), moved_handler);
         });
     }
@@ -80,15 +90,15 @@ public:
     void on_accept(const asio::error_code& error, asio::ip::tcp::socket socket,
         const on_accept_handler_type& handler) {
         if (error) {
-            if (error == asio::error::operation_aborted) {
-                return;
-            }
-            MPRPC_ERROR(logger_, error.message());
-            handler(error_info(error_code::failed_to_read, error.message()),
+            MPRPC_ERROR(
+                logger_, "failed to accept a connection: {}", error.message());
+            handler(error_info(error_code::failed_to_accept, error.message()),
                 nullptr);
             return;
         }
 
+        MPRPC_TRACE(
+            logger_, "accepted a connection from {}", socket.remote_endpoint());
         handler(error_info(),
             std::make_shared<tcp_session>(logger_, std::move(socket),
                 io_context_,

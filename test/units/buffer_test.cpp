@@ -35,7 +35,7 @@ TEST_CASE("mprpc::buffer") {
         std::shared_ptr<mprpc::buffer> buf;
         REQUIRE_NOTHROW(buf = std::make_shared<mprpc::buffer>());
 
-        REQUIRE(buf->data() != nullptr);
+        REQUIRE(static_cast<void*>(buf->data()) != nullptr);
         REQUIRE(buf->size() == 0);
         REQUIRE(buf->capacity() == initial_capacity);
 
@@ -47,7 +47,7 @@ TEST_CASE("mprpc::buffer") {
         std::shared_ptr<mprpc::buffer> buf;
         REQUIRE_NOTHROW(buf = std::make_shared<mprpc::buffer>(size));
 
-        REQUIRE(buf->data() != nullptr);
+        REQUIRE(static_cast<void*>(buf->data()) != nullptr);
         REQUIRE(buf->size() == size);
         REQUIRE(buf->capacity() == initial_capacity);
     }
@@ -58,7 +58,7 @@ TEST_CASE("mprpc::buffer") {
         std::shared_ptr<mprpc::buffer> buf;
         REQUIRE_NOTHROW(buf = std::make_shared<mprpc::buffer>(size));
 
-        REQUIRE(buf->data() != nullptr);
+        REQUIRE(static_cast<void*>(buf->data()) != nullptr);
         REQUIRE(buf->size() == size);
         REQUIRE(buf->capacity() == capacity);
     }
