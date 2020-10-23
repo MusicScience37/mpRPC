@@ -59,7 +59,7 @@ public:
           io_context_(io_context),
           parser_factory_(std::move(parser_factory_ptr)) {
         try {
-            socket_ = std::move(asio::ip::tcp::acceptor(io_context, endpoint));
+            socket_ = asio::ip::tcp::acceptor(io_context, endpoint);
         } catch (const std::system_error& e) {
             MPRPC_ERROR(
                 logger_, "failed to listen to {} with {}", endpoint, e.what());
