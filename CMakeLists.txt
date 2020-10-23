@@ -76,6 +76,10 @@ target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt spdlog asio)
 target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings)
 target_check_clang_tidy(mprpc)
 
+set(BUILDNAME
+    "${CMAKE_HOST_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}-${CMAKE_BUILD_TYPE}"
+)
+
 option(MPRPC_TESTING "enable testing of mpRPC" OFF)
 if(MPRPC_TESTING)
     add_subdirectory(extern/Catch2)
