@@ -73,6 +73,7 @@ include(GenerateExportHeader)
 generate_export_header(
     mprpc EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/include/mprpc/mprpc_export.h")
 target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt spdlog asio)
+target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings)
 target_check_clang_tidy(mprpc)
 
 option(MPRPC_TESTING "enable testing of mpRPC" OFF)
