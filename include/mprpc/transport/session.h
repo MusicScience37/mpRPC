@@ -22,6 +22,8 @@
 #include <functional>
 #include <memory>
 
+#include <stl_ext/shared_function.h>
+
 #include "mprpc/error_info.h"
 #include "mprpc/message_data.h"
 #include "mprpc/transport/address.h"
@@ -36,10 +38,11 @@ class session {
 public:
     //! type of handlers on reading a message
     using on_read_handler_type =
-        std::function<void(const error_info&, const message_data&)>;
+        stl_ext::shared_function<void(const error_info&, const message_data&)>;
 
     //! type of handlers on writing a message
-    using on_write_handler_type = std::function<void(const error_info&)>;
+    using on_write_handler_type =
+        stl_ext::shared_function<void(const error_info&)>;
 
     /*!
      * \brief asynchronously read a message

@@ -22,6 +22,8 @@
 #include <functional>
 #include <memory>
 
+#include <stl_ext/shared_function.h>
+
 #include "mprpc/error_info.h"
 #include "mprpc/transport/address.h"
 #include "mprpc/transport/session.h"
@@ -35,8 +37,8 @@ namespace transport {
 class acceptor {
 public:
     //! type of handlers on accepting connections
-    using on_accept_handler_type =
-        std::function<void(const error_info&, std::shared_ptr<session>)>;
+    using on_accept_handler_type = stl_ext::shared_function<void(
+        const error_info&, std::shared_ptr<session>)>;
 
     /*!
      * \brief asynchronously accept a connection
