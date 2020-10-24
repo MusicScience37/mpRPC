@@ -27,6 +27,7 @@
 #include <asio/executor_work_guard.hpp>
 #include <asio/io_context.hpp>
 #include <asio/post.hpp>
+#include <stl_ext/shared_function.h>
 
 #include "mprpc/error_info.h"
 #include "mprpc/exception.h"
@@ -41,7 +42,7 @@ namespace mprpc {
 class thread_pool {
 public:
     //! type of handlers called when errors happen
-    using on_error_handler_type = std::function<void(const error_info&)>;
+    using on_error_handler_type = stl_ext::shared_function<void(const error_info&)>;
 
     /*!
      * \brief construct

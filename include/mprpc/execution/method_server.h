@@ -21,6 +21,8 @@
 
 #include <functional>
 
+#include <stl_ext/shared_function.h>
+
 #include "mprpc/error_info.h"
 #include "mprpc/message.h"
 #include "mprpc/transport/session.h"
@@ -42,8 +44,8 @@ public:
      * - whether response exists
      * - response message (if exists)
      */
-    using on_message_processed_handler =
-        std::function<void(const error_info&, bool, const message_data&)>;
+    using on_message_processed_handler = stl_ext::shared_function<void(
+        const error_info&, bool, const message_data&)>;
 
     /*!
      * \brief asynchronously process message

@@ -56,6 +56,8 @@ add_library(asio INTERFACE)
 target_include_directories(
     asio SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/extern/asio/asio/include)
 
+add_subdirectory(extern/cpp-stl-ext)
+
 option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)
 if(MPRPC_BUILD_DOC)
     add_subdirectory(doc)
@@ -72,7 +74,7 @@ set_target_properties(
 include(GenerateExportHeader)
 generate_export_header(
     mprpc EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/include/mprpc/mprpc_export.h")
-target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt spdlog asio)
+target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt spdlog asio stl_ext)
 target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings)
 target_check_clang_tidy(mprpc)
 
