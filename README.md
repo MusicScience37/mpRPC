@@ -25,7 +25,7 @@ $ cmake .. && make -j
 * Homebrew: `brew install spdlog`
 * MacPorts: `sudo port install spdlog`
 * FreeBSD:  `cd /usr/ports/devel/spdlog/ && make install clean`
-* Fedora: `yum install spdlog`
+* Fedora: `dnf install spdlog`
 * Gentoo: `emerge dev-libs/spdlog`
 * Arch Linux: `pacman -S spdlog`
 * vcpkg: `vcpkg install spdlog`
@@ -56,7 +56,6 @@ $ cmake .. && make -j
 #### Basic usage
 ```c++
 #include "spdlog/spdlog.h"
-#include "spdlog/sinks/basic_file_sink.h"
 
 int main() 
 {
@@ -79,10 +78,6 @@ int main()
     // define SPDLOG_ACTIVE_LEVEL to desired level
     SPDLOG_TRACE("Some trace message with param {}", 42);
     SPDLOG_DEBUG("Some debug message");
-    
-    // Set the default logger to file logger
-    auto file_logger = spdlog::basic_logger_mt("basic_logger", "logs/basic.txt");
-    spdlog::set_default_logger(file_logger);            
 }
 
 ```
@@ -166,6 +161,20 @@ spdlog::dump_backtrace(); // log them now! show the last 32 messages
 // periodically flush all *registered* loggers every 3 seconds:
 // warning: only use if all your loggers are thread safe ("_mt" loggers)
 spdlog::flush_every(std::chrono::seconds(3));
+
+```
+
+---
+#### Stopwatch
+```c++
+// Stopwatch support for spdlog
+#include "spdlog/stopwatch.h"
+void stopwatch_example()
+{
+    spdlog::stopwatch sw;    
+    spdlog::debug("Elapsed {}", sw);
+    spdlog::debug("Elapsed {:.3}", sw);       
+}
 
 ```
 
