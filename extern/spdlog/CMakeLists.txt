@@ -1,14 +1,6 @@
 # Copyright(c) 2019 spdlog authors Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
-cmake_minimum_required(VERSION 3.2)
-
-if(${CMAKE_VERSION} VERSION_LESS 3.11)
-    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-else()
-    cmake_policy(VERSION 3.11)
-endif()
-
-enable_language(C)
+cmake_minimum_required(VERSION 3.10)
 
 # ---------------------------------------------------------------------------------------
 # Start spdlog project
@@ -40,7 +32,7 @@ endif()
 
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "MSYS")
     set(CMAKE_CXX_EXTENSIONS ON)
 endif()
 
@@ -200,7 +192,8 @@ endif()
 # Misc definitions according to tweak options
 # ---------------------------------------------------------------------------------------
 set(SPDLOG_WCHAR_TO_UTF8_SUPPORT ${SPDLOG_WCHAR_SUPPORT})
-foreach(SPDLOG_OPTION
+foreach(
+    SPDLOG_OPTION
     SPDLOG_WCHAR_TO_UTF8_SUPPORT
     SPDLOG_WCHAR_FILENAMES
     SPDLOG_NO_EXCEPTIONS
@@ -208,8 +201,7 @@ foreach(SPDLOG_OPTION
     SPDLOG_PREVENT_CHILD_FD
     SPDLOG_NO_THREAD_ID
     SPDLOG_NO_TLS
-    SPDLOG_NO_ATOMIC_LEVELS
-)
+    SPDLOG_NO_ATOMIC_LEVELS)
     if(${SPDLOG_OPTION})
         target_compile_definitions(spdlog PUBLIC ${SPDLOG_OPTION})
         target_compile_definitions(spdlog_header_only INTERFACE ${SPDLOG_OPTION})
