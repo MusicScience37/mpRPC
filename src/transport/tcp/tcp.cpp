@@ -32,18 +32,19 @@ namespace tcp {
 
 std::shared_ptr<acceptor> create_tcp_acceptor(
     const std::shared_ptr<mprpc::logging::logger>& logger,
-    const std::string& host, const std::uint16_t& port, thread_pool& threads,
+    const std::string& ip_address, const std::uint16_t& port,
+    thread_pool& threads,
     const std::shared_ptr<parser_factory>& parser_factory_ptr) {
-    try {
-        const auto ip_address = asio::ip::make_address(host);
-        const auto endpoint = asio::ip::tcp::endpoint(ip_address, port);
-        return std::make_unique<tcp_acceptor>(
-            logger, endpoint, threads.context(), parser_factory_ptr);
-    } catch (const asio::system_error& e) {
-        MPRPC_ERROR(
-            logger, "failed to listen to {}:{} with {}", host, port, e.what());
-        throw exception(error_info(error_code::failed_to_listen, e.what()));
+    asio::error_code err;
+    const auto ip_address_parsed = asio::ip::make_address(ip_address, err);
+    if (err) {
+        MPRPC_ERROR(logger, "invalid IP address: {}", ip_address);
+        throw exception(error_info(
+            error_code::failed_to_listen, "invalid IP address: " + ip_address));
     }
+    const auto endpoint = asio::ip::tcp::endpoint(ip_address_parsed, port);
+    return std::make_unique<tcp_acceptor>(
+        logger, endpoint, threads.context(), parser_factory_ptr);
 }
 
 std::shared_ptr<connector> create_tcp_connector(

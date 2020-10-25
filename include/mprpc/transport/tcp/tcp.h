@@ -38,7 +38,7 @@ namespace tcp {
  * \brief create a TCP acceptor
  *
  * \param logger logger
- * \param host host address to listen
+ * \param ip_address host IP address string to listen (IPv4 or IPv6)
  * \param port port number to listen
  * \param threads thread pool
  * \param parser_factory_ptr parser factory
@@ -46,7 +46,8 @@ namespace tcp {
  */
 MPRPC_EXPORT std::shared_ptr<acceptor> create_tcp_acceptor(
     const std::shared_ptr<mprpc::logging::logger>& logger,
-    const std::string& host, const std::uint16_t& port, thread_pool& threads,
+    const std::string& ip_address, const std::uint16_t& port,
+    thread_pool& threads,
     const std::shared_ptr<parser_factory>& parser_factory_ptr);
 
 /*!
