@@ -17,6 +17,8 @@
  * \file
  * \brief test of RPC on TCP
  */
+#include "mprpc/transport/tcp/tcp.h"
+
 #include <future>
 
 #include <catch2/catch.hpp>
@@ -26,8 +28,6 @@
 #include "mprpc/logging/spdlog_logger.h"
 #include "mprpc/server.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
-#include "mprpc/transport/tcp/tcp_acceptor.h"
-#include "mprpc/transport/tcp/tcp_connector.h"
 
 TEST_CASE("RPC on TCP") {
     constexpr std::size_t max_file_size = 1024 * 1024;
@@ -52,13 +52,11 @@ TEST_CASE("RPC on TCP") {
     const auto parser_factory =
         std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
 
-    // 127.0.0.1:3780
+    const auto host = std::string("127.0.0.1");
     constexpr std::uint16_t port = 3780;
-    const auto endpoint =
-        asio::ip::tcp::endpoint(asio::ip::address_v4::loopback(), port);
 
-    auto acceptor = std::make_shared<mprpc::transport::tcp::tcp_acceptor>(
-        logger, endpoint, threads->context(), parser_factory);
+    auto acceptor = mprpc::transport::tcp::create_tcp_acceptor(
+        logger, host, port, *threads, parser_factory);
 
     auto server = mprpc::server(logger, threads, {acceptor}, method_server);
     server.start();
@@ -66,11 +64,8 @@ TEST_CASE("RPC on TCP") {
     const auto duration = std::chrono::milliseconds(100);
     std::this_thread::sleep_for(duration);
 
-    auto connector_socket = asio::ip::tcp::socket(threads->context());
-    REQUIRE_NOTHROW(connector_socket.connect(endpoint));
-    auto connector = std::make_shared<mprpc::transport::tcp::tcp_connector>(
-        logger, std::move(connector_socket), threads->context(),
-        parser_factory->create_streaming_parser(logger));
+    auto connector = mprpc::transport::tcp::create_tcp_connector(
+        logger, host, port, *threads, parser_factory);
 
     SECTION("request") {
         constexpr mprpc::msgid_t msgid = 5;
