@@ -15,34 +15,32 @@
  */
 /*!
  * \file
- * \brief declaration and implementation of thread_pool class
+ * \brief declaration of thread_pool class
  */
 #pragma once
 
-#include <functional>
-#include <thread>
-#include <utility>
-#include <vector>
+#include <memory>
 
-#include <asio/executor_work_guard.hpp>
 #include <asio/io_context.hpp>
-#include <asio/post.hpp>
 #include <stl_ext/shared_function.h>
 
 #include "mprpc/error_info.h"
-#include "mprpc/exception.h"
 #include "mprpc/logging/logger.h"
-#include "mprpc/logging/logging_macros.h"
+#include "mprpc/mprpc_export.h"
 
 namespace mprpc {
 
 /*!
  * \brief class of threads to run asio::io_context::run
  */
-class thread_pool {
+class MPRPC_EXPORT thread_pool {
 public:
     //! type of handlers called when errors happen
-    using on_error_handler_type = stl_ext::shared_function<void(const error_info&)>;
+    using on_error_handler_type =
+        stl_ext::shared_function<void(const error_info&)>;
+
+    //! type of functions to execute
+    using function_type = stl_ext::shared_function<void()>;
 
     /*!
      * \brief construct
@@ -51,11 +49,7 @@ public:
      * \param num_threads number of threads
      */
     explicit thread_pool(
-        std::shared_ptr<logging::logger> logger, std::size_t num_threads = 1)
-        : context_(static_cast<int>(num_threads)),
-          work_guard_(asio::make_work_guard(context_)),
-          num_threads_(num_threads),
-          logger_(std::move(logger)) {}
+        std::shared_ptr<logging::logger> logger, std::size_t num_threads = 1);
 
     /*!
      * \brief set handler called when errors happen
@@ -64,69 +58,41 @@ public:
      *
      * \warning Call this before starting threads.
      */
-    void on_error(on_error_handler_type handler) {
-        on_error_ = std::move(handler);
-    }
+    void on_error(on_error_handler_type handler);
 
     /*!
      * \brief start threads if not started
      *
      * \note This function is not thread safe for the same object.
      */
-    void start() {
-        if (threads_.empty()) {
-            threads_.reserve(num_threads_);
-            for (std::size_t i = 0; i < num_threads_; ++i) {
-                threads_.emplace_back(&thread_pool::process_in_thread, this);
-            }
-            MPRPC_DEBUG(logger_, "started {} threads", num_threads_);
-        }
-    }
+    void start();
 
     /*!
      * \brief stop threads if not stopped
      *
      * \note This function is not thread safe for the same object.
      */
-    void stop() {
-        if (context_.stopped()) {
-            return;
-        }
-        work_guard_.reset();
-        context_.stop();
-        for (auto& thread : threads_) {
-            thread.join();
-        }
-        threads_.clear();
-        MPRPC_DEBUG(logger_, "stopped {} threads", num_threads_);
-    }
+    void stop();
 
     /*!
      * \brief get io_context object
      *
      * \return io_context object
      */
-    asio::io_context& context() { return context_; }
+    asio::io_context& context();
 
     /*!
      * \brief add a function to be executed
      *
-     * \tparam Function type of function
-     * \tparam Args types of arguments
      * \param function function
-     * \param args arguments
      */
-    template <typename Function, typename... Args>
-    void post(Function&& function, Args&&... args) {
-        asio::post(context_, std::forward<Function>(function),
-            std::forward<Args>(args)...);
-    }
+    void post(function_type function);
 
     /*!
      * \brief destruct
      *
      */
-    ~thread_pool() { stop(); }
+    ~thread_pool();
 
     thread_pool(const thread_pool&) = delete;
     thread_pool(thread_pool&&) = delete;
@@ -137,47 +103,20 @@ private:
     /*!
      * \brief process in thread
      */
-    void process_in_thread() {
-        try {
-            context_.run();
-            MPRPC_TRACE(logger_, "finishing thread normally");
-        } catch (const exception& e) {
-            process_thread_error(e.info());
-        } catch (const std::exception& e) {
-            process_thread_error(
-                error_info(error_code::unexpected_error, e.what()));
-        }
-    }
+    void process_in_thread();
 
     /*!
      * \brief process errors
      *
      * \param error error
      */
-    void process_thread_error(const error_info& error) {
-        MPRPC_FATAL(logger_, "error in thread: {}", error);
-        if (on_error_) {
-            on_error_(error);
-        }
-    }
+    void process_thread_error(const error_info& error);
 
-    //! io_context object
-    asio::io_context context_;
+    //! struct for internal data
+    struct impl;
 
-    //! object to control executor work
-    asio::executor_work_guard<asio::io_context::executor_type> work_guard_;
-
-    //! number of threads
-    std::size_t num_threads_;
-
-    //! threads
-    std::vector<std::thread> threads_{};
-
-    //! handler called when errors happen
-    on_error_handler_type on_error_{};
-
-    //! logger
-    std::shared_ptr<logging::logger> logger_;
+    //! internal data
+    std::unique_ptr<impl> impl_{};
 };
 
 }  // namespace mprpc

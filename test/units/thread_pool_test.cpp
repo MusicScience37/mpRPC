@@ -22,10 +22,12 @@
 #include <atomic>
 #include <memory>
 #include <stdexcept>
+#include <thread>
 
 #include <catch2/catch.hpp>
 
 #include "create_logger.h"
+#include "mprpc/exception.h"
 #include "mprpc/logging/logging_macros.h"
 
 TEST_CASE("mprpc::thread_pool") {
