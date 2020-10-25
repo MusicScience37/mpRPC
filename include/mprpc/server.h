@@ -23,8 +23,10 @@
 #include <unordered_set>
 #include <vector>
 
+#include "mprpc/error_info.h"
 #include "mprpc/execution/method_server.h"
 #include "mprpc/logging/logger.h"
+#include "mprpc/logging/logging_macros.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
 

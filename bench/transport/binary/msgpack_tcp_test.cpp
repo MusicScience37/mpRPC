@@ -8,9 +8,7 @@
 #include "mprpc/logging/spdlog_logger.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
-#include "mprpc/transport/tcp/tcp_acceptor.h"
-#include "mprpc/transport/tcp/tcp_connector.h"
-#include "mprpc/transport/tcp/tcp_session.h"
+#include "mprpc/transport/tcp/tcp.h"
 
 class mprpc_session : public std::enable_shared_from_this<mprpc_session> {
 public:
@@ -94,28 +92,23 @@ static void transport_binary_msgpack_tcp(benchmark::State& state) {
     const auto size = static_cast<std::size_t>(state.range());
     const auto data = mprpc::generate_binary_data(size);
 
-    // server address: 127.0.0.1:3780
+    const auto host = std::string("127.0.0.1");
     constexpr std::uint16_t port = 3780;
-    const auto endpoint =
-        asio::ip::tcp::endpoint(asio::ip::address_v4::loopback(), port);
 
     const auto parser_factory =
         std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
 
     try {
-        auto acceptor = std::make_shared<mprpc::transport::tcp::tcp_acceptor>(
-            logger, endpoint, threads->context(), parser_factory);
+        auto acceptor = mprpc::transport::tcp::create_tcp_acceptor(
+            logger, host, port, *threads, parser_factory);
         auto server = std::make_shared<mprpc_server>(acceptor);
         server->start();
 
         const auto wait_duration = std::chrono::milliseconds(100);
         std::this_thread::sleep_for(wait_duration);
 
-        auto client_socket = asio::ip::tcp::socket(threads->context());
-        client_socket.connect(endpoint);
-        auto client = std::make_shared<mprpc::transport::tcp::tcp_connector>(
-            logger, std::move(client_socket), threads->context(),
-            parser_factory->create_streaming_parser(logger));
+        auto client = mprpc::transport::tcp::create_tcp_connector(
+            logger, host, port, *threads, parser_factory);
 
         for (auto _ : state) {
             {

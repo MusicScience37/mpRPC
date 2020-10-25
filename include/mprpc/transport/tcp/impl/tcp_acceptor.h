@@ -31,8 +31,8 @@
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
 #include "mprpc/transport/parser.h"
-#include "mprpc/transport/tcp/tcp_address.h"
-#include "mprpc/transport/tcp/tcp_session.h"
+#include "mprpc/transport/tcp/impl/tcp_address.h"
+#include "mprpc/transport/tcp/impl/tcp_session.h"
 
 namespace mprpc {
 namespace transport {

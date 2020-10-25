@@ -17,7 +17,7 @@
  * \file
  * \brief test of tcp_address class
  */
-#include "mprpc/transport/tcp/tcp_address.h"
+#include "mprpc/transport/tcp/impl/tcp_address.h"
 
 #include <catch2/catch.hpp>
 
