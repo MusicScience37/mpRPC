@@ -20,9 +20,11 @@
 #include "mprpc/transport/tcp/tcp.h"
 
 #include <asio/ip/address.hpp>
+#include <asio/ip/tcp.hpp>
 
 #include "mprpc/exception.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/transport/asio_helper/basic_endpoint.h"
 #include "mprpc/transport/tcp/impl/tcp_acceptor.h"
 #include "mprpc/transport/tcp/impl/tcp_connector.h"
 
@@ -51,19 +53,39 @@ std::shared_ptr<connector> create_tcp_connector(
     const std::shared_ptr<mprpc::logging::logger>& logger,
     const std::string& host, const std::uint16_t& port, thread_pool& threads,
     const std::shared_ptr<parser_factory>& parser_factory_ptr) {
-    try {
-        const auto ip_address = asio::ip::make_address(host);
-        const auto endpoint = asio::ip::tcp::endpoint(ip_address, port);
-        auto connector_socket = asio::ip::tcp::socket(threads.context());
-        connector_socket.connect(endpoint);
-        return std::make_unique<tcp_connector>(logger,
-            std::move(connector_socket), threads.context(),
-            parser_factory_ptr->create_streaming_parser(logger));
-    } catch (const asio::system_error& e) {
-        MPRPC_ERROR(
-            logger, "failed to connect to {}:{} with {}", host, port, e.what());
-        throw exception(error_info(error_code::failed_to_listen, e.what()));
+    asio::ip::tcp::resolver resolver{threads.context()};
+    asio::error_code err;
+    MPRPC_DEBUG(logger, "resloving {}:{}", host, port);
+    auto resolved_endpoints = resolver.resolve(host, std::to_string(port), err);
+    if (err) {
+        MPRPC_ERROR(logger, "failed to resolve {}: {}", host, err.message());
+        throw exception(error_info(error_code::failed_to_resolve,
+            "failed to resolve " + host + ": " + err.message()));
     }
+
+    for (const auto& entry : resolved_endpoints) {
+        MPRPC_TRACE(logger, "resolved endpoint: {}", entry.endpoint());
+    }
+
+    auto connector_socket = asio::ip::tcp::socket(threads.context());
+    for (const auto& entry : resolved_endpoints) {
+        MPRPC_DEBUG(
+            logger, "trying to connect to endpoint: {}", entry.endpoint());
+        connector_socket.connect(entry.endpoint(), err);
+        if (!err) {
+            return std::make_unique<tcp_connector>(logger,
+                std::move(connector_socket), threads.context(),
+                parser_factory_ptr->create_streaming_parser(logger));
+        }
+
+        MPRPC_DEBUG(logger, "failed to connect to {}: {}", entry.endpoint(),
+            err.message());
+    }
+    MPRPC_ERROR(
+        logger, "failed to connect to {}:{}: {}", host, port, err.message());
+    throw exception(error_info(error_code::failed_to_connect,
+        "failed to connect to " + host + ":" + std::to_string(port) + ": " +
+            err.message()));
 }
 
 }  // namespace tcp
