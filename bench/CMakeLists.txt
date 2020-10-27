@@ -5,7 +5,7 @@ set(MPRPC_BENCH_DIR
     CACHE PATH "directory to which result of benchmarks are outputted" FORCE)
 file(MAKE_DIRECTORY ${MPRPC_BENCH_DIR})
 
-add_custom_target(mprpc_bench COMMENT "executed benchmarks of mpRPC")
+option(MPRPC_BENCH_IN_TEST "perform benchmarks in tests" OFF)
 
 macro(add_mprpc_bench _TARGET)
     target_link_libraries(
@@ -14,14 +14,13 @@ macro(add_mprpc_bench _TARGET)
     target_check_clang_tidy(${_TARGET})
 
     set(BENCH_RESULT_PATH ${MPRPC_BENCH_DIR}/${_TARGET}.json)
-    add_custom_target(
-        ${_TARGET}_execution
-        COMMAND ${_TARGET} "--benchmark_out_format=json"
-                "--benchmark_out=${_TARGET}.json"
-        DEPENDS ${_TARGET}
-        WORKING_DIRECTORY "${MPRPC_BENCH_DIR}"
-        COMMENT "executing ${_TARGET}")
-    add_dependencies(mprpc_bench ${_TARGET}_execution)
+    if(MPRPC_BENCH_IN_TEST)
+        add_test(
+            NAME ${_TARGET}
+            COMMAND ${_TARGET} "--benchmark_out_format=json"
+                    "--benchmark_out=${_TARGET}.json"
+            WORKING_DIRECTORY "${MPRPC_BENCH_DIR}")
+    endif()
 endmacro()
 
 add_subdirectory(parser)
