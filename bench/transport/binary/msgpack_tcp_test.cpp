@@ -140,12 +140,12 @@ static void transport_binary_msgpack_tcp(benchmark::State& state) {
                 future.get();
             }
         }
+
+        threads->stop();
     } catch (const std::exception& err) {
         MPRPC_ERROR(logger, err.what());
         state.SkipWithError(err.what());
     }
-
-    threads->stop();
 
     set_counters(state);
 }

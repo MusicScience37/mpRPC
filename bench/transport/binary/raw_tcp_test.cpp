@@ -144,12 +144,12 @@ static void transport_binary_raw_tcp(benchmark::State& state) {
             asio::read(
                 client, asio::buffer(read_data.data(), read_data.size()));
         }
+
+        threads->stop();
     } catch (const asio::system_error& err) {
         MPRPC_ERROR(logger, err.what());
         state.SkipWithError(err.what());
     }
-
-    threads->stop();
 
     set_counters(state);
 }
