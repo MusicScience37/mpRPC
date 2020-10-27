@@ -149,7 +149,6 @@ doc:
     - mkdir build_doc
     - cmake -S ./ -B build_doc
       -DMPRPC_BUILD_DOC:BOOL=ON
-      -DMPRPC_BUILD_LATEX_DOC:BOOL=ON
     - cmake --build build_doc --target mprpc_doc
   artifacts:
     paths:
@@ -173,7 +172,6 @@ pages:
   script:
     - mkdir public
     - mv build_doc/doc/sphinx/html public/sphinx
-    - mv build_doc/doc/sphinx/latex/mprpc.pdf public/mprpc.pdf
     - mv build_doc/doc/doxygen/html public/doxygen
     - mv build_gcc_coverage/coverage/html public/gcc_coverage
     - mv build_clang_coverage/coverage/html public/clang_coverage
