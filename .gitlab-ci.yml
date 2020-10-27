@@ -86,6 +86,19 @@ static analysis:
     when: always
     expire_in: "3 mos"
 
+.debug-test-base:
+  extends: .release-test-base
+  script:
+    - mkdir $BUILD_DIR
+    - cmake -S ./ -B $BUILD_DIR
+      -DCMAKE_BUILD_TYPE=Debug
+      -DMPRPC_TESTING:BOOL=ON
+      -DMPRPC_BENCH_IN_TEST:BOOL=ON
+      -DMPRPC_WRITE_JUNIT:BOOL=ON
+    - cd $BUILD_DIR
+    - ctest -V -M Experimental -T Configure -T Build -T Test -T MemCheck
+    - ctest -M Experimental -T Submit
+
 clang coverage:
   extends: .release-test-base
   stage: Test with Clang
@@ -103,7 +116,7 @@ clang coverage:
     - cd $BUILD_DIR
     - mkdir coverage
     - export LLVM_PROFILE_FILE=$(pwd)/coverage/coverage_%p.profraw
-    - ctest -V -M Experimental -T Configure -T Build -T Test -T MemCheck
+    - ctest -V -M Experimental -T Configure -T Build -T Test
     - ctest -M Experimental -T Submit
     - cd ../
     - scripts/collect_llvm_coverage.sh build_clang_coverage
@@ -124,19 +137,26 @@ gcc coverage:
       "-DCMAKE_CXX_FLAGS=--coverage"
       "-DCMAKE_MODULE_LINKER_FLAGS=--coverage"
     - cd $BUILD_DIR
-    - ctest -V -M Experimental -T Configure -T Build -T Test -T MemCheck
+    - ctest -V -M Experimental -T Configure -T Build -T Test
     - ctest -M Experimental -T Coverage || true
     - ctest -M Experimental -T Submit
     - cd ../
     - scripts/collect_gcc_coverage.sh build_gcc_coverage
   coverage: '/Total:\|\s*(\d+\.?\d+?)%/'
 
-gcc-10:
+gcc-10-release:
   extends: .release-test-base
   stage: Test with GCC
   image: musicscience37/gcc-ci:gcc10-v3.0
   variables:
-    BUILD_DIR: build_gcc10
+    BUILD_DIR: build_gcc10_release
+
+gcc-10-debug:
+  extends: .debug-test-base
+  stage: Test with GCC
+  image: musicscience37/gcc-ci:gcc10-v3.0
+  variables:
+    BUILD_DIR: build_gcc10_debug
 
 doc:
   extends: .retry setting
