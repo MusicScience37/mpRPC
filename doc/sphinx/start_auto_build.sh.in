@@ -1,8 +1,0 @@
-#!/bin/bash
-
-sphinx-autobuild \
-    ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/html_auto \
-    -D breathe_projects.mprpc="${CMAKE_CURRENT_BINARY_DIR}/../doxygen/xml" \
-    -D plantuml="java -jar ${PLANTUML_JAR_PATH}" \
-    -D release=${PROJECT_VERSION} \
-    -H 0 -p 8888

@@ -26,8 +26,10 @@ set(PLANTUML_JAR_PATH
     "${DEFAULT_PLANTUML_JAR_PATH}"
     CACHE FILEPATH "path of plantuml.jar")
 
+set(MPRPC_DOXYGEN_XML_DIR "${CMAKE_CURRENT_BINARY_DIR}/doxygen_xml")
+
 set(MPRPC_SPHINX_OPTIONS
-    -D breathe_projects.mprpc="${CMAKE_CURRENT_BINARY_DIR}/../doxygen/xml" -D
+    -D breathe_projects.mprpc="${MPRPC_DOXYGEN_XML_DIR}" -D
     "plantuml=java -jar ${PLANTUML_JAR_PATH}" -D release=${PROJECT_VERSION})
 
 add_custom_target(
@@ -38,9 +40,6 @@ add_custom_target(
 
 add_dependencies(mprpc_doc_sphinx_html mprpc_doc_doxygen)
 add_dependencies(mprpc_doc mprpc_doc_sphinx_html)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/start_auto_build.sh.in
-               ${CMAKE_CURRENT_BINARY_DIR}/start_auto_build.sh)
 
 if(MPRPC_BUILD_LATEX_DOC)
     add_custom_target(

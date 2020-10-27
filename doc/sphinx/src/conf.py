@@ -14,6 +14,7 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import textwrap
 
 # -- Project information -----------------------------------------------------
 
@@ -47,6 +48,31 @@ breathe_default_members = ('members', 'private-members')
 
 breathe_domain_by_extension = {
     "h": "cpp",
+}
+
+# -- Options for exhale ------------------------------------------------------
+
+extensions += ['exhale']
+exhale_args = {
+    "containmentFolder": "./cpp-api",
+    "rootFileName": "index.rst",
+    "rootFileTitle": "C++ API Reference",
+    "doxygenStripFromPath":  "../../../include",
+    "createTreeView": True,
+    "exhaleExecutesDoxygen": True,
+    "exhaleDoxygenStdin": textwrap.dedent('''
+        INPUT = ../../../include
+        RECURSIVE = YES
+        FILE_PATTERNS = *.h *.cpp
+        BUILTIN_STL_SUPPORT = YES
+        ENABLE_PREPROCESSING = YES
+        MACRO_EXPANSION = YES
+        EXPAND_ONLY_PREDEF = YES
+        PREDEFINED = MPRPC_DOCUMENTATION=1 MPRPC_EXPORT=""
+        SEARCH_INCLUDES = YES
+        INCLUDE_PATH = ../../../include
+        XML_OUTPUT = .
+    '''),
 }
 
 # -- Options for PlantUML ----------------------------------------------------

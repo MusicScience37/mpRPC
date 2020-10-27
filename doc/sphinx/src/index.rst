@@ -8,6 +8,6 @@ An implementation of MessagePack-RPC in C++
     :caption: Contents:
 
     overview
-    Reference/index
+    cpp-api/index
     license
     acknowledgement
