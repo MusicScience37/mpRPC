@@ -43,6 +43,7 @@ static analysis:
     - cmake -S ./ -B build_static_analysis
       -DMPRPC_ENABLE_CLANG_TIDY:BOOL=ON
       -DMPRPC_TESTING:BOOL=ON
+      -DMPRPC_ENABLE_BENCH:BOOL=ON
       -DMPRPC_ENABLE_CPP_WARNINGS:BOOL=ON
     - cmake --build build_static_analysis
       --target mprpc_clang_tidy
@@ -72,6 +73,7 @@ static analysis:
     - cmake -S ./ -B $BUILD_DIR
       -DCMAKE_BUILD_TYPE=Release
       -DMPRPC_TESTING:BOOL=ON
+      -DMPRPC_ENABLE_BENCH:BOOL=ON
       -DMPRPC_BENCH_IN_TEST:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
     - cd $BUILD_DIR
@@ -93,6 +95,7 @@ static analysis:
     - cmake -S ./ -B $BUILD_DIR
       -DCMAKE_BUILD_TYPE=Debug
       -DMPRPC_TESTING:BOOL=ON
+      -DMPRPC_ENABLE_BENCH:BOOL=ON
       -DMPRPC_BENCH_IN_TEST:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
     - cd $BUILD_DIR
