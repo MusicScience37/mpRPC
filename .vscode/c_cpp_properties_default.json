@@ -1,0 +1,27 @@
+{
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/build/Debug/include",
+        "${workspaceFolder}/test/utils/include",
+        "${workspaceFolder}/bench/utils/include",
+        "${workspaceFolder}/extern/asio/asio/include",
+        "${workspaceFolder}/extern/benchmark/include",
+        "${workspaceFolder}/extern/Catch2/single_include",
+        "${workspaceFolder}/extern/fmt/include",
+        "${workspaceFolder}/extern/lyra/include",
+        "${workspaceFolder}/extern/msgpack-c/include",
+        "${workspaceFolder}/extern/spdlog/include",
+        "${workspaceFolder}/extern/cpp-stl-ext/include"
+      ],
+      "defines": [],
+      "compilerPath": "/usr/bin/g++",
+      "cStandard": "c11",
+      "cppStandard": "c++14",
+      "intelliSenseMode": "gcc-x64"
+    }
+  ],
+  "version": 4
+}
