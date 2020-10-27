@@ -14,11 +14,9 @@
 class session : public std::enable_shared_from_this<session> {
 public:
     session(std::shared_ptr<mprpc::logging::logger> logger,
-        asio::ip::tcp::socket socket,
-        std::shared_ptr<mprpc::thread_pool> threads, std::size_t data_size)
+        asio::ip::tcp::socket socket, std::size_t data_size)
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
-          threads_(std::move(threads)),
           data_(std::vector<char>(data_size)) {}
 
     void start() { do_read(); }
@@ -57,8 +55,6 @@ private:
 
     asio::ip::tcp::socket socket_;
 
-    std::shared_ptr<mprpc::thread_pool> threads_;
-
     std::vector<char> data_;
 };
 
@@ -70,7 +66,6 @@ public:
         std::size_t data_size)
         : logger_(std::move(logger)),
           socket_(threads->context(), endpoint),
-          threads_(threads),
           data_size_(data_size) {}
 
     void start() { do_accept(); }
@@ -95,8 +90,8 @@ private:
             return;
         }
 
-        auto s = std::make_shared<session>(
-            logger_, std::move(socket), threads_, data_size_);
+        auto s =
+            std::make_shared<session>(logger_, std::move(socket), data_size_);
         s->start();
 
         do_accept();
@@ -105,8 +100,6 @@ private:
     std::shared_ptr<mprpc::logging::logger> logger_;
 
     asio::ip::tcp::acceptor socket_;
-
-    std::shared_ptr<mprpc::thread_pool> threads_;
 
     std::size_t data_size_;
 };
