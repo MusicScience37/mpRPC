@@ -20,8 +20,12 @@ public:
 private:
     void do_read() {
         session_->async_read(
-            [self = shared_from_this()](const mprpc::error_info& error,
+            [weak_self = weak_from_this()](const mprpc::error_info& error,
                 const mprpc::message_data& message) {
+                auto self = weak_self.lock();
+                if (!self) {
+                    return;
+                }
                 self->on_read(error, message);
             });
     }
@@ -33,8 +37,13 @@ private:
         }
 
         session_->async_write(message,
-            [self = shared_from_this()](
-                const mprpc::error_info& error) { self->on_write(error); });
+            [weak_self = weak_from_this()](const mprpc::error_info& error) {
+                auto self = weak_self.lock();
+                if (!self) {
+                    return;
+                }
+                self->on_write(error);
+            });
     }
 
     void on_write(const mprpc::error_info& error) {
@@ -43,6 +52,10 @@ private:
         }
 
         do_read();
+    }
+
+    std::weak_ptr<mprpc_session> weak_from_this() {
+        return std::enable_shared_from_this<mprpc_session>::shared_from_this();
     }
 
     std::shared_ptr<mprpc::transport::session> session_;
@@ -73,10 +86,13 @@ private:
         }
         auto s = std::make_shared<mprpc_session>(session);
         s->start();
+        sessions_.push_back(s);
         do_accept();
     }
 
     std::shared_ptr<mprpc::transport::acceptor> acceptor_;
+
+    std::vector<std::shared_ptr<mprpc_session>> sessions_;
 };
 
 static void transport_binary_msgpack_tcp(benchmark::State& state) {
