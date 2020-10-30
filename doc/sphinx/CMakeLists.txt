@@ -36,5 +36,4 @@ add_custom_target(
             ${CMAKE_CURRENT_BINARY_DIR} ${MPRPC_SPHINX_OPTIONS}
     COMMENT "Generate Sphinx html API documentation for mprpc")
 
-add_dependencies(mprpc_doc_sphinx_html mprpc_doc_doxygen)
 add_dependencies(mprpc_doc mprpc_doc_sphinx_html)
