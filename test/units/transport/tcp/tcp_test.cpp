@@ -23,8 +23,10 @@
 #include <thread>
 
 #include <catch2/catch.hpp>
+#include <msgpack.hpp>
 
 #include "../../create_logger.h"
+#include "mprpc/logging/logging_macros.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
 
 TEST_CASE("mprpc::transport::tcp") {
