@@ -104,4 +104,94 @@ TEST_CASE("mprpc::impl::response_future_data") {
         REQUIRE_NOTHROW(future_data.set_handler(handler));
         REQUIRE_THROWS(future_data.set_handler(handler));
     }
+
+    threads->stop();
+}
+
+TEST_CASE("mprpc::response_future") {
+    const auto logger = create_logger("mprpc::impl::response_future_data");
+
+    const auto threads = std::make_shared<mprpc::thread_pool>(logger, 1);
+    threads->start();
+
+    const auto data =
+        std::make_shared<mprpc::impl::response_future_data>(*threads);
+
+    static const auto timeout = std::chrono::seconds(3);
+
+    // sample response
+    const auto response_data = std::string({char(0xC2)});  // false
+    const auto response =
+        mprpc::message_data(response_data.data(), response_data.size());
+
+    SECTION("use of empty future") {
+        mprpc::response_future response_future;
+        REQUIRE_THROWS(response_future.then(
+            [](const mprpc::error_info&, const mprpc::message_data&) {}));
+        REQUIRE_THROWS(response_future.then([](const mprpc::message_data&) {},
+            [](const mprpc::error_info&) {}));
+    }
+
+    SECTION("use of a handler") {
+        mprpc::response_future response_future{data};
+
+        std::promise<mprpc::message_data> promise;
+        auto future = promise.get_future();
+        REQUIRE_NOTHROW(
+            response_future.then([&promise](const mprpc::error_info& error,
+                                     const mprpc::message_data& msg) {
+                if (error) {
+                    promise.set_exception(
+                        std::make_exception_ptr(mprpc::exception(error)));
+                } else {
+                    promise.set_value(msg);
+                }
+            }));
+
+        SECTION("on failure") {
+            REQUIRE_NOTHROW(data->set_error(mprpc::error_info(
+                mprpc::error_code::unexpected_error, "test error")));
+
+            REQUIRE(future.wait_for(timeout) == std::future_status::ready);
+            REQUIRE_THROWS_WITH(future.get(), Catch::Contains("test error"));
+        }
+
+        SECTION("on success") {
+            REQUIRE_NOTHROW(data->set_response(response));
+
+            REQUIRE(future.wait_for(timeout) == std::future_status::ready);
+            REQUIRE(future.get() == response);
+        }
+    }
+
+    SECTION("use of separate handlers") {
+        mprpc::response_future response_future{data};
+
+        std::promise<mprpc::message_data> promise;
+        auto future = promise.get_future();
+        REQUIRE_NOTHROW(response_future.then(
+            [&promise](
+                const mprpc::message_data& msg) { promise.set_value(msg); },
+            [&promise](const mprpc::error_info& error) {
+                promise.set_exception(
+                    std::make_exception_ptr(mprpc::exception(error)));
+            }));
+
+        SECTION("on failure") {
+            REQUIRE_NOTHROW(data->set_error(mprpc::error_info(
+                mprpc::error_code::unexpected_error, "test error")));
+
+            REQUIRE(future.wait_for(timeout) == std::future_status::ready);
+            REQUIRE_THROWS_WITH(future.get(), Catch::Contains("test error"));
+        }
+
+        SECTION("on success") {
+            REQUIRE_NOTHROW(data->set_response(response));
+
+            REQUIRE(future.wait_for(timeout) == std::future_status::ready);
+            REQUIRE(future.get() == response);
+        }
+    }
+
+    threads->stop();
 }

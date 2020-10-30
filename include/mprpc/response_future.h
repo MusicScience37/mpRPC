@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include <memory>
 #include <mutex>
 
 #include <stl_ext/shared_function.h>
@@ -139,4 +140,69 @@ private:
 };
 
 }  // namespace impl
+
+/*!
+ * \brief class of futures for response messages
+ */
+class response_future {
+public:
+    /*!
+     * \brief construct (empty)
+     */
+    response_future() = default;
+
+    /*!
+     * \brief construct
+     *
+     * \param data data
+     */
+    explicit response_future(std::shared_ptr<impl::response_future_data> data)
+        : data_(std::move(data)) {}
+
+    /*!
+     * \brief set handler
+     *
+     * \param handler handler
+     */
+    void then(const stl_ext::shared_function<void(
+            const error_info&, const message_data&)>& handler) {
+        require_data();
+        data_->set_handler(handler);
+    }
+
+    /*!
+     * \brief set handlers
+     *
+     * \param on_success handler on success
+     * \param on_failure handler on failure
+     */
+    void then(
+        const stl_ext::shared_function<void(const message_data&)>& on_success,
+        const stl_ext::shared_function<void(const error_info&)>& on_failure) {
+        require_data();
+        data_->set_handler([on_success, on_failure](const error_info& error,
+                               const message_data& msg) {
+            if (error) {
+                on_failure(error);
+            } else {
+                on_success(msg);
+            }
+        });
+    }
+
+private:
+    /*!
+     * \brief check that data is not empty
+     */
+    void require_data() const {
+        if (!data_) {
+            throw exception(error_info(
+                error_code::invalid_future_use, "tried to use empty future"));
+        }
+    }
+
+    //! data
+    std::shared_ptr<impl::response_future_data> data_{};
+};
+
 }  // namespace mprpc
