@@ -227,4 +227,43 @@ private:
     std::shared_ptr<impl::response_future_data> data_{};
 };
 
+/*!
+ * \brief class of promise for response messages
+ */
+class response_promise {
+public:
+    /*!
+     * \brief construct
+     *
+     * \param threads thread pool
+     */
+    explicit response_promise(thread_pool& threads)
+        : data_(std::make_shared<impl::response_future_data>(threads)) {}
+
+    /*!
+     * \brief get future
+     *
+     * \return future
+     */
+    response_future get_future() { return response_future(data_); }
+
+    /*!
+     * \brief set error
+     *
+     * \param error error
+     */
+    void set_error(const error_info& error) { data_->set_error(error); }
+
+    /*!
+     * \brief set response message
+     *
+     * \param msg response message
+     */
+    void set_response(const message_data& msg) { data_->set_response(msg); }
+
+private:
+    //! data
+    std::shared_ptr<impl::response_future_data> data_;
+};
+
 }  // namespace mprpc
