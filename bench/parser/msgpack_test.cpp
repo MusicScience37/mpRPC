@@ -8,8 +8,7 @@
 static void parse_msgpack(benchmark::State& state) {
     static auto logger =
         mprpc::logging::create_stdout_logger("mprpc_bench_parser_msgpack");
-    auto parser =
-        std::make_shared<mprpc::transport::parsers::msgpack_parser>(logger);
+    auto parser = mprpc::transport::parsers::create_msgpack_parser(logger);
 
     auto size = static_cast<std::size_t>(state.range());
     auto data = mprpc::generate_string_data(size);

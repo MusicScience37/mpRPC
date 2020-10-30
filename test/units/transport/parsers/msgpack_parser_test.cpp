@@ -28,8 +28,9 @@
 TEST_CASE("mprpc::transport::parsers::msgpack_parser") {
     auto logger = create_logger("mprpc::transport::parsers::msgpack_parser");
 
-    using mprpc::transport::parsers::msgpack_parser;
-    msgpack_parser parser(logger);
+    const auto parser_ptr =
+        mprpc::transport::parsers::create_msgpack_parser(logger);
+    auto& parser = *parser_ptr;
 
     SECTION("parse a message") {
         const auto data_str = std::string({char(0x92), char(0x01), char(0x02)});
@@ -59,7 +60,9 @@ TEST_CASE("mprpc::transport::parsers::msgpack_streaming_parser") {
     auto logger =
         create_logger("mprpc::transport::parsers::msgpack_streaming_parser");
 
-    mprpc::transport::parsers::msgpack_streaming_parser parser(logger);
+    const auto parser_ptr =
+        mprpc::transport::parsers::create_msgpack_streaming_parser(logger);
+    auto& parser = *parser_ptr;
 
     SECTION("parse a message") {
         const auto data_str = std::string({char(0x92), char(0x01), char(0x02)});

@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "mprpc/generate_binary_data.h"
+#include "mprpc/logging/logging_macros.h"
 #include "mprpc/logging/spdlog_logger.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
