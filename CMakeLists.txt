@@ -63,8 +63,8 @@ if(MPRPC_BUILD_DOC)
     add_subdirectory(doc)
 endif()
 
-add_library(mprpc SHARED src/logging/spdlog_logger.cpp src/thread_pool.cpp
-                         src/transport/tcp/tcp.cpp)
+add_library(mprpc SHARED src/format_message.cpp src/logging/spdlog_logger.cpp
+                         src/thread_pool.cpp src/transport/tcp/tcp.cpp)
 target_include_directories(mprpc PUBLIC ${MPRPC_SOURCE_DIR}/include
                                         ${CMAKE_BINARY_DIR}/include)
 set_target_properties(
