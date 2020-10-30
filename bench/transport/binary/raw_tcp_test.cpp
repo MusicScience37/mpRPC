@@ -105,8 +105,7 @@ private:
 };
 
 static void transport_binary_raw_tcp(benchmark::State& state) {
-    static const auto logger = mprpc::logging::create_stdout_logger(
-        "mprpc_bench_transport_binary_raw_tcp");
+    static const auto logger = mprpc::logging::create_stdout_logger();
 
     constexpr std::size_t num_threads = 2;
     const auto threads =

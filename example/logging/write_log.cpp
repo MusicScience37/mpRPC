@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 
         if (filename.empty()) {
             logger = mprpc::logging::create_stdout_logger(
-                "test_logger", mprpc::logging::log_level::trace);
+                mprpc::logging::log_level::trace);
         } else {
             logger = mprpc::logging::create_file_logger(
                 "test_logger", filename, mprpc::logging::log_level::trace);

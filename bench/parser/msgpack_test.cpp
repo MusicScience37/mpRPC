@@ -6,8 +6,7 @@
 #include "mprpc/transport/parsers/msgpack_parser.h"
 
 static void parse_msgpack(benchmark::State& state) {
-    static auto logger =
-        mprpc::logging::create_stdout_logger("mprpc_bench_parser_msgpack");
+    static auto logger = mprpc::logging::create_stdout_logger();
     auto parser = mprpc::transport::parsers::create_msgpack_parser(logger);
 
     auto size = static_cast<std::size_t>(state.range());
