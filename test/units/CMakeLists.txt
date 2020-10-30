@@ -25,5 +25,6 @@ add_executable(
     execution/function_method_executor_test.cpp
     execution/simple_method_server_test.cpp
     server_test.cpp
-    server_builder_test.cpp)
+    server_builder_test.cpp
+    response_future_test.cpp)
 target_add_catch2(mprpc_test_units)

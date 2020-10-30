@@ -69,6 +69,13 @@ enum execution_errors : error_code_t {
     method_not_found = 300  //!< method not found
 };
 
+/*!
+ * \brief enumeration of future-related error codes
+ */
+enum future_errors : error_code_t {
+    invalid_future_use = 400  //!< use of invalid future
+};
+
 }  // namespace error_code
 
 }  // namespace mprpc
