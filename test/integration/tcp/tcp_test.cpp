@@ -23,10 +23,8 @@
 
 #include <catch2/catch.hpp>
 
-#include "mprpc/execution/function_method_executor.h"
-#include "mprpc/execution/simple_method_server.h"
 #include "mprpc/logging/spdlog_logger.h"
-#include "mprpc/server.h"
+#include "mprpc/server_builder.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
 
 TEST_CASE("RPC on TCP") {
@@ -39,27 +37,18 @@ TEST_CASE("RPC on TCP") {
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 2);
     threads->start();
 
-    std::vector<std::shared_ptr<mprpc::execution::method_executor>> methods;
-
-    methods.push_back(
-        mprpc::execution::make_function_method_executor<std::string(
-            std::string)>(logger, "echo", [](std::string str) { return str; }));
-
-    const auto method_server =
-        std::make_shared<mprpc::execution::simple_method_server>(
-            logger, *threads, methods);
-
     const auto parser_factory =
         std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
 
     const auto host = std::string("127.0.0.1");
     constexpr std::uint16_t port = 3780;
 
-    auto acceptor = mprpc::transport::tcp::create_tcp_acceptor(
-        logger, host, port, *threads, parser_factory);
-
-    auto server = mprpc::server(logger, threads, {acceptor}, method_server);
-    server.start();
+    auto server = mprpc::server_builder(logger)
+                      .num_threads(2)
+                      .listen_tcp(host, port)
+                      .method<std::string(std::string)>(
+                          "echo", [](std::string str) { return str; })
+                      .create();
 
     const auto duration = std::chrono::milliseconds(100);
     std::this_thread::sleep_for(duration);
