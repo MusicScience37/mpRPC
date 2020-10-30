@@ -97,9 +97,8 @@ private:
 };
 
 static void transport_binary_msgpack_tcp(benchmark::State& state) {
-    static const auto logger = mprpc::logging::create_stdout_logger(
-        "mprpc_bench_transport_binary_msgpack_tcp",
-        mprpc::logging::log_level::error);
+    static const auto logger =
+        mprpc::logging::create_stdout_logger(mprpc::logging::log_level::error);
 
     constexpr std::size_t num_threads = 2;
     const auto threads =

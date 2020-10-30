@@ -58,9 +58,21 @@ public:
      * \brief start process
      */
     void start() {
+        MPRPC_INFO(logger_, "server starting");
+        threads_->start();
         for (const auto& acceptor : acceptors_) {
             do_accept(acceptor);
         }
+        MPRPC_INFO(logger_, "server started");
+    }
+
+    /*!
+     * \brief stop process
+     */
+    void stop() {
+        MPRPC_INFO(logger_, "server stopping");
+        threads_->stop();
+        MPRPC_INFO(logger_, "server stopped");
     }
 
     server(const server&) = delete;
@@ -79,7 +91,7 @@ public:
     server& operator=(server&&) = default;
 
     //! destruct
-    ~server() = default;
+    ~server() { stop(); }
 
 private:
     /*!

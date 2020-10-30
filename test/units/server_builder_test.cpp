@@ -15,57 +15,53 @@
  */
 /*!
  * \file
- * \brief test of RPC on TCP
+ * \brief test of server_builder class
  */
-#include "mprpc/transport/tcp/tcp.h"
+#include "mprpc/server_builder.h"
 
 #include <future>
+#include <tuple>
 
 #include <catch2/catch.hpp>
 
-#include "mprpc/logging/spdlog_logger.h"
-#include "mprpc/server_builder.h"
-#include "mprpc/transport/parsers/msgpack_parser.h"
+#include "create_logger.h"
+#include "mprpc/pack_data.h"
 
-TEST_CASE("RPC on TCP") {
-    constexpr std::size_t max_file_size = 1024 * 1024;
-    constexpr std::size_t max_files = 5;
-    auto logger = mprpc::logging::create_file_logger("mprpc_test_integ_tcp",
-        "mprpc_test_integ_tcp.log", mprpc::logging::log_level::trace,
-        max_file_size, max_files, true);
+TEST_CASE("mprpc::server_builder") {
+    const auto logger = create_logger("mprpc::server_builder");
 
-    const auto threads = std::make_shared<mprpc::thread_pool>(logger, 2);
-    threads->start();
+    SECTION("create a server") {
+        const auto host = std::string("127.0.0.1");
+        constexpr std::uint16_t port = 3780;
 
-    const auto parser_factory =
-        std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
+        auto server = mprpc::server_builder(logger)
+                          .num_threads(2)
+                          .listen_tcp(host, port)
+                          .method<std::string(std::string)>(
+                              "echo", [](std::string str) { return str; })
+                          .create();
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
+        const auto wait_duration = std::chrono::milliseconds(100);
+        std::this_thread::sleep_for(wait_duration);
 
-    auto server = mprpc::server_builder(logger)
-                      .num_threads(2)
-                      .listen_tcp(host, port)
-                      .method<std::string(std::string)>(
-                          "echo", [](std::string str) { return str; })
-                      .create();
+        const auto threads = std::make_shared<mprpc::thread_pool>(logger, 3);
+        threads->start();
 
-    const auto duration = std::chrono::milliseconds(100);
-    std::this_thread::sleep_for(duration);
+        const auto parser_factory = std::make_shared<
+            mprpc::transport::parsers::msgpack_parser_factory>();
 
-    auto connector = mprpc::transport::tcp::create_tcp_connector(
-        logger, host, port, *threads, parser_factory);
+        const auto connector = mprpc::transport::tcp::create_tcp_connector(
+            logger, host, port, *threads, parser_factory);
 
-    SECTION("request") {
-        constexpr mprpc::msgid_t msgid = 5;
-        const auto str = std::string("abc");
-        const auto message =
+        const mprpc::msgid_t msgid = 37;
+        const auto str = std::string("abcde");
+        const auto request =
             mprpc::pack_request(msgid, "echo", std::make_tuple(str));
         {
             auto promise = std::promise<void>();
             auto future = promise.get_future();
             connector->async_write(
-                message, [&promise](const mprpc::error_info& error) {
+                request, [&promise](const mprpc::error_info& error) {
                     if (error) {
                         promise.set_exception(
                             std::make_exception_ptr(mprpc::exception(error)));
@@ -94,7 +90,7 @@ TEST_CASE("RPC on TCP") {
         REQUIRE(response.msgid() == msgid);
         REQUIRE(response.has_error() == false);
         REQUIRE(response.result_as<std::string>() == str);
-    }
 
-    threads->stop();
+        threads->stop();
+    }
 }

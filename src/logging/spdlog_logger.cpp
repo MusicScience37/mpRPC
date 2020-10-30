@@ -184,10 +184,11 @@ std::shared_ptr<logger> create_file_logger(const std::string& logger_name,
         log_output_level);
 }
 
-std::shared_ptr<logger> create_stdout_logger(
-    const std::string& logger_name, log_level log_output_level) {
+std::shared_ptr<logger> create_stdout_logger(log_level log_output_level) {
+    static const auto spdlog_console_logger =
+        spdlog::stdout_color_mt("mprpc_console_logger");
     return std::make_shared<spdlog_logger>(
-        spdlog::stdout_color_mt(logger_name), log_output_level);
+        spdlog_console_logger, log_output_level);
 }
 
 }  // namespace logging

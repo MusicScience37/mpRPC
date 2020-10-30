@@ -69,12 +69,10 @@ MPRPC_EXPORT std::shared_ptr<logger> create_file_logger(
 /*!
  * \brief create logger to write logs to standard output
  *
- * \param logger_name name of logger (unique in process)
  * \param log_output_level log output level
  * \return logger
  */
 MPRPC_EXPORT std::shared_ptr<logger> create_stdout_logger(
-    const std::string& logger_name,
     log_level log_output_level = log_level::info);
 
 }  // namespace logging

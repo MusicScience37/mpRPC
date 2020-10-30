@@ -130,7 +130,6 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
     }
 
     SECTION("create logger to write to stdout") {
-        REQUIRE_NOTHROW(
-            mprpc::logging::create_stdout_logger("test_spdlog_logger_stdout"));
+        REQUIRE_NOTHROW(mprpc::logging::create_stdout_logger());
     }
 }
