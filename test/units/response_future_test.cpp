@@ -193,5 +193,26 @@ TEST_CASE("mprpc::response_future") {
         }
     }
 
+    SECTION("use of std::future") {
+        mprpc::response_future response_future{data};
+
+        auto future = response_future.get_future();
+
+        SECTION("on failure") {
+            REQUIRE_NOTHROW(data->set_error(mprpc::error_info(
+                mprpc::error_code::unexpected_error, "test error")));
+
+            REQUIRE(future.wait_for(timeout) == std::future_status::ready);
+            REQUIRE_THROWS_WITH(future.get(), Catch::Contains("test error"));
+        }
+
+        SECTION("on success") {
+            REQUIRE_NOTHROW(data->set_response(response));
+
+            REQUIRE(future.wait_for(timeout) == std::future_status::ready);
+            REQUIRE(future.get() == response);
+        }
+    }
+
     threads->stop();
 }

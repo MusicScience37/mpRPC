@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include <future>
 #include <memory>
 #include <mutex>
 
@@ -188,6 +189,27 @@ public:
                 on_success(msg);
             }
         });
+    }
+
+    /*!
+     * \brief get std::future object for response
+     *
+     * \return std::future object
+     */
+    std::future<message_data> get_future() {
+        std::promise<message_data> promise;
+        auto future = promise.get_future();
+        data_->set_handler(
+            [moved_promise = std::move(promise)](const mprpc::error_info& error,
+                const mprpc::message_data& msg) mutable {
+                if (error) {
+                    moved_promise.set_exception(
+                        std::make_exception_ptr(exception(error)));
+                } else {
+                    moved_promise.set_value(msg);
+                }
+            });
+        return future;
     }
 
 private:
