@@ -65,11 +65,37 @@ TEST_CASE("RPC on TCP") {
         REQUIRE(future.get() == str);
     }
 
+    SECTION("request echo") {
+        const auto str = std::string("abc");
+        REQUIRE(echo_client.request(str) == str);
+    }
+
+    SECTION("request echo with operator") {
+        const auto str = std::string("abc");
+        REQUIRE(echo_client(str) == str);
+    }
+
     SECTION("async_request count") {
-        REQUIRE(counter.load() == 0);
+        counter = 0;
         auto future = count_client.async_request().get_future();
         REQUIRE(future.wait_for(timeout) == std::future_status::ready);
         REQUIRE_NOTHROW(future.get());
         REQUIRE(counter.load() == 1);
     }
+
+    SECTION("request count") {
+        counter = 0;
+        REQUIRE_NOTHROW(count_client.request());
+        REQUIRE(counter.load() == 1);
+    }
+
+    SECTION("request count with operator") {
+        counter = 0;
+        REQUIRE_NOTHROW(count_client());
+        REQUIRE(counter.load() == 1);
+    }
+
+    client.stop();
+    server.stop();
+    std::this_thread::sleep_for(duration);
 }
