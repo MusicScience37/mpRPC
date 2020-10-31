@@ -34,6 +34,7 @@
 
 namespace mprpc {
 
+//! struct for internal data
 struct thread_pool::impl {
     //! io_context object
     asio::io_context context;
@@ -56,8 +57,8 @@ struct thread_pool::impl {
     /*!
      * \brief construct
      *
-     * \param logger logger
-     * \param num_threads number of threads
+     * \param logger_in logger
+     * \param num_threads_in number of threads
      */
     impl(std::shared_ptr<logging::logger> logger_in, std::size_t num_threads_in)
         : context(static_cast<int>(num_threads_in)),
