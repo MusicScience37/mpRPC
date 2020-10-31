@@ -1,0 +1,7 @@
+add_executable(mprpc_ex_echo_server echo_server.cpp)
+target_link_libraries(mprpc_ex_echo_server mprpc lyra mprpc_cpp_warnings)
+target_check_clang_tidy(mprpc_ex_echo_server)
+
+add_executable(mprpc_ex_echo_client echo_client.cpp)
+target_link_libraries(mprpc_ex_echo_client mprpc lyra mprpc_cpp_warnings)
+target_check_clang_tidy(mprpc_ex_echo_client)
