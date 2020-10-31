@@ -113,6 +113,25 @@ public:
         return async_request<Result>(method, params...).get_future().get();
     }
 
+    /*!
+     * \brief send notification
+     *
+     * \tparam Params parameters types
+     * \param method method name
+     * \param params parameters
+     */
+    template <typename... Params>
+    void notify(const std::string& method, const Params&... params) {
+        const auto msg =
+            pack_notification(method, std::forward_as_tuple(params...));
+        connector_->async_write(msg, [this, method](const error_info& error) {
+            if (error) {
+                MPRPC_WARN(
+                    logger_, "failed to send notification of {}", method);
+            }
+        });
+    }
+
     client(const client&) = delete;
     client& operator=(const client&) = delete;
 

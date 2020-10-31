@@ -80,6 +80,15 @@ public:
         return request(params...);
     }
 
+    /*!
+     * \brief send notification
+     *
+     * \param params parameters
+     */
+    void notify(const ParamsType&... params) {
+        client_.notify(method_, params...);
+    }
+
 private:
     //! client
     client& client_;

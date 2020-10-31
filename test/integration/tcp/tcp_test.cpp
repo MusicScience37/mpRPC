@@ -95,6 +95,20 @@ TEST_CASE("RPC on TCP") {
         REQUIRE(counter.load() == 1);
     }
 
+    SECTION("notify count") {
+        counter = 0;
+        REQUIRE_NOTHROW(count_client.notify());
+        constexpr std::size_t repetition = 100;
+        for (std::size_t i = 0; i < repetition; ++i) {
+            const auto duration = std::chrono::milliseconds(100);
+            std::this_thread::sleep_for(duration);
+            if (counter == 1) {
+                break;
+            }
+        }
+        REQUIRE(counter.load() == 1);
+    }
+
     client.stop();
     server.stop();
     std::this_thread::sleep_for(duration);

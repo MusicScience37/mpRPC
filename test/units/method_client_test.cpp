@@ -97,6 +97,22 @@ TEST_CASE("mprpc::method_client") {
         REQUIRE(future.get() == result);
     }
 
+    SECTION("notify") {
+        auto client = mprpc::client(logger, threads, connector);
+        client.start();
+
+        auto method = mprpc::method_client<int(int, int, int)>(client, "test");
+
+        REQUIRE_NOTHROW(method.notify(1, 2, 3));
+
+        const auto request_data = connector->get_written_data();
+        mprpc::message request;
+        REQUIRE_NOTHROW(request = mprpc::message(request_data));
+        REQUIRE(request.method() == "test");
+        REQUIRE(request.params_as<std::tuple<int, int, int>>() ==
+            std::make_tuple(1, 2, 3));
+    }
+
     SECTION("async_request for void result") {
         auto client = mprpc::client(logger, threads, connector);
         client.start();
