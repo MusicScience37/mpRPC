@@ -21,7 +21,6 @@
 
 #include <memory>
 
-#include "mprpc/message.h"
 #include "mprpc/pack_data.h"
 #include "mprpc/response_future.h"
 
@@ -78,15 +77,14 @@ public:
     void then(const stl_ext::shared_function<void(result_type)>& on_success,
         const stl_ext::shared_function<void(const error_info&)>& on_failure) {
         future_.then(
-            [on_success, on_failure](const message_data& msg) {
+            [on_success, on_failure](const message& msg) {
                 try {
-                    auto parsed = message(msg);
-                    if (parsed.has_error()) {
+                    if (msg.has_error()) {
                         on_failure(error_info(error_code::unexpected_error,
-                            "error on server", pack_data(parsed.error())));
+                            "error on server", pack_data(msg.error())));
                         return;
                     }
-                    on_success(parsed.result_as<result_type>());
+                    on_success(msg.result_as<result_type>());
                 } catch (const exception& e) {
                     on_failure(e.info());
                 }

@@ -34,8 +34,10 @@ TEST_CASE("mprpc::typed_response_future") {
 
     // sample responses
     const int error_data = 37;
-    const auto error_response = mprpc::pack_error_response(0, error_data);
-    const auto response = mprpc::pack_response(0, std::string("abc"));
+    const auto error_response =
+        mprpc::message(mprpc::pack_error_response(0, error_data));
+    const auto response =
+        mprpc::message(mprpc::pack_response(0, std::string("abc")));
 
     SECTION("use of a handler") {
         mprpc::response_promise response_promise(*threads);

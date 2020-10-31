@@ -172,7 +172,7 @@ private:
                     msg.msgid());
                 return;
             }
-            iter->second.promise.set_response(data);
+            iter->second.promise.set_response(msg);
         } catch (const exception& e) {
             MPRPC_ERROR(logger_, "client stopping on parse error");
             std::unique_lock<std::mutex> lock(*mutex_);

@@ -25,6 +25,7 @@
 
 #include "create_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/pack_data.h"
 
 TEST_CASE("mprpc::impl::response_future_data") {
     const auto logger = create_logger("mprpc::impl::response_future_data");
@@ -32,10 +33,10 @@ TEST_CASE("mprpc::impl::response_future_data") {
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 1);
     threads->start();
 
-    std::promise<mprpc::message_data> promise;
+    std::promise<mprpc::message> promise;
     auto future = promise.get_future();
     const auto handler = [&promise](const mprpc::error_info& error,
-                             const mprpc::message_data& msg) {
+                             const mprpc::message& msg) {
         if (error) {
             promise.set_exception(
                 std::make_exception_ptr(mprpc::exception(error)));
@@ -58,15 +59,14 @@ TEST_CASE("mprpc::impl::response_future_data") {
     }
 
     SECTION("set data first, and set handler") {
-        const auto response_data = std::string({char(0xC2)});  // false
-        const auto response =
-            mprpc::message_data(response_data.data(), response_data.size());
+        const auto response_data = mprpc::pack_response(0, std::string("abc"));
+        const auto response = mprpc::message(response_data);
 
         REQUIRE_NOTHROW(future_data.set_response(response));
         REQUIRE_NOTHROW(future_data.set_handler(handler));
 
         REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-        REQUIRE(future.get() == response);
+        REQUIRE(future.get().result_as<std::string>() == "abc");
     }
 
     SECTION("set handler first, and set error") {
@@ -79,21 +79,19 @@ TEST_CASE("mprpc::impl::response_future_data") {
     }
 
     SECTION("set handler first, and set data") {
-        const auto response_data = std::string({char(0xC2)});  // false
-        const auto response =
-            mprpc::message_data(response_data.data(), response_data.size());
+        const auto response_data = mprpc::pack_response(0, std::string("abc"));
+        const auto response = mprpc::message(response_data);
 
         REQUIRE_NOTHROW(future_data.set_handler(handler));
         REQUIRE_NOTHROW(future_data.set_response(response));
 
         REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-        REQUIRE(future.get() == response);
+        REQUIRE(future.get().result_as<std::string>() == "abc");
     }
 
     SECTION("duplicate error and response") {
-        const auto response_data = std::string({char(0xC2)});  // false
-        const auto response =
-            mprpc::message_data(response_data.data(), response_data.size());
+        const auto response_data = mprpc::pack_response(0, std::string("abc"));
+        const auto response = mprpc::message(response_data);
 
         REQUIRE_NOTHROW(future_data.set_error(mprpc::error_info(
             mprpc::error_code::unexpected_error, "test error")));
@@ -120,26 +118,25 @@ TEST_CASE("mprpc::response_future") {
     static const auto timeout = std::chrono::seconds(3);
 
     // sample response
-    const auto response_data = std::string({char(0xC2)});  // false
-    const auto response =
-        mprpc::message_data(response_data.data(), response_data.size());
+    const auto response_data = mprpc::pack_response(0, std::string("abc"));
+    const auto response = mprpc::message(response_data);
 
     SECTION("use of empty future") {
         mprpc::response_future response_future;
         REQUIRE_THROWS(response_future.then(
-            [](const mprpc::error_info&, const mprpc::message_data&) {}));
-        REQUIRE_THROWS(response_future.then([](const mprpc::message_data&) {},
-            [](const mprpc::error_info&) {}));
+            [](const mprpc::error_info&, const mprpc::message&) {}));
+        REQUIRE_THROWS(response_future.then(
+            [](const mprpc::message&) {}, [](const mprpc::error_info&) {}));
     }
 
     SECTION("use of a handler") {
         mprpc::response_future response_future{data};
 
-        std::promise<mprpc::message_data> promise;
+        std::promise<mprpc::message> promise;
         auto future = promise.get_future();
         REQUIRE_NOTHROW(
             response_future.then([&promise](const mprpc::error_info& error,
-                                     const mprpc::message_data& msg) {
+                                     const mprpc::message& msg) {
                 if (error) {
                     promise.set_exception(
                         std::make_exception_ptr(mprpc::exception(error)));
@@ -160,18 +157,17 @@ TEST_CASE("mprpc::response_future") {
             REQUIRE_NOTHROW(data->set_response(response));
 
             REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE(future.get() == response);
+            REQUIRE(future.get().result_as<std::string>() == "abc");
         }
     }
 
     SECTION("use of separate handlers") {
         mprpc::response_future response_future{data};
 
-        std::promise<mprpc::message_data> promise;
+        std::promise<mprpc::message> promise;
         auto future = promise.get_future();
         REQUIRE_NOTHROW(response_future.then(
-            [&promise](
-                const mprpc::message_data& msg) { promise.set_value(msg); },
+            [&promise](const mprpc::message& msg) { promise.set_value(msg); },
             [&promise](const mprpc::error_info& error) {
                 promise.set_exception(
                     std::make_exception_ptr(mprpc::exception(error)));
@@ -189,7 +185,7 @@ TEST_CASE("mprpc::response_future") {
             REQUIRE_NOTHROW(data->set_response(response));
 
             REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE(future.get() == response);
+            REQUIRE(future.get().result_as<std::string>() == "abc");
         }
     }
 
@@ -210,7 +206,7 @@ TEST_CASE("mprpc::response_future") {
             REQUIRE_NOTHROW(data->set_response(response));
 
             REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE(future.get() == response);
+            REQUIRE(future.get().result_as<std::string>() == "abc");
         }
     }
 
@@ -226,13 +222,12 @@ TEST_CASE("mprpc::response_promise") {
     static const auto timeout = std::chrono::seconds(3);
 
     // sample response
-    const auto response_data = std::string({char(0xC2)});  // false
-    const auto response =
-        mprpc::message_data(response_data.data(), response_data.size());
+    const auto response_data = mprpc::pack_response(0, std::string("abc"));
+    const auto response = mprpc::message(response_data);
 
     SECTION("use promise") {
         mprpc::response_promise promise(*threads);
-        std::future<mprpc::message_data> future;
+        std::future<mprpc::message> future;
         REQUIRE_NOTHROW(future = promise.get_future().get_future());
 
         SECTION("set error") {
@@ -247,7 +242,7 @@ TEST_CASE("mprpc::response_promise") {
             REQUIRE_NOTHROW(promise.set_response(response));
 
             REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE(future.get() == response);
+            REQUIRE(future.get().result_as<std::string>() == "abc");
         }
     }
 
