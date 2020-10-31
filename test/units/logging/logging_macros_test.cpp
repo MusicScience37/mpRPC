@@ -19,7 +19,8 @@
  */
 #include "mprpc/logging/logging_macros.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 namespace {
 
@@ -67,7 +68,8 @@ TEST_CASE("logging macros in mpRPC") {
 #line 3 "test.cpp"
         REQUIRE(std::string(MPRPC_FILENAME) == "test.cpp");
         REQUIRE(MPRPC_LINE == 4);
-        REQUIRE_THAT(test_func_name(), Catch::Contains("test_func_name"));
+        REQUIRE_THAT(
+            test_func_name(), Catch::Matchers::Contains("test_func_name"));
     }
 
     SECTION("macro to write log") {
@@ -77,7 +79,8 @@ TEST_CASE("logging macros in mpRPC") {
         test_mprpc_log(&logger);
         REQUIRE(logger.filename == "test.cpp");
         REQUIRE(logger.line == 5);
-        REQUIRE_THAT(logger.function, Catch::Contains("test_mprpc_log"));
+        REQUIRE_THAT(
+            logger.function, Catch::Matchers::Contains("test_mprpc_log"));
         REQUIRE(logger.level == log_level::info);
         REQUIRE(logger.message == "value: 37");
 

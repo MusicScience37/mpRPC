@@ -17,7 +17,7 @@
  * \file
  * \brief test of RPC on TCP
  */
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "mprpc/client_builder.h"
 #include "mprpc/logging/spdlog_logger.h"

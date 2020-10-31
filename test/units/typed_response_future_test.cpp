@@ -19,7 +19,8 @@
  */
 #include "mprpc/typed_response_future.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 #include "create_logger.h"
 #include "mprpc/pack_data.h"
@@ -66,7 +67,7 @@ TEST_CASE("mprpc::typed_response_future") {
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
             REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("test error"));
+                result_future.get(), Catch::Matchers::Contains("test error"));
         }
 
         SECTION("on server error") {
@@ -74,8 +75,8 @@ TEST_CASE("mprpc::typed_response_future") {
 
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("error on server"));
+            REQUIRE_THROWS_WITH(result_future.get(),
+                Catch::Matchers::Contains("error on server"));
         }
 
         SECTION("on success") {
@@ -112,7 +113,7 @@ TEST_CASE("mprpc::typed_response_future") {
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
             REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("test error"));
+                result_future.get(), Catch::Matchers::Contains("test error"));
         }
 
         SECTION("on server error") {
@@ -120,8 +121,8 @@ TEST_CASE("mprpc::typed_response_future") {
 
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("error on server"));
+            REQUIRE_THROWS_WITH(result_future.get(),
+                Catch::Matchers::Contains("error on server"));
         }
 
         SECTION("on success") {
@@ -148,7 +149,7 @@ TEST_CASE("mprpc::typed_response_future") {
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
             REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("test error"));
+                result_future.get(), Catch::Matchers::Contains("test error"));
         }
 
         SECTION("on server error") {
@@ -156,8 +157,8 @@ TEST_CASE("mprpc::typed_response_future") {
 
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("error on server"));
+            REQUIRE_THROWS_WITH(result_future.get(),
+                Catch::Matchers::Contains("error on server"));
         }
 
         SECTION("on success") {
@@ -209,7 +210,7 @@ TEST_CASE("mprpc::typed_response_future<void>") {
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
             REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("test error"));
+                result_future.get(), Catch::Matchers::Contains("test error"));
         }
 
         SECTION("on server error") {
@@ -217,8 +218,8 @@ TEST_CASE("mprpc::typed_response_future<void>") {
 
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("error on server"));
+            REQUIRE_THROWS_WITH(result_future.get(),
+                Catch::Matchers::Contains("error on server"));
         }
 
         SECTION("on success") {
@@ -252,7 +253,7 @@ TEST_CASE("mprpc::typed_response_future<void>") {
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
             REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("test error"));
+                result_future.get(), Catch::Matchers::Contains("test error"));
         }
 
         SECTION("on server error") {
@@ -260,8 +261,8 @@ TEST_CASE("mprpc::typed_response_future<void>") {
 
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("error on server"));
+            REQUIRE_THROWS_WITH(result_future.get(),
+                Catch::Matchers::Contains("error on server"));
         }
 
         SECTION("on success") {
@@ -287,7 +288,7 @@ TEST_CASE("mprpc::typed_response_future<void>") {
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
             REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("test error"));
+                result_future.get(), Catch::Matchers::Contains("test error"));
         }
 
         SECTION("on server error") {
@@ -295,8 +296,8 @@ TEST_CASE("mprpc::typed_response_future<void>") {
 
             REQUIRE(
                 result_future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE_THROWS_WITH(
-                result_future.get(), Catch::Contains("error on server"));
+            REQUIRE_THROWS_WITH(result_future.get(),
+                Catch::Matchers::Contains("error on server"));
         }
 
         SECTION("on success") {

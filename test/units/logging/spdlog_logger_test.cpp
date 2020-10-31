@@ -23,7 +23,8 @@
 #include <regex>
 #include <sstream>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
 #include <spdlog/logger.h>
 #include <spdlog/sinks/ostream_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
@@ -61,7 +62,7 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
         test_mprpc_log(logger);
         auto log = remove_line_feed(stream.str());
         REQUIRE_THAT(log,
-            Catch::Matches(
+            Catch::Matchers::Matches(
                 R"***(\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
                 R"***(\[info\]  \(thread \d*\) value: 37 \(test.cpp:5\))***"));
 
@@ -69,7 +70,7 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
         logger->write(mprpc::logging::log_level::error, "message");
         log = remove_line_feed(stream.str());
         REQUIRE_THAT(log,
-            Catch::Matches(
+            Catch::Matchers::Matches(
                 R"***(\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
                 R"***(\[error\] \(thread \d*\) message)***"));
     }
@@ -87,37 +88,37 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
         logger->write(log_level::trace, "message");
         auto log = stream.str();
         log.pop_back();
-        REQUIRE_THAT(log, Catch::Contains("] [trace] ("));
+        REQUIRE_THAT(log, Catch::Matchers::Contains("] [trace] ("));
 
         stream.str("");
         logger->write(log_level::debug, "message");
         log = stream.str();
         log.pop_back();
-        REQUIRE_THAT(log, Catch::Contains("] [debug] ("));
+        REQUIRE_THAT(log, Catch::Matchers::Contains("] [debug] ("));
 
         stream.str("");
         logger->write(log_level::info, "message");
         log = stream.str();
         log.pop_back();
-        REQUIRE_THAT(log, Catch::Contains("] [info]  ("));
+        REQUIRE_THAT(log, Catch::Matchers::Contains("] [info]  ("));
 
         stream.str("");
         logger->write(log_level::warn, "message");
         log = stream.str();
         log.pop_back();
-        REQUIRE_THAT(log, Catch::Contains("] [warn]  ("));
+        REQUIRE_THAT(log, Catch::Matchers::Contains("] [warn]  ("));
 
         stream.str("");
         logger->write(log_level::error, "message");
         log = stream.str();
         log.pop_back();
-        REQUIRE_THAT(log, Catch::Contains("] [error] ("));
+        REQUIRE_THAT(log, Catch::Matchers::Contains("] [error] ("));
 
         stream.str("");
         logger->write(log_level::fatal, "message");
         log = stream.str();
         log.pop_back();
-        REQUIRE_THAT(log, Catch::Contains("] [fatal] ("));
+        REQUIRE_THAT(log, Catch::Matchers::Contains("] [fatal] ("));
     }
 
     SECTION("create logger to write to file") {
