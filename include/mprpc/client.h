@@ -99,6 +99,20 @@ public:
         }
     }
 
+    /*!
+     * \brief synchronously request
+     *
+     * \tparam Result result type
+     * \tparam Params parameters types
+     * \param method method name
+     * \param params parameters
+     * \return result
+     */
+    template <typename Result, typename... Params>
+    Result request(const std::string& method, const Params&... params) {
+        return async_request<Result>(method, params...).get_future().get();
+    }
+
     client(const client&) = delete;
     client& operator=(const client&) = delete;
 

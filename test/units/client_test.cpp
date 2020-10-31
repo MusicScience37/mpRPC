@@ -61,6 +61,40 @@ TEST_CASE("mprpc::client") {
         REQUIRE(future.get() == result);
     }
 
+    SECTION("request") {
+        auto client = mprpc::client(logger, threads, connector);
+        client.start();
+
+        auto future = std::async(
+            [&client] { return client.request<int>("test", 1, 2, 3); });
+
+        const auto duration = std::chrono::milliseconds(100);
+        constexpr std::size_t repetitions = 100;
+        mprpc::message_data request_data;
+        for (std::size_t i = 0; i < repetitions; ++i) {
+            request_data = connector->get_written_data();
+            if (request_data.size() > 0) {
+                break;
+            }
+            std::this_thread::sleep_for(duration);
+        }
+
+        mprpc::message request;
+        REQUIRE_NOTHROW(request = mprpc::message(request_data));
+        REQUIRE(request.method() == "test");
+        REQUIRE(request.params_as<std::tuple<int, int, int>>() ==
+            std::make_tuple(1, 2, 3));
+
+        constexpr int result = 37;
+        const auto response_data =
+            mprpc::pack_response(request.msgid(), result);
+        connector->add_read_data(response_data);
+
+        const auto timeout = std::chrono::seconds(3);
+        REQUIRE(future.wait_for(timeout) == std::future_status::ready);
+        REQUIRE(future.get() == result);
+    }
+
     SECTION("async_request for void result") {
         auto client = mprpc::client(logger, threads, connector);
         client.start();
