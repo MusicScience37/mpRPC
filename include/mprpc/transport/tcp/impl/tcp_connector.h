@@ -29,6 +29,7 @@
 #include "mprpc/transport/connector.h"
 #include "mprpc/transport/parser.h"
 #include "mprpc/transport/tcp/impl/tcp_address.h"
+#include "mprpc/transport/tcp/tcp_connector_config.h"
 
 namespace mprpc {
 namespace transport {
@@ -46,12 +47,14 @@ public:
      * \param socket socket
      * \param io_context io_context
      * \param parser parser
+     * \param config configuration
      */
     tcp_connector(const std::shared_ptr<logging::logger>& logger,
         asio::ip::tcp::socket socket, asio::io_context& io_context,
-        std::shared_ptr<streaming_parser> parser)
-        : socket_helper_(std::make_shared<socket_helper_type>(
-              logger, std::move(socket), io_context, std::move(parser))) {
+        std::shared_ptr<streaming_parser> parser, tcp_connector_config config)
+        : socket_helper_(std::make_shared<socket_helper_type>(logger,
+              std::move(socket), io_context, std::move(parser), config_)),
+          config_(config) {
         MPRPC_INFO(logger, "conencted {} to {}",
             socket_helper_->socket().local_endpoint(),
             socket_helper_->socket().remote_endpoint());
@@ -87,6 +90,9 @@ private:
 
     //! socket helper
     std::shared_ptr<socket_helper_type> socket_helper_;
+
+    //! configuration
+    tcp_connector_config config_;
 };
 
 }  // namespace tcp

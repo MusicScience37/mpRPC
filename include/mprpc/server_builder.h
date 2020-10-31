@@ -62,18 +62,21 @@ public:
      *
      * \param ip_address IP address string (IPv4 or IPv6)
      * \param port port number
+     * \param config configuration
      * \return this object
      */
-    server_builder& listen_tcp(
-        const std::string& ip_address, std::uint16_t port) {
+    server_builder& listen_tcp(const std::string& ip_address,
+        std::uint16_t port,
+        transport::tcp::tcp_acceptor_config config =
+            transport::tcp::tcp_acceptor_config()) {
         acceptor_factories_.emplace_back(
-            [ip_address, port](
+            [ip_address, port, config](
                 const std::shared_ptr<mprpc::logging::logger>& logger,
                 thread_pool& threads,
                 const std::shared_ptr<transport::parser_factory>&
                     parser_factory) {
                 return transport::tcp::create_tcp_acceptor(
-                    logger, ip_address, port, threads, parser_factory);
+                    logger, ip_address, port, threads, parser_factory, config);
             });
         return *this;
     }

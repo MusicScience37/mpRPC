@@ -33,6 +33,7 @@
 #include "mprpc/transport/parser.h"
 #include "mprpc/transport/tcp/impl/tcp_address.h"
 #include "mprpc/transport/tcp/impl/tcp_session.h"
+#include "mprpc/transport/tcp/tcp_acceptor_config.h"
 
 namespace mprpc {
 namespace transport {
@@ -50,14 +51,17 @@ public:
      * \param endpoint server endpoint
      * \param io_context io_context
      * \param parser_factory_ptr factory of parsers
+     * \param config configuration
      */
     tcp_acceptor(std::shared_ptr<mprpc::logging::logger> logger,
         const asio::ip::tcp::endpoint& endpoint, asio::io_context& io_context,
-        std::shared_ptr<parser_factory> parser_factory_ptr)
+        std::shared_ptr<parser_factory> parser_factory_ptr,
+        tcp_acceptor_config config)
         : logger_(std::move(logger)),
           socket_(io_context),
           io_context_(io_context),
-          parser_factory_(std::move(parser_factory_ptr)) {
+          parser_factory_(std::move(parser_factory_ptr)),
+          config_(config) {
         try {
             socket_ = asio::ip::tcp::acceptor(io_context, endpoint);
         } catch (const std::system_error& e) {
@@ -101,8 +105,8 @@ public:
             logger_, "accepted a connection from {}", socket.remote_endpoint());
         handler(error_info(),
             std::make_shared<tcp_session>(logger_, std::move(socket),
-                io_context_,
-                parser_factory_->create_streaming_parser(logger_)));
+                io_context_, parser_factory_->create_streaming_parser(logger_),
+                config_));
     }
 
     //! \copydoc mprpc::transport::acceptor::local_address
@@ -122,6 +126,9 @@ private:
 
     //! factory of parsers
     std::shared_ptr<parser_factory> parser_factory_;
+
+    //! configuration
+    tcp_acceptor_config config_;
 };
 
 }  // namespace tcp

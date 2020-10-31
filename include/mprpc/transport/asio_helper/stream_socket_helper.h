@@ -32,6 +32,7 @@
 #include "mprpc/logging/logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/thread_pool.h"
+#include "mprpc/transport/asio_helper/stream_socket_config.h"
 #include "mprpc/transport/parser.h"
 
 namespace mprpc {
@@ -65,14 +66,17 @@ public:
      * \param socket socket
      * \param io_context io_context
      * \param parser parser
+     * \param config configuration
      */
     stream_socket_helper(std::shared_ptr<logging::logger> logger,
         socket_type socket, asio::io_context& io_context,
-        std::shared_ptr<streaming_parser> parser)
+        std::shared_ptr<streaming_parser> parser,
+        const stream_socket_config& config)
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
           strand_(asio::make_strand(io_context)),
-          parser_(std::move(parser)) {}
+          parser_(std::move(parser)),
+          config_(config) {}
 
     /*!
      * \brief asynchronously read a message
@@ -137,7 +141,7 @@ private:
      * \param handler handler
      */
     void do_read_bytes(on_read_handler_type handler) {
-        static constexpr std::size_t min_buf_size = 1024;
+        const std::size_t min_buf_size = config_.streaming_min_buf_size.value();
         const auto buf_size = std::max(min_buf_size, socket_.available());
         parser_->prepare_buffer(buf_size);
         socket_.async_read_some(asio::buffer(parser_->buffer(), buf_size),
@@ -310,6 +314,9 @@ private:
 
     //! parser of messages
     std::shared_ptr<streaming_parser> parser_;
+
+    //! configuration
+    const stream_socket_config& config_;
 };
 
 }  // namespace asio_helper
