@@ -21,6 +21,7 @@ add_executable(
     transport/asio_helper/basic_endpoint_test.cpp
     transport/tcp/tcp_address_test.cpp
     transport/tcp/tcp_test.cpp
+    transport/udp/udp_address_test.cpp
     pack_data_test.cpp
     message_test.cpp
     execution/function_method_executor_test.cpp
