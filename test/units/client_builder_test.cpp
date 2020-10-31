@@ -48,7 +48,7 @@ TEST_CASE("mprpc::client_builder") {
 
         const auto str = std::string("abcde");
         auto future =
-            client.async_request<std::string>("echo", str).get_future();
+            client->async_request<std::string>("echo", str).get_future();
 
         const auto timeout = std::chrono::seconds(3);
         REQUIRE(future.wait_for(timeout) == std::future_status::ready);

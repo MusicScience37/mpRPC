@@ -20,6 +20,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "mprpc/client.h"
 #include "mprpc/logging/spdlog_logger.h"
@@ -77,14 +78,15 @@ public:
      *
      * \return client
      */
-    client create() {
+    std::unique_ptr<client> create() {
         const auto threads =
             std::make_shared<thread_pool>(logger_, num_threads_);
 
         auto connector = connector_factory_(logger_, *threads, parser_factory_);
 
-        auto res = client(logger_, threads, std::move(connector));
-        res.start();
+        auto res =
+            std::make_unique<client>(logger_, threads, std::move(connector));
+        res->start();
 
         return res;
     }

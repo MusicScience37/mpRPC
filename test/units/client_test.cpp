@@ -37,7 +37,7 @@ TEST_CASE("mprpc::client") {
             threads->context());
 
     SECTION("async_request") {
-        auto client = mprpc::client(logger, threads, connector);
+        mprpc::client client{logger, threads, connector};
         client.start();
 
         std::future<int> future;
@@ -62,7 +62,7 @@ TEST_CASE("mprpc::client") {
     }
 
     SECTION("request") {
-        auto client = mprpc::client(logger, threads, connector);
+        mprpc::client client{logger, threads, connector};
         client.start();
 
         auto future = std::async(
@@ -96,7 +96,7 @@ TEST_CASE("mprpc::client") {
     }
 
     SECTION("notify") {
-        auto client = mprpc::client(logger, threads, connector);
+        mprpc::client client{logger, threads, connector};
         client.start();
 
         REQUIRE_NOTHROW(client.notify("test", 1, 2, 3));
@@ -110,7 +110,7 @@ TEST_CASE("mprpc::client") {
     }
 
     SECTION("async_request for void result") {
-        auto client = mprpc::client(logger, threads, connector);
+        mprpc::client client{logger, threads, connector};
         client.start();
 
         std::future<void> future;

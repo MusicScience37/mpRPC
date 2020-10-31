@@ -20,6 +20,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "mprpc/execution/function_method_executor.h"
 #include "mprpc/execution/simple_method_server.h"
@@ -110,7 +111,7 @@ public:
      *
      * \return server
      */
-    server create() {
+    std::unique_ptr<server> create() {
         const auto threads =
             std::make_shared<thread_pool>(logger_, num_threads_);
 
@@ -123,9 +124,9 @@ public:
             acceptors.push_back(factory(logger_, *threads, parser_factory_));
         }
 
-        auto srv = server(
+        auto srv = std::make_unique<server>(
             logger_, threads, std::move(acceptors), std::move(method_server));
-        srv.start();
+        srv->start();
 
         return srv;
     }

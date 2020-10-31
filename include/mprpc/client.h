@@ -134,18 +134,8 @@ public:
 
     client(const client&) = delete;
     client& operator=(const client&) = delete;
-
-    /*!
-     * \brief copy
-     */
-    client(client&&) = default;
-
-    /*!
-     * \brief copy
-     *
-     * \return this object
-     */
-    client& operator=(client&&) = default;
+    client(client&&) = delete;
+    client& operator=(client&&) = delete;
 
     //! destruct
     ~client() { stop(); }
