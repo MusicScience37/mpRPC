@@ -172,6 +172,7 @@ private:
                     msg.msgid());
                 return;
             }
+            MPRPC_DEBUG(logger_, "(msgid={}) response: {}", msg.msgid(), msg);
             iter->second.promise.set_response(msg);
         } catch (const exception& e) {
             MPRPC_ERROR(logger_, "client stopping on parse error");
