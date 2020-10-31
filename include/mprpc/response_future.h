@@ -27,7 +27,7 @@
 
 #include "mprpc/error_info.h"
 #include "mprpc/exception.h"
-#include "mprpc/message_data.h"
+#include "mprpc/message.h"
 #include "mprpc/thread_pool.h"
 
 namespace mprpc {
