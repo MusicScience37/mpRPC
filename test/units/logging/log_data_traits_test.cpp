@@ -19,7 +19,7 @@
  */
 #include "mprpc/logging/log_data_traits.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("mprpc::logging::log_data_traits") {
     SECTION("traits for int") {

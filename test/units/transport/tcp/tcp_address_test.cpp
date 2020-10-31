@@ -19,7 +19,7 @@
  */
 #include "mprpc/transport/tcp/impl/tcp_address.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("mprpc::transport::tcp::tcp_address") {
     SECTION("IP v4 address") {

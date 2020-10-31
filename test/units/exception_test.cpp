@@ -21,7 +21,8 @@
 
 #include <type_traits>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 TEST_CASE("mprpc::exception") {
     SECTION("default functions") {
