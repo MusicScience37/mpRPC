@@ -178,6 +178,11 @@ private:
 
         try {
             auto msg = message(data);
+            if (msg.type() != msgtype::response) {
+                throw exception(error_info(error_code::invalid_message,
+                    "message type is not response"));
+            }
+
             std::unique_lock<std::mutex> lock(*mutex_);
             auto iter = requests_.find(msg.msgid());
             if (iter == requests_.end()) {
@@ -186,10 +191,11 @@ private:
                     msg.msgid());
                 return;
             }
+
             MPRPC_DEBUG(logger_, "(msgid={}) response: {}", msg.msgid(), msg);
             iter->second.promise.set_response(msg);
         } catch (const exception& e) {
-            MPRPC_ERROR(logger_, "client stopping on parse error");
+            MPRPC_ERROR(logger_, "client stopping on error: {}", e.info());
             std::unique_lock<std::mutex> lock(*mutex_);
             for (auto& req : requests_) {
                 req.second.promise.set_error(error);
