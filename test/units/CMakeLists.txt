@@ -11,6 +11,7 @@ add_executable(
     error_info_test.cpp
     exception_test.cpp
     format_message_test.cpp
+    config/option_test.cpp
     thread_pool_test.cpp
     transport/mock/mock_session_test.cpp
     transport/mock/mock_acceptor_test.cpp

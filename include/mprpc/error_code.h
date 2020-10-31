@@ -76,6 +76,13 @@ enum future_errors : error_code_t {
     invalid_future_use = 400  //!< use of invalid future
 };
 
+/*!
+ * \brief enumeration of configuration-related error codes
+ */
+enum config_errors : error_code_t {
+    invalid_config_value = 500  //!< invalid configuration value
+};
+
 }  // namespace error_code
 
 }  // namespace mprpc
