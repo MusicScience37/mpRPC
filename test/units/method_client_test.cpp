@@ -15,9 +15,9 @@
  */
 /*!
  * \file
- * \brief test of client class
+ * \brief test of method_client class
  */
-#include "mprpc/client.h"
+#include "mprpc/method_client.h"
 
 #include <future>
 
@@ -26,8 +26,8 @@
 #include "create_logger.h"
 #include "mprpc/transport/mock/mock_connector.h"
 
-TEST_CASE("mprpc::client") {
-    const auto logger = create_logger("mprpc::client");
+TEST_CASE("mprpc::method_client") {
+    const auto logger = create_logger("mprpc::method_client");
 
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 2);
     threads->start();
@@ -40,9 +40,10 @@ TEST_CASE("mprpc::client") {
         auto client = mprpc::client(logger, threads, connector);
         client.start();
 
+        auto method = mprpc::method_client<int(int, int, int)>(client, "test");
+
         std::future<int> future;
-        REQUIRE_NOTHROW(
-            future = client.async_request<int>("test", 1, 2, 3).get_future());
+        REQUIRE_NOTHROW(future = method.async_request(1, 2, 3).get_future());
 
         const auto request_data = connector->get_written_data();
         mprpc::message request;

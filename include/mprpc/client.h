@@ -77,7 +77,7 @@ public:
      * \tparam Params parameters types
      * \param method method name
      * \param params parameters
-     * \return
+     * \return future
      */
     template <typename Result, typename... Params>
     typed_response_future<Result> async_request(
