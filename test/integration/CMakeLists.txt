@@ -16,3 +16,4 @@ endif()
 
 add_subdirectory(logging)
 add_subdirectory(tcp)
+add_subdirectory(udp)
