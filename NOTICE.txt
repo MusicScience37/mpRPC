@@ -1,0 +1,25 @@
+Copyright 2020 MusicScience37 (Kenta Kabashima)
+
+This project includes Catch2 library, which is available under a 
+"Boost Software License, Version 1.0." For details, see extern/Catch2.
+
+This project includes msgpack-c library, which is available under a 
+"Boost Software License, Version 1.0." For details, see extern/msgpack-c.
+
+This project includes fmt library, which is available under a 
+"MIT License." For details, see extern/fmt.
+
+This project includes spdlog library, which is available under a 
+"MIT License." For details, see extern/spdlog.
+
+This project includes lyra library, which is available under a 
+"Boost Software License, Version 1.0." For details, see extern/lyra.
+
+This project includes asio library, which is available under a 
+"Boost Software License, Version 1.0." For details, see extern/asio.
+
+This project includes benchmark library, which is available under a 
+"Apache License, Version 2.0." For details, see extern/benchmark.
+
+This project includes cpp-stl-ext library, which is available under a 
+"Apache License, Version 2.0." For details, see extern/cpp-stl-ext.

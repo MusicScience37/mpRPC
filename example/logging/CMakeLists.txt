@@ -1,0 +1,3 @@
+add_executable(mprpc_logging_write_log write_log.cpp)
+target_link_libraries(mprpc_logging_write_log mprpc lyra mprpc_cpp_warnings)
+target_check_clang_tidy(mprpc_logging_write_log)

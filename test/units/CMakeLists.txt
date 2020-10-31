@@ -1,0 +1,34 @@
+add_executable(
+    mprpc_test_units
+    logging/log_data_traits_test.cpp
+    logging/format_log_data_test.cpp
+    logging/logger_test.cpp
+    logging/logging_macros_test.cpp
+    logging/spdlog_logger_test.cpp
+    create_logger.cpp
+    buffer_test.cpp
+    message_data_test.cpp
+    error_info_test.cpp
+    exception_test.cpp
+    format_message_test.cpp
+    thread_pool_test.cpp
+    transport/mock/mock_session_test.cpp
+    transport/mock/mock_acceptor_test.cpp
+    transport/mock/mock_connector_test.cpp
+    transport/mock/mock_address_test.cpp
+    transport/parsers/msgpack_parser_test.cpp
+    transport/asio_helper/basic_endpoint_test.cpp
+    transport/tcp/tcp_address_test.cpp
+    transport/tcp/tcp_test.cpp
+    pack_data_test.cpp
+    message_test.cpp
+    execution/function_method_executor_test.cpp
+    execution/simple_method_server_test.cpp
+    server_test.cpp
+    server_builder_test.cpp
+    response_future_test.cpp
+    typed_response_future_test.cpp
+    client_test.cpp
+    method_client_test.cpp
+    client_builder_test.cpp)
+target_add_catch2(mprpc_test_units)
