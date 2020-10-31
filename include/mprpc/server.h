@@ -77,18 +77,8 @@ public:
 
     server(const server&) = delete;
     server& operator=(const server&) = delete;
-
-    /*!
-     * \brief copy
-     */
-    server(server&&) = default;
-
-    /*!
-     * \brief copy
-     *
-     * \return this object
-     */
-    server& operator=(server&&) = default;
+    server(server&&) = delete;
+    server& operator=(server&&) = delete;
 
     //! destruct
     ~server() { stop(); }

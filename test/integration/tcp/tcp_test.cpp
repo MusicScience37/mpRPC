@@ -53,8 +53,8 @@ TEST_CASE("RPC on TCP") {
                       .create();
 
     auto echo_client =
-        mprpc::method_client<std::string(std::string)>(client, "echo");
-    auto count_client = mprpc::method_client<void()>(client, "count");
+        mprpc::method_client<std::string(std::string)>(*client, "echo");
+    auto count_client = mprpc::method_client<void()>(*client, "count");
 
     const auto timeout = std::chrono::seconds(3);
 
@@ -109,7 +109,7 @@ TEST_CASE("RPC on TCP") {
         REQUIRE(counter.load() == 1);
     }
 
-    client.stop();
-    server.stop();
+    client->stop();
+    server->stop();
     std::this_thread::sleep_for(duration);
 }

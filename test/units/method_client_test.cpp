@@ -37,7 +37,7 @@ TEST_CASE("mprpc::method_client") {
             threads->context());
 
     SECTION("async_request") {
-        auto client = mprpc::client(logger, threads, connector);
+        mprpc::client client{logger, threads, connector};
         client.start();
 
         auto method = mprpc::method_client<int(int, int, int)>(client, "test");
@@ -63,7 +63,7 @@ TEST_CASE("mprpc::method_client") {
     }
 
     SECTION("request") {
-        auto client = mprpc::client(logger, threads, connector);
+        mprpc::client client{logger, threads, connector};
         client.start();
 
         auto method = mprpc::method_client<int(int, int, int)>(client, "test");
@@ -98,7 +98,7 @@ TEST_CASE("mprpc::method_client") {
     }
 
     SECTION("notify") {
-        auto client = mprpc::client(logger, threads, connector);
+        mprpc::client client{logger, threads, connector};
         client.start();
 
         auto method = mprpc::method_client<int(int, int, int)>(client, "test");
@@ -114,7 +114,7 @@ TEST_CASE("mprpc::method_client") {
     }
 
     SECTION("async_request for void result") {
-        auto client = mprpc::client(logger, threads, connector);
+        mprpc::client client{logger, threads, connector};
         client.start();
 
         auto method = mprpc::method_client<void(int, int, int)>(client, "test");
