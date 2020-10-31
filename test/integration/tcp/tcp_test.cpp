@@ -25,20 +25,23 @@
 #include "mprpc/server_builder.h"
 
 TEST_CASE("RPC on TCP") {
-    constexpr std::size_t max_file_size = 1024 * 1024;
-    constexpr std::size_t max_files = 5;
-    auto logger = mprpc::logging::create_file_logger("mprpc_test_integ_tcp",
-        "mprpc_test_integ_tcp.log", mprpc::logging::log_level::trace,
-        max_file_size, max_files, true);
+    static constexpr std::size_t max_file_size = 1024 * 1024;
+    static constexpr std::size_t max_files = 5;
+    static const auto logger = mprpc::logging::create_file_logger(
+        "mprpc_test_integ_tcp", "mprpc_test_integ_tcp.log",
+        mprpc::logging::log_level::trace, max_file_size, max_files, true);
 
     const auto host = std::string("127.0.0.1");
     constexpr std::uint16_t port = 3780;
+
+    std::atomic<int> counter{0};
 
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
                       .listen_tcp(host, port)
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
+                      .method<void()>("count", [&counter] { ++counter; })
                       .create();
 
     const auto duration = std::chrono::milliseconds(100);
@@ -51,6 +54,7 @@ TEST_CASE("RPC on TCP") {
 
     auto echo_client =
         mprpc::method_client<std::string(std::string)>(client, "echo");
+    auto count_client = mprpc::method_client<void()>(client, "count");
 
     const auto timeout = std::chrono::seconds(3);
 
@@ -59,5 +63,13 @@ TEST_CASE("RPC on TCP") {
         auto future = echo_client.async_request(str).get_future();
         REQUIRE(future.wait_for(timeout) == std::future_status::ready);
         REQUIRE(future.get() == str);
+    }
+
+    SECTION("async_request count") {
+        REQUIRE(counter.load() == 0);
+        auto future = count_client.async_request().get_future();
+        REQUIRE(future.wait_for(timeout) == std::future_status::ready);
+        REQUIRE_NOTHROW(future.get());
+        REQUIRE(counter.load() == 1);
     }
 }
