@@ -15,10 +15,21 @@
  */
 /*!
  * \file
- * \brief header to include all transport-related headers
+ * \brief declaration and implementation of udp_acceptor_config class
  */
 #pragma once
 
-#include "mprpc/transport/parsers/msgpack_parser.h"
-#include "mprpc/transport/tcp/tcp.h"
-#include "mprpc/transport/udp/udp.h"
+#include "mprpc/transport/udp/udp_common_config.h"
+
+namespace mprpc {
+namespace transport {
+namespace udp {
+
+/*!
+ * \brief configuration for UDP acceptors
+ */
+struct udp_acceptor_config : udp_common_config {};
+
+}  // namespace udp
+}  // namespace transport
+}  // namespace mprpc

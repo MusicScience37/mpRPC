@@ -15,19 +15,20 @@
  */
 /*!
  * \file
- * \brief declaration and implementation of common options
+ * \brief declaration and implementation of udp_common_config class
  */
 #pragma once
 
 #include "mprpc/config/option.h"
 
 namespace mprpc {
-namespace config {
+namespace transport {
+namespace udp {
 
 /*!
- * \brief configuration option type for minimum buffer size in streaming parser
+ * \brief configuration option type for buffer size in datagrams
  */
-struct streaming_min_buf_size {
+struct datagram_buf_size_type {
     //! value type
     using value_type = std::size_t;
 
@@ -37,7 +38,7 @@ struct streaming_min_buf_size {
      * \return default value
      */
     static value_type default_value() noexcept {
-        constexpr std::size_t value = 1024;
+        constexpr std::size_t value = 65527;  // limit of UDP
         return value;
     }
 
@@ -54,8 +55,17 @@ struct streaming_min_buf_size {
      *
      * \return option name
      */
-    static std::string name() { return "streaming_min_buf_size"; }
+    static std::string name() { return "datagram_buf_size"; }
 };
 
-}  // namespace config
+/*!
+ * \brief common configuration of UDP
+ */
+struct udp_common_config {
+    //! buffer size in datagrams
+    config::option<datagram_buf_size_type> datagram_buf_size{};
+};
+
+}  // namespace udp
+}  // namespace transport
 }  // namespace mprpc

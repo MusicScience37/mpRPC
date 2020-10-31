@@ -15,7 +15,7 @@
  */
 /*!
  * \file
- * \brief test of RPC on TCP
+ * \brief test of RPC on UDP
  */
 #include "common.h"
 #include "mprpc/client_builder.h"
@@ -25,7 +25,7 @@
 #include "mprpc/method_client.h"
 #include "mprpc/server_builder.h"
 
-static void echo_tcp(benchmark::State& state) {
+static void echo_udp(benchmark::State& state) {
     static const auto logger =
         mprpc::logging::create_stdout_logger(mprpc::logging::log_level::warn);
 
@@ -38,7 +38,7 @@ static void echo_tcp(benchmark::State& state) {
     try {
         auto server = mprpc::server_builder(logger)
                           .num_threads(2)
-                          .listen_tcp(host, port)
+                          .listen_udp(host, port)
                           .method<std::string(std::string)>(
                               "echo", [](std::string str) { return str; })
                           .create();
@@ -48,7 +48,7 @@ static void echo_tcp(benchmark::State& state) {
 
         auto client = mprpc::client_builder(logger)
                           .num_threads(2)
-                          .connect_tcp(host, port)
+                          .connect_udp(host, port)
                           .create();
 
         auto echo_client =
@@ -65,4 +65,5 @@ static void echo_tcp(benchmark::State& state) {
 
     set_counters(state);
 }
-BENCH_ECHO(echo_tcp);
+// NOLINTNEXTLINE
+BENCHMARK(echo_udp)->UseRealTime()->RangeMultiplier(32)->Range(1, 1024 * 32);

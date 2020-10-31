@@ -1,2 +1,2 @@
-add_executable(mprpc_bench_rpc_echo tcp_test.cpp)
+add_executable(mprpc_bench_rpc_echo tcp_test.cpp udp_test.cpp)
 add_mprpc_bench(mprpc_bench_rpc_echo)
