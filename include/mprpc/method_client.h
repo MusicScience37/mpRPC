@@ -56,8 +56,28 @@ public:
      * \return future
      */
     typed_response_future<ResultType> async_request(
-        const ParamsType... params) {
+        const ParamsType&... params) {
         return client_.async_request<ResultType>(method_, params...);
+    }
+
+    /*!
+     * \brief synchronously request
+     *
+     * \param params parameters
+     * \return result
+     */
+    ResultType request(const ParamsType&... params) {
+        return client_.request<ResultType>(method_, params...);
+    }
+
+    /*!
+     * \brief synchronously request
+     *
+     * \param params parameters
+     * \return result
+     */
+    ResultType operator()(const ParamsType&... params) {
+        return request(params...);
     }
 
 private:
