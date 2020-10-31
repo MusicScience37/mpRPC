@@ -114,4 +114,81 @@ private:
     response_future future_{};
 };
 
+/*!
+ * \brief typed_response_future for void
+ */
+template <>
+class typed_response_future<void> {
+public:
+    /*!
+     * \brief construct (empty)
+     */
+    typed_response_future() = default;
+
+    /*!
+     * \brief construct
+     *
+     * \param future response future
+     */
+    explicit typed_response_future(response_future future)
+        : future_(std::move(future)) {}
+
+    /*!
+     * \brief set handler
+     *
+     * \note ResultType must be default constructible
+     *
+     * \param handler handler
+     */
+    void then(
+        const stl_ext::shared_function<void(const error_info&)>& handler) {
+        then([handler]() { handler(error_info()); },
+            [handler](const error_info& error) { handler(error); });
+    }
+
+    /*!
+     * \brief set handlers
+     *
+     * \param on_success handler on success
+     * \param on_failure handler on failure
+     */
+    void then(const stl_ext::shared_function<void()>& on_success,
+        const stl_ext::shared_function<void(const error_info&)>& on_failure) {
+        future_.then(
+            [on_success, on_failure](const message& msg) {
+                try {
+                    if (msg.has_error()) {
+                        on_failure(error_info(error_code::unexpected_error,
+                            "error on server", pack_data(msg.error())));
+                        return;
+                    }
+                    on_success();
+                } catch (const exception& e) {
+                    on_failure(e.info());
+                }
+            },
+            [on_failure](const error_info& error) { on_failure(error); });
+    }
+
+    /*!
+     * \brief get std::future object for response
+     *
+     * \return std::future object
+     */
+    std::future<void> get_future() {
+        auto promise = std::make_shared<std::promise<void>>();
+        auto future = promise->get_future();
+        then([promise]() { promise->set_value(); },
+            [promise](const error_info& error) {
+                promise->set_exception(
+                    std::make_exception_ptr(exception(error)));
+            });
+        return future;
+    }
+
+private:
+    //! response future
+    response_future future_{};
+};
+
 }  // namespace mprpc
