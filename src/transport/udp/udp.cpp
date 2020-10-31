@@ -75,7 +75,6 @@ std::shared_ptr<connector> create_udp_connector(
         MPRPC_TRACE(logger, "resolved endpoint: {}", entry.endpoint());
     }
     const auto endpoint = resolved_endpoints.begin()->endpoint();
-    MPRPC_DEBUG(logger, "send UDP packets to {}", endpoint);
 
     auto socket = asio::ip::udp::socket(threads.context());
     if (endpoint.address().is_v4()) {
@@ -85,6 +84,9 @@ std::shared_ptr<connector> create_udp_connector(
         socket = asio::ip::udp::socket(
             threads.context(), asio::ip::udp::endpoint(asio::ip::udp::v6(), 0));
     }
+
+    MPRPC_DEBUG(logger, "send UDP packets from {} to {}",
+        socket.local_endpoint(), endpoint);
 
     return std::make_shared<udp_connector>(logger, std::move(socket), endpoint,
         threads.context(), parser_factory_ptr->create_parser(logger), config);

@@ -122,6 +122,7 @@ private:
      * \param handler handler
      */
     void do_read(const on_read_handler_type& handler) {
+        MPRPC_TRACE(logger_, "receive next packet");
         socket_.async_receive_from(asio::buffer(buf_.data(), buf_.size()),
             sender_,
             asio::bind_executor(strand_,
