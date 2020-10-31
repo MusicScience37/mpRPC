@@ -29,5 +29,6 @@ add_executable(
     response_future_test.cpp
     typed_response_future_test.cpp
     client_test.cpp
+    method_client_test.cpp
     client_builder_test.cpp)
 target_add_catch2(mprpc_test_units)

@@ -57,7 +57,7 @@ public:
      */
     typed_response_future<ResultType> async_request(
         const ParamsType... params) {
-        return client_.async_request(method_, params);
+        return client_.async_request<ResultType>(method_, params...);
     }
 
 private:
