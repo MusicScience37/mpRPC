@@ -57,7 +57,7 @@ public:
     }
 
     /*!
-     * \brief set to listen a tcp port
+     * \brief set to listen a TCP port
      *
      * \param ip_address IP address string (IPv4 or IPv6)
      * \param port port number
@@ -133,7 +133,7 @@ public:
 private:
     //! logger
     std::shared_ptr<mprpc::logging::logger> logger_{
-        logging::create_stdout_logger()};
+        logging::create_stdout_logger(mprpc::logging::log_level::info)};
 
     //! number of threads
     std::size_t num_threads_{1};

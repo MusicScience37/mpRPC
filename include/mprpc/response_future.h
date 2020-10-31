@@ -27,7 +27,7 @@
 
 #include "mprpc/error_info.h"
 #include "mprpc/exception.h"
-#include "mprpc/message_data.h"
+#include "mprpc/message.h"
 #include "mprpc/thread_pool.h"
 
 namespace mprpc {
@@ -40,7 +40,7 @@ class response_future_data {
 public:
     //! type of handlers on responses received
     using on_response_handler_type =
-        stl_ext::shared_function<void(const error_info&, const message_data&)>;
+        stl_ext::shared_function<void(const error_info&, const message&)>;
 
     /*!
      * \brief construct
@@ -68,7 +68,7 @@ public:
         }
 
         threads_.post([error, on_response = on_response_] {
-            on_response(error, message_data());
+            on_response(error, message());
         });
     }
 
@@ -77,7 +77,7 @@ public:
      *
      * \param msg response message
      */
-    void set_response(const message_data& msg) {
+    void set_response(const message& msg) {
         std::unique_lock<std::mutex> lock(mutex_);
         if (has_response_) {
             throw exception(error_info(error_code::invalid_future_use,
@@ -128,7 +128,7 @@ private:
     error_info error_{};
 
     //! response message
-    message_data msg_{};
+    message msg_{};
 
     //! whether this object has a handler on responses
     bool has_handler_{false};
@@ -165,8 +165,9 @@ public:
      *
      * \param handler handler
      */
-    void then(const stl_ext::shared_function<void(
-            const error_info&, const message_data&)>& handler) {
+    void then(
+        const stl_ext::shared_function<void(const error_info&, const message&)>&
+            handler) {
         require_data();
         data_->set_handler(handler);
     }
@@ -177,12 +178,11 @@ public:
      * \param on_success handler on success
      * \param on_failure handler on failure
      */
-    void then(
-        const stl_ext::shared_function<void(const message_data&)>& on_success,
+    void then(const stl_ext::shared_function<void(const message&)>& on_success,
         const stl_ext::shared_function<void(const error_info&)>& on_failure) {
         require_data();
-        data_->set_handler([on_success, on_failure](const error_info& error,
-                               const message_data& msg) {
+        data_->set_handler([on_success, on_failure](
+                               const error_info& error, const message& msg) {
             if (error) {
                 on_failure(error);
             } else {
@@ -196,12 +196,12 @@ public:
      *
      * \return std::future object
      */
-    std::future<message_data> get_future() {
-        std::promise<message_data> promise;
+    std::future<message> get_future() {
+        std::promise<message> promise;
         auto future = promise.get_future();
         data_->set_handler(
             [moved_promise = std::move(promise)](const mprpc::error_info& error,
-                const mprpc::message_data& msg) mutable {
+                const mprpc::message& msg) mutable {
                 if (error) {
                     moved_promise.set_exception(
                         std::make_exception_ptr(exception(error)));
@@ -259,7 +259,7 @@ public:
      *
      * \param msg response message
      */
-    void set_response(const message_data& msg) { data_->set_response(msg); }
+    void set_response(const message& msg) { data_->set_response(msg); }
 
 private:
     //! data
