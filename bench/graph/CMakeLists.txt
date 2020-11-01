@@ -1,4 +1,4 @@
-find_package(Python3 COMPONENTS Interpreter)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 macro(add_mprpc_bench_graph _TARGET _SCRIPT)
     target_link_libraries(${_TARGET} PRIVATE mprpc mprpc_bench_utils
