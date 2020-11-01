@@ -1,2 +1,3 @@
-add_executable(mprpc_bench_rpc_echo tcp_test.cpp udp_test.cpp)
+add_executable(mprpc_bench_rpc_echo exec_test.cpp tcp_test.cpp udp_test.cpp)
+target_link_libraries(mprpc_bench_rpc_echo PRIVATE mprpc_test_utils)
 add_mprpc_bench(mprpc_bench_rpc_echo)
