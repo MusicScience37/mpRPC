@@ -114,6 +114,20 @@ public:
     }
 
     /*!
+     * \brief post a function to use sockets
+     *
+     * \param function function
+     */
+    void post(const stl_ext::shared_function<void(socket_type&)>& function) {
+        asio::post(strand_, [weak_self = weak_from_this(), function]() {
+            auto self = weak_self.lock();
+            if (self) {
+                function(self->socket_);
+            }
+        });
+    }
+
+    /*!
      * \brief access to socket
      *
      * \return socket

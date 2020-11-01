@@ -61,6 +61,11 @@ public:
         const message_data& data, on_write_handler_type handler) = 0;
 
     /*!
+     * \brief shutdown connection gracefully
+     */
+    virtual void shutdown() {}
+
+    /*!
      * \brief get the address of remote endpoint
      *
      * \return address of remote endpoint
