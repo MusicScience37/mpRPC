@@ -16,4 +16,4 @@ macro(add_mprpc_bench_graph _TARGET _SCRIPT)
 endmacro()
 
 add_executable(mprpc_bench_graph_echo echo_test.cpp)
-add_mprpc_bench_graph(mprpc_bench_graph_echo echo_grpah.py)
+add_mprpc_bench_graph(mprpc_bench_graph_echo echo_graph.py)
