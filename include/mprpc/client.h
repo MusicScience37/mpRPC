@@ -66,6 +66,7 @@ public:
      */
     void stop() {
         MPRPC_INFO(logger_, "client stopping");
+        connector_->shutdown();
         threads_->stop();
         MPRPC_INFO(logger_, "client stopped");
     }
