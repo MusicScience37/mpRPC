@@ -47,17 +47,17 @@ static void echo_exec(benchmark::State& state) {
             std::make_shared<mprpc::execution::simple_method_server>(
                 logger, *threads, methods);
 
-        const auto request =
-            mprpc::pack_request(0, "echo", std::forward_as_tuple(data));
-
         const auto session =
             std::make_shared<mprpc::transport::mock::mock_session>(
                 threads->context());
 
         for (auto _ : state) {
+            const auto request = mprpc::message(
+                mprpc::pack_request(0, "echo", std::forward_as_tuple(data)));
+
             std::promise<mprpc::message_data> promise;
             auto future = promise.get_future();
-            server->async_process_message(session, mprpc::message(request),
+            server->async_process_message(session, request,
                 [&promise](const mprpc::error_info& error, bool response_exists,
                     const mprpc::message_data& message) {
                     if (error) {
@@ -69,8 +69,10 @@ static void echo_exec(benchmark::State& state) {
                         promise.set_value(mprpc::message_data());
                     }
                 });
-            auto response = future.get();
-            benchmark::DoNotOptimize(response);
+
+            const auto response = mprpc::message(future.get());
+            const auto result = response.result_as<std::string>();
+            benchmark::DoNotOptimize(result);
         }
     } catch (const std::exception& err) {
         MPRPC_ERROR(logger, err.what());
