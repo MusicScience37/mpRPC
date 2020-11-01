@@ -40,7 +40,8 @@ static analysis:
     - git clone https://github.com/PSPDFKit-labs/clang-tidy-to-junit.git
     - cd ../
   script:
-    - cmake -S ./ -B build_static_analysis
+    - pipenv run
+      cmake -S ./ -B build_static_analysis
       -DMPRPC_ENABLE_CLANG_TIDY:BOOL=ON
       -DMPRPC_TESTING:BOOL=ON
       -DMPRPC_ENABLE_BENCH:BOOL=ON
@@ -70,7 +71,8 @@ static analysis:
     - pipenv install --dev
   script:
     - mkdir $BUILD_DIR
-    - cmake -S ./ -B $BUILD_DIR
+    - pipenv run
+      cmake -S ./ -B $BUILD_DIR
       -DCMAKE_BUILD_TYPE=Release
       -DMPRPC_TESTING:BOOL=ON
       -DMPRPC_ENABLE_BENCH:BOOL=ON
@@ -92,7 +94,8 @@ static analysis:
   extends: .release-test-base
   script:
     - mkdir $BUILD_DIR
-    - cmake -S ./ -B $BUILD_DIR
+    - pipenv run
+      cmake -S ./ -B $BUILD_DIR
       -DCMAKE_BUILD_TYPE=Debug
       -DMPRPC_TESTING:BOOL=ON
       -DMPRPC_ENABLE_BENCH:BOOL=ON
@@ -110,7 +113,8 @@ clang coverage:
     BUILD_DIR: build_clang_coverage
   script:
     - mkdir $BUILD_DIR
-    - cmake -S ./ -B $BUILD_DIR
+    - pipenv run
+      cmake -S ./ -B $BUILD_DIR
       -DCMAKE_BUILD_TYPE=Debug
       -DMPRPC_TESTING:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
@@ -133,7 +137,8 @@ gcc coverage:
     BUILD_DIR: build_gcc_coverage
   script:
     - mkdir $BUILD_DIR
-    - cmake -S ./ -B $BUILD_DIR
+    - pipenv run
+      cmake -S ./ -B $BUILD_DIR
       -DCMAKE_BUILD_TYPE=Debug
       -DMPRPC_TESTING:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
@@ -171,7 +176,8 @@ doc:
     - pipenv install --dev
   script:
     - mkdir build_doc
-    - cmake -S ./ -B build_doc
+    - pipenv run
+      cmake -S ./ -B build_doc
       -DMPRPC_BUILD_DOC:BOOL=ON
     - cmake --build build_doc --target mprpc_doc
   artifacts:
