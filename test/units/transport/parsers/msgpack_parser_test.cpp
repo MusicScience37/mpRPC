@@ -40,20 +40,6 @@ TEST_CASE("mprpc::transport::parsers::msgpack_parser") {
         REQUIRE_NOTHROW(parsed_data = parser.parse(data.data(), data.size()));
         REQUIRE(parsed_data == data);
     }
-
-    SECTION("parse error") {
-        const auto data_str = std::string({char(0xC1)});
-        const auto data = mprpc::message_data(data_str.data(), data_str.size());
-        REQUIRE_THROWS_AS(
-            parser.parse(data.data(), data.size()), mprpc::exception);
-    }
-
-    SECTION("insufficient bytes") {
-        const auto data_str = std::string({char(0x91)});
-        const auto data = mprpc::message_data(data_str.data(), data_str.size());
-        REQUIRE_THROWS_AS(
-            parser.parse(data.data(), data.size()), mprpc::exception);
-    }
 }
 
 TEST_CASE("mprpc::transport::parsers::msgpack_streaming_parser") {

@@ -37,22 +37,12 @@ class msgpack_parser : public parser {
 public:
     /*!
      * \brief construct
-     *
-     * \param logger logger
      */
-    explicit msgpack_parser(std::shared_ptr<logging::logger> logger)
-        : logger_(std::move(logger)) {}
+    msgpack_parser() = default;
 
     //! \copydoc mprpc::transport::parser::parse
     message_data parse(const char* data, std::size_t size) override {
-        try {
-            visitor v;
-            ::msgpack::parse(data, size, v);
-            return message_data(data, size);
-        } catch (const exception& e) {
-            MPRPC_ERROR(logger_, e.what());
-            throw;
-        }
+        return message_data(data, size);
     }
 
     //! destruct
@@ -62,32 +52,11 @@ public:
     msgpack_parser(msgpack_parser&&) = delete;
     msgpack_parser& operator=(const msgpack_parser&) = delete;
     msgpack_parser& operator=(msgpack_parser&&) = delete;
-
-private:
-    //! visitor
-    class visitor : public ::msgpack::null_visitor {
-    public:
-        //! visit parse error
-        [[noreturn]] void parse_error(  // NOLINT: use of external library
-            size_t /*parsed_offset*/, size_t /*error_offset*/) {
-            throw exception(error_info(
-                error_code::parse_error, "failed to parse a message"));
-        }
-
-        //! visit error of insufficient bytes
-        void insufficient_bytes(  // NOLINT: use of external library
-            size_t /*parsed_offset*/, size_t /*error_offset*/) {
-            parse_error(0, 0);
-        }
-    };
-
-    //! logger
-    std::shared_ptr<logging::logger> logger_;
 };
 
 std::unique_ptr<parser> create_msgpack_parser(
-    std::shared_ptr<logging::logger> logger) {
-    return std::make_unique<msgpack_parser>(std::move(logger));
+    std::shared_ptr<logging::logger> /*logger*/) {  // NOLINT: for compatible API
+    return std::make_unique<msgpack_parser>();
 }
 
 /*!
