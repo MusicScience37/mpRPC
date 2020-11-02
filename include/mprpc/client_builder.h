@@ -60,15 +60,41 @@ public:
      *
      * \param host host address to connect to
      * \param port port number to connect to
+     * \param config configuration
      * \return this object
      */
-    client_builder& connect_tcp(const std::string& host, std::uint16_t port) {
+    client_builder& connect_tcp(const std::string& host, std::uint16_t port,
+        transport::tcp::tcp_connector_config config =
+            transport::tcp::tcp_connector_config()) {
         connector_factory_ =
-            [host, port](const std::shared_ptr<mprpc::logging::logger>& logger,
+            [host, port, config](
+                const std::shared_ptr<mprpc::logging::logger>& logger,
                 thread_pool& threads,
                 const std::shared_ptr<transport::parser_factory>& factory) {
                 return transport::tcp::create_tcp_connector(
-                    logger, host, port, threads, factory);
+                    logger, host, port, threads, factory, config);
+            };
+        return *this;
+    }
+
+    /*!
+     * \brief set to connect to a UDP port
+     *
+     * \param host host address to connect to
+     * \param port port number to connect to
+     * \param config configuration
+     * \return this object
+     */
+    client_builder& connect_udp(const std::string& host, std::uint16_t port,
+        transport::udp::udp_connector_config config =
+            transport::udp::udp_connector_config()) {
+        connector_factory_ =
+            [host, port, config](
+                const std::shared_ptr<mprpc::logging::logger>& logger,
+                thread_pool& threads,
+                const std::shared_ptr<transport::parser_factory>& factory) {
+                return transport::udp::create_udp_connector(
+                    logger, host, port, threads, factory, config);
             };
         return *this;
     }

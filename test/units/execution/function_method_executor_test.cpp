@@ -19,7 +19,7 @@
  */
 #include "mprpc/execution/function_method_executor.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "../create_logger.h"
 

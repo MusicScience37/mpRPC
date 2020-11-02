@@ -31,6 +31,7 @@
 #include "mprpc/transport/parser.h"
 #include "mprpc/transport/session.h"
 #include "mprpc/transport/tcp/impl/tcp_address.h"
+#include "mprpc/transport/tcp/tcp_acceptor_config.h"
 
 namespace mprpc {
 namespace transport {
@@ -48,12 +49,15 @@ public:
      * \param socket socket
      * \param io_context io_context
      * \param parser parser
+     * \param config configuration
      */
     tcp_session(const std::shared_ptr<logging::logger>& logger,
         asio::ip::tcp::socket socket, asio::io_context& io_context,
-        std::shared_ptr<streaming_parser> parser)
-        : socket_helper_(std::make_shared<socket_helper_type>(
-              logger, std::move(socket), io_context, std::move(parser))) {
+        std::shared_ptr<streaming_parser> parser,
+        const tcp_acceptor_config& config)
+        : socket_helper_(std::make_shared<socket_helper_type>(logger,
+              std::move(socket), io_context, std::move(parser), config)),
+          logger_(logger) {
         MPRPC_INFO(logger, "accepted connection from {} at {}",
             socket_helper_->socket().remote_endpoint(),
             socket_helper_->socket().local_endpoint());
@@ -70,6 +74,22 @@ public:
         socket_helper_->async_write(data, std::move(handler));
     }
 
+    //! \copydoc mprpc::transport::session::shutdown
+    void shutdown() override {
+        std::promise<void> promise;
+        auto future = promise.get_future();
+        socket_helper_->post(
+            [&promise, logger = logger_](asio::ip::tcp::socket& socket) {
+                MPRPC_INFO(logger, "gracefully shutting down a session with {}",
+                    socket.remote_endpoint());
+                promise.set_value();
+                socket.shutdown(asio::ip::tcp::socket::shutdown_both);
+                socket.close();
+            });
+        const auto timeout = std::chrono::milliseconds(100);
+        future.wait_for(timeout);
+    }
+
     //! \copydoc mprpc::transport::session::remote_address
     std::shared_ptr<const address> remote_address() const override {
         return std::make_shared<tcp_address>(
@@ -83,6 +103,9 @@ private:
 
     //! socket helper
     std::shared_ptr<socket_helper_type> socket_helper_;
+
+    //! logger
+    std::shared_ptr<logging::logger> logger_;
 };
 
 }  // namespace tcp

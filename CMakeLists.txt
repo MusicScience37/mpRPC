@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(
     mprpc
-    VERSION 0.1
+    VERSION 0.2
     DESCRIPTION "An implementation of MessagePack-RPC in C++"
     LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14)
@@ -66,7 +66,8 @@ endif()
 add_library(
     mprpc SHARED
     src/format_message.cpp src/logging/spdlog_logger.cpp src/thread_pool.cpp
-    src/transport/parsers/msgpack_parser.cpp src/transport/tcp/tcp.cpp)
+    src/transport/parsers/msgpack_parser.cpp src/transport/tcp/tcp.cpp
+    src/transport/udp/udp.cpp)
 target_include_directories(mprpc PUBLIC ${MPRPC_SOURCE_DIR}/include
                                         ${CMAKE_BINARY_DIR}/include)
 set_target_properties(

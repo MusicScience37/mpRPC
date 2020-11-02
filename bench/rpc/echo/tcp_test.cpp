@@ -37,7 +37,7 @@ static void echo_tcp(benchmark::State& state) {
 
     try {
         auto server = mprpc::server_builder(logger)
-                          .num_threads(1)
+                          .num_threads(2)
                           .listen_tcp(host, port)
                           .method<std::string(std::string)>(
                               "echo", [](std::string str) { return str; })
@@ -47,7 +47,7 @@ static void echo_tcp(benchmark::State& state) {
         std::this_thread::sleep_for(duration);
 
         auto client = mprpc::client_builder(logger)
-                          .num_threads(1)
+                          .num_threads(2)
                           .connect_tcp(host, port)
                           .create();
 

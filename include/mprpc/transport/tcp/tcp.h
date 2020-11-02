@@ -29,6 +29,8 @@
 #include "mprpc/transport/acceptor.h"
 #include "mprpc/transport/connector.h"
 #include "mprpc/transport/parser.h"
+#include "mprpc/transport/tcp/tcp_acceptor_config.h"
+#include "mprpc/transport/tcp/tcp_connector_config.h"
 
 namespace mprpc {
 namespace transport {
@@ -42,13 +44,15 @@ namespace tcp {
  * \param port port number to listen
  * \param threads thread pool
  * \param parser_factory_ptr parser factory
+ * \param config configuration
  * \return TCP acceptor
  */
 MPRPC_EXPORT std::shared_ptr<acceptor> create_tcp_acceptor(
     const std::shared_ptr<mprpc::logging::logger>& logger,
     const std::string& ip_address, const std::uint16_t& port,
     thread_pool& threads,
-    const std::shared_ptr<parser_factory>& parser_factory_ptr);
+    const std::shared_ptr<parser_factory>& parser_factory_ptr,
+    tcp_acceptor_config config = tcp_acceptor_config());
 
 /*!
  * \brief create a TCP connector
@@ -58,12 +62,14 @@ MPRPC_EXPORT std::shared_ptr<acceptor> create_tcp_acceptor(
  * \param port port number to connect to
  * \param threads thread pool
  * \param parser_factory_ptr parser factory
+ * \param config configuration
  * \return TCP connector
  */
 MPRPC_EXPORT std::shared_ptr<connector> create_tcp_connector(
     const std::shared_ptr<mprpc::logging::logger>& logger,
     const std::string& host, const std::uint16_t& port, thread_pool& threads,
-    const std::shared_ptr<parser_factory>& parser_factory_ptr);
+    const std::shared_ptr<parser_factory>& parser_factory_ptr,
+    tcp_connector_config config = tcp_connector_config());
 
 }  // namespace tcp
 }  // namespace transport
