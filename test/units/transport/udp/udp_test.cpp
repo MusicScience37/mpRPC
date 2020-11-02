@@ -27,6 +27,7 @@
 
 #include "../../create_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/transport/compressors/null_compressor.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
 
 TEST_CASE("mprpc::transport::udp") {
@@ -34,6 +35,9 @@ TEST_CASE("mprpc::transport::udp") {
 
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 2);
     threads->start();
+
+    const auto comp_factory = std::make_shared<
+        mprpc::transport::compressors::null_compressor_factory>();
 
     const auto parser_factory =
         std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
@@ -43,7 +47,7 @@ TEST_CASE("mprpc::transport::udp") {
 
     SECTION("communicate") {
         auto acceptor = mprpc::transport::udp::create_udp_acceptor(
-            logger, host, port, *threads, parser_factory);
+            logger, host, port, *threads, comp_factory, parser_factory);
         auto session_promise =
             std::promise<std::shared_ptr<mprpc::transport::session>>();
         auto session_future = session_promise.get_future();
@@ -62,7 +66,7 @@ TEST_CASE("mprpc::transport::udp") {
         std::this_thread::sleep_for(wait_duration);
 
         auto connector = mprpc::transport::udp::create_udp_connector(
-            logger, host, port, *threads, parser_factory);
+            logger, host, port, *threads, comp_factory, parser_factory);
 
         MPRPC_INFO(logger, "client to server transport");
         auto send_result_promise = std::promise<void>();

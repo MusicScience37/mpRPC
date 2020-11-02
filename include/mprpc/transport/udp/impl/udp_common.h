@@ -31,6 +31,7 @@
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/asio_helper/basic_endpoint.h"
+#include "mprpc/transport/compressor.h"
 #include "mprpc/transport/parser.h"
 #include "mprpc/transport/udp/impl/udp_address.h"
 #include "mprpc/transport/udp/udp_common_config.h"
@@ -59,15 +60,18 @@ public:
      * \param logger logger
      * \param socket socket
      * \param io_context io_context
+     * \param comp compressor
      * \param parser_ptr parser
      * \param config configuration
      */
     udp_common(std::shared_ptr<logging::logger> logger,
         asio::ip::udp::socket socket, asio::io_context& io_context,
-        std::shared_ptr<parser> parser_ptr, const udp_common_config& config)
+        std::shared_ptr<compressor> comp, std::shared_ptr<parser> parser_ptr,
+        const udp_common_config& config)
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
           strand_(asio::make_strand(io_context)),
+          compressor_(std::move(comp)),
           parser_(std::move(parser_ptr)),
           config_(config) {}
 
@@ -185,9 +189,10 @@ private:
     void do_write(const asio::ip::udp::endpoint& endpoint,
         const message_data& msg, const on_write_handler_type& handler) {
         MPRPC_TRACE(logger_, "send a message");
+        const auto data = compressor_->compress(msg);
         socket_.async_send_to(asio::buffer(msg.data(), msg.size()), endpoint,
             asio::bind_executor(strand_,
-                [weak_self = weak_from_this(), msg, handler](
+                [weak_self = weak_from_this(), msg, data, handler](
                     const asio::error_code& error, std::size_t num_bytes) {
                     const auto self = weak_self.lock();
                     if (self) {
@@ -236,6 +241,9 @@ private:
 
     //! strand
     asio::strand<asio::io_context::executor_type> strand_;
+
+    //! compressor of messages
+    std::shared_ptr<compressor> compressor_;
 
     //! parser of messages
     std::shared_ptr<parser> parser_;

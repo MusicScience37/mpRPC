@@ -33,6 +33,7 @@
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/asio_helper/stream_socket_config.h"
+#include "mprpc/transport/compressor.h"
 #include "mprpc/transport/parser.h"
 
 namespace mprpc {
@@ -65,18 +66,23 @@ public:
      * \param logger logger
      * \param socket socket
      * \param io_context io_context
+     * \param comp compressor
      * \param parser parser
      * \param config configuration
      */
     stream_socket_helper(std::shared_ptr<logging::logger> logger,
         socket_type socket, asio::io_context& io_context,
+        std::shared_ptr<streaming_compressor> comp,
         std::shared_ptr<streaming_parser> parser,
         const stream_socket_config& config)
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
           strand_(asio::make_strand(io_context)),
+          compressor_(std::move(comp)),
           parser_(std::move(parser)),
-          config_(config) {}
+          config_(config) {
+        compressor_->init();
+    }
 
     /*!
      * \brief asynchronously read a message
@@ -261,11 +267,11 @@ private:
      * \brief write a message
      */
     void do_write() {
-        const auto& data = writing_queue_.front().first;
+        const auto data = compressor_->compress(writing_queue_.front().first);
         MPRPC_TRACE(logger_, "starting to write a message");
         asio::async_write(socket_, asio::buffer(data.data(), data.size()),
             asio::bind_executor(strand_,
-                [weak_self = weak_from_this()](
+                [weak_self = weak_from_this(), data](
                     const asio::error_code& error, std::size_t /*num_bytes*/) {
                     auto self = weak_self.lock();
                     if (!self) {
@@ -325,6 +331,9 @@ private:
 
     //! queue of messages to be written
     std::queue<std::pair<message_data, on_write_handler_type>> writing_queue_{};
+
+    //! compressor of messages
+    std::shared_ptr<streaming_compressor> compressor_;
 
     //! parser of messages
     std::shared_ptr<streaming_parser> parser_;

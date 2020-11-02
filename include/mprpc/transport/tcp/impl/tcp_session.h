@@ -48,15 +48,18 @@ public:
      * \param logger logger
      * \param socket socket
      * \param io_context io_context
+     * \param comp compressor
      * \param parser parser
      * \param config configuration
      */
     tcp_session(const std::shared_ptr<logging::logger>& logger,
         asio::ip::tcp::socket socket, asio::io_context& io_context,
+        std::shared_ptr<streaming_compressor> comp,
         std::shared_ptr<streaming_parser> parser,
         const tcp_acceptor_config& config)
-        : socket_helper_(std::make_shared<socket_helper_type>(logger,
-              std::move(socket), io_context, std::move(parser), config)),
+        : socket_helper_(
+              std::make_shared<socket_helper_type>(logger, std::move(socket),
+                  io_context, std::move(comp), std::move(parser), config)),
           logger_(logger) {
         MPRPC_INFO(logger, "accepted connection from {} at {}",
             socket_helper_->socket().remote_endpoint(),

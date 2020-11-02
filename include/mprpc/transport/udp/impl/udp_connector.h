@@ -49,15 +49,17 @@ public:
      * \param socket socket
      * \param endpoint endpoint
      * \param io_context io_context
+     * \param comp compressor
      * \param parser_ptr parser
      * \param config configuration
      */
     udp_connector(std::shared_ptr<logging::logger> logger,
         asio::ip::udp::socket socket, asio::ip::udp::endpoint endpoint,
-        asio::io_context& io_context, std::shared_ptr<parser> parser_ptr,
-        udp_connector_config config)
-        : helper_(std::make_shared<udp_common>(std::move(logger),
-              std::move(socket), io_context, std::move(parser_ptr), config_)),
+        asio::io_context& io_context, std::shared_ptr<compressor> comp,
+        std::shared_ptr<parser> parser_ptr, udp_connector_config config)
+        : helper_(
+              std::make_shared<udp_common>(std::move(logger), std::move(socket),
+                  io_context, std::move(comp), std::move(parser_ptr), config_)),
           endpoint_(std::move(endpoint)),
           config_(config) {
         helper_->init();

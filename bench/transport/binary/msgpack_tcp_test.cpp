@@ -8,6 +8,7 @@
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/logging/spdlog_logger.h"
 #include "mprpc/thread_pool.h"
+#include "mprpc/transport/compressors/null_compressor.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
 #include "mprpc/transport/tcp/tcp.h"
 
@@ -111,12 +112,15 @@ static void transport_binary_msgpack_tcp(benchmark::State& state) {
     const auto host = std::string("127.0.0.1");
     constexpr std::uint16_t port = 3780;
 
+    const auto comp_factory = std::make_shared<
+        mprpc::transport::compressors::null_compressor_factory>();
+
     const auto parser_factory =
         std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
 
     try {
         auto acceptor = mprpc::transport::tcp::create_tcp_acceptor(
-            logger, host, port, *threads, parser_factory);
+            logger, host, port, *threads, comp_factory, parser_factory);
         auto server = std::make_shared<mprpc_server>(acceptor);
         server->start();
 
@@ -124,7 +128,7 @@ static void transport_binary_msgpack_tcp(benchmark::State& state) {
         std::this_thread::sleep_for(wait_duration);
 
         auto client = mprpc::transport::tcp::create_tcp_connector(
-            logger, host, port, *threads, parser_factory);
+            logger, host, port, *threads, comp_factory, parser_factory);
 
         for (auto _ : state) {
             {
