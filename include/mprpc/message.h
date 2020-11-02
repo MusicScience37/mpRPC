@@ -43,20 +43,13 @@ public:
     /*!
      * \brief construct
      *
-     * \param handle handle of parsed object
-     */
-    explicit message(msgpack::object_handle handle) {
-        parse(std::move(handle));
-    }
-
-    /*!
-     * \brief construct
-     *
      * \param data message data
      */
     explicit message(const message_data& data) {
         try {
-            parse(msgpack::unpack(data.data(), data.size()));
+            data_->msg_data = data;
+            parse(msgpack::unpack(
+                data.data(), data.size(), &message::nocopy_reference_func));
         } catch (const msgpack::parse_error&) {
             throw exception(
                 error_info(error_code::parse_error, "parse error of message"));
@@ -332,8 +325,21 @@ private:
         }
     }
 
+    /*!
+     * \brief reference func in msgpack-c library without copy of raw data
+     *
+     * \return whether buffer is referenced by msgpack-c library
+     */
+    static bool nocopy_reference_func(msgpack::type::object_type /*type*/,
+        std::size_t /*length*/, void* /*user_data*/) {
+        return true;
+    }
+
     //! struct of data
     struct inner_data {
+        //! message data
+        message_data msg_data{};
+
         //! handle of parsed object
         msgpack::object_handle handle{};
 
