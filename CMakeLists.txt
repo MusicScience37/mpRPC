@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(
     mprpc
-    VERSION 0.1
+    VERSION 0.2
     DESCRIPTION "An implementation of MessagePack-RPC in C++"
     LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14)
