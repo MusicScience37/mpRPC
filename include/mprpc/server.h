@@ -71,6 +71,11 @@ public:
      */
     void stop() {
         MPRPC_INFO(logger_, "server stopping");
+        std::unique_lock<std::mutex> lock(*mutex_);
+        for (const auto& session : sessions_) {
+            session->shutdown();
+        }
+        lock.unlock();
         threads_->stop();
         MPRPC_INFO(logger_, "server stopped");
     }
@@ -147,8 +152,7 @@ private:
     void on_read(const std::shared_ptr<transport::session>& session,
         const error_info& error, const message_data& data) {
         if (error) {
-            std::unique_lock<std::mutex> lock(*mutex_);
-            sessions_.erase(session);
+            async_remove_session(session);
             return;
         }
         try {
@@ -160,8 +164,7 @@ private:
                 });
         } catch (const exception& e) {
             MPRPC_ERROR(logger_, "{}", e.info());
-            std::unique_lock<std::mutex> lock(*mutex_);
-            sessions_.erase(session);
+            async_remove_session(session);
             return;
         }
         do_read(session);
@@ -185,6 +188,20 @@ private:
             return;
         }
         session->async_write(response, [](const error_info& /*error*/) {});
+    }
+
+    /*!
+     * \brief asynchronously remove a session
+     *
+     * \param session session
+     */
+    void async_remove_session(
+        const std::shared_ptr<transport::session>& session) {
+        threads_->post([this, session] {
+            std::unique_lock<std::mutex> lock(*mutex_);
+            session->shutdown();
+            sessions_.erase(session);
+        });
     }
 
     //! logger

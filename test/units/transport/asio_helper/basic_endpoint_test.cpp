@@ -22,7 +22,7 @@
 #include <cstdint>
 
 #include <asio/ip/tcp.hpp>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "mprpc/logging/format_log_data.h"
 

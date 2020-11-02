@@ -19,6 +19,8 @@
  */
 #pragma once
 
+#include <future>
+
 #include <asio/ip/tcp.hpp>
 
 #include "mprpc/logging/logger.h"
@@ -29,6 +31,7 @@
 #include "mprpc/transport/connector.h"
 #include "mprpc/transport/parser.h"
 #include "mprpc/transport/tcp/impl/tcp_address.h"
+#include "mprpc/transport/tcp/tcp_connector_config.h"
 
 namespace mprpc {
 namespace transport {
@@ -46,12 +49,15 @@ public:
      * \param socket socket
      * \param io_context io_context
      * \param parser parser
+     * \param config configuration
      */
     tcp_connector(const std::shared_ptr<logging::logger>& logger,
         asio::ip::tcp::socket socket, asio::io_context& io_context,
-        std::shared_ptr<streaming_parser> parser)
-        : socket_helper_(std::make_shared<socket_helper_type>(
-              logger, std::move(socket), io_context, std::move(parser))) {
+        std::shared_ptr<streaming_parser> parser, tcp_connector_config config)
+        : socket_helper_(std::make_shared<socket_helper_type>(logger,
+              std::move(socket), io_context, std::move(parser), config_)),
+          logger_(logger),
+          config_(config) {
         MPRPC_INFO(logger, "conencted {} to {}",
             socket_helper_->socket().local_endpoint(),
             socket_helper_->socket().remote_endpoint());
@@ -66,6 +72,22 @@ public:
     void async_write(
         const message_data& data, on_write_handler_type handler) override {
         socket_helper_->async_write(data, std::move(handler));
+    }
+
+    //! \copydoc mprpc::transport::connector::shutdown
+    void shutdown() override {
+        std::promise<void> promise;
+        auto future = promise.get_future();
+        socket_helper_->post(
+            [&promise, logger = logger_](asio::ip::tcp::socket& socket) {
+                MPRPC_INFO(logger, "gracefully shutting down a connector on {}",
+                    socket.local_endpoint());
+                promise.set_value();
+                socket.shutdown(asio::ip::tcp::socket::shutdown_both);
+                socket.close();
+            });
+        const auto timeout = std::chrono::milliseconds(100);
+        future.wait_for(timeout);
     }
 
     //! \copydoc mprpc::transport::connector::local_address
@@ -87,6 +109,12 @@ private:
 
     //! socket helper
     std::shared_ptr<socket_helper_type> socket_helper_;
+
+    //! logger
+    std::shared_ptr<logging::logger> logger_;
+
+    //! configuration
+    tcp_connector_config config_;
 };
 
 }  // namespace tcp

@@ -21,7 +21,8 @@
 
 #include <future>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 #include "create_logger.h"
 #include "mprpc/logging/logging_macros.h"
@@ -55,7 +56,8 @@ TEST_CASE("mprpc::impl::response_future_data") {
         REQUIRE_NOTHROW(future_data.set_handler(handler));
 
         REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-        REQUIRE_THROWS_WITH(future.get(), Catch::Contains("test error"));
+        REQUIRE_THROWS_WITH(
+            future.get(), Catch::Matchers::Contains("test error"));
     }
 
     SECTION("set data first, and set handler") {
@@ -75,7 +77,8 @@ TEST_CASE("mprpc::impl::response_future_data") {
             mprpc::error_code::unexpected_error, "test error")));
 
         REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-        REQUIRE_THROWS_WITH(future.get(), Catch::Contains("test error"));
+        REQUIRE_THROWS_WITH(
+            future.get(), Catch::Matchers::Contains("test error"));
     }
 
     SECTION("set handler first, and set data") {
@@ -150,7 +153,8 @@ TEST_CASE("mprpc::response_future") {
                 mprpc::error_code::unexpected_error, "test error")));
 
             REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE_THROWS_WITH(future.get(), Catch::Contains("test error"));
+            REQUIRE_THROWS_WITH(
+                future.get(), Catch::Matchers::Contains("test error"));
         }
 
         SECTION("on success") {
@@ -178,7 +182,8 @@ TEST_CASE("mprpc::response_future") {
                 mprpc::error_code::unexpected_error, "test error")));
 
             REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE_THROWS_WITH(future.get(), Catch::Contains("test error"));
+            REQUIRE_THROWS_WITH(
+                future.get(), Catch::Matchers::Contains("test error"));
         }
 
         SECTION("on success") {
@@ -199,7 +204,8 @@ TEST_CASE("mprpc::response_future") {
                 mprpc::error_code::unexpected_error, "test error")));
 
             REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE_THROWS_WITH(future.get(), Catch::Contains("test error"));
+            REQUIRE_THROWS_WITH(
+                future.get(), Catch::Matchers::Contains("test error"));
         }
 
         SECTION("on success") {
@@ -235,7 +241,8 @@ TEST_CASE("mprpc::response_promise") {
                 mprpc::error_code::unexpected_error, "test error")));
 
             REQUIRE(future.wait_for(timeout) == std::future_status::ready);
-            REQUIRE_THROWS_WITH(future.get(), Catch::Contains("test error"));
+            REQUIRE_THROWS_WITH(
+                future.get(), Catch::Matchers::Contains("test error"));
         }
 
         SECTION("set response") {

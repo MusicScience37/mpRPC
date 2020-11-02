@@ -66,7 +66,8 @@ endif()
 add_library(
     mprpc SHARED
     src/format_message.cpp src/logging/spdlog_logger.cpp src/thread_pool.cpp
-    src/transport/parsers/msgpack_parser.cpp src/transport/tcp/tcp.cpp)
+    src/transport/parsers/msgpack_parser.cpp src/transport/tcp/tcp.cpp
+    src/transport/udp/udp.cpp)
 target_include_directories(mprpc PUBLIC ${MPRPC_SOURCE_DIR}/include
                                         ${CMAKE_BINARY_DIR}/include)
 set_target_properties(

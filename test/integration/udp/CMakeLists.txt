@@ -1,0 +1,2 @@
+add_executable(mprpc_test_integ_udp udp_test.cpp)
+target_add_catch2(mprpc_test_integ_udp)

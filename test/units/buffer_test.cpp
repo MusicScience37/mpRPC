@@ -19,9 +19,10 @@
  */
 #include "mprpc/buffer.h"
 
+#include <memory>
 #include <type_traits>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("mprpc::buffer") {
     constexpr std::size_t initial_capacity = 1024;
