@@ -57,7 +57,7 @@ inline spdlog::level::level_enum convert_log_level_to_spdlog(log_level level) {
 /*!
  * \brief class to format log level
  */
-class log_level_flag : public spdlog::custom_flag_formatter {
+class log_level_flag final : public spdlog::custom_flag_formatter {
 public:
     /*!
      * \brief format log level
@@ -118,7 +118,7 @@ private:
 /*!
  * \brief class of logger using spdlog library
  */
-class spdlog_logger : public logger {
+class spdlog_logger final : public logger {
 public:
     /*!
      * \brief construct

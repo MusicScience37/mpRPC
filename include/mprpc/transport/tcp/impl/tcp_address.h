@@ -33,7 +33,7 @@ namespace impl {
 /*!
  * \brief class of addresses for TCP sockets
  */
-class tcp_address : public address {
+class tcp_address final : public address {
 public:
     /*!
      * \brief construct

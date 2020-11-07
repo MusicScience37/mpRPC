@@ -33,7 +33,7 @@ namespace impl {
  *
  * \note UDP has no session, but this class performs compatible process.
  */
-class udp_session : public session {
+class udp_session final : public session {
 public:
     /*!
      * \brief construct

@@ -41,7 +41,7 @@ namespace impl {
 /*!
  * \brief class of sessions on TCP sockets
  */
-class tcp_session : public session {
+class tcp_session final : public session {
 public:
     /*!
      * \brief construct

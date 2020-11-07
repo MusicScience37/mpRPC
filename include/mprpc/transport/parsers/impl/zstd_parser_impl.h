@@ -35,7 +35,7 @@ namespace impl {
 /*!
  * \brief class of parsers of messages using zstd library without streaming
  */
-class zstd_parser : public parser {
+class zstd_parser final : public parser {
 public:
     /*!
      * \brief construct
@@ -93,7 +93,7 @@ private:
 /*!
  * \brief class of parsers of messages using zstd library with streaming
  */
-class zstd_streaming_parser : public streaming_parser {
+class zstd_streaming_parser final : public streaming_parser {
 public:
     /*!
      * \brief construct

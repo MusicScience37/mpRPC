@@ -34,7 +34,7 @@ namespace mock {
 /*!
  * \brief class to mock acceptors
  */
-class mock_acceptor : public acceptor {
+class mock_acceptor final : public acceptor {
 public:
     /*!
      * \brief construct

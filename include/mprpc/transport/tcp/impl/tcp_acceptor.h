@@ -43,7 +43,7 @@ namespace impl {
 /*!
  * \brief class of acceptors on TCP sockets
  */
-class tcp_acceptor : public acceptor {
+class tcp_acceptor final : public acceptor {
 public:
     /*!
      * \brief construct

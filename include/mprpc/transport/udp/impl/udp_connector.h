@@ -41,7 +41,7 @@ namespace impl {
 /*!
  * \brief class of connectors on UDP sockets
  */
-class udp_connector : public connector {
+class udp_connector final : public connector {
 public:
     /*!
      * \brief construct

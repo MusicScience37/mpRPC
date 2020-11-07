@@ -34,7 +34,7 @@ namespace impl {
 /*!
  * \brief class of parsers of messages with msgpack only
  */
-class msgpack_parser : public parser {
+class msgpack_parser final : public parser {
 public:
     /*!
      * \brief construct
@@ -58,7 +58,7 @@ public:
 /*!
  * \brief class of parsers of messages with msgpack and streaming
  */
-class msgpack_streaming_parser : public streaming_parser {
+class msgpack_streaming_parser final : public streaming_parser {
 public:
     /*!
      * \brief construct
