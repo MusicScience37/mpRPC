@@ -28,6 +28,7 @@
 namespace mprpc {
 namespace transport {
 namespace tcp {
+namespace impl {
 
 /*!
  * \brief class of addresses for TCP sockets
@@ -54,6 +55,7 @@ private:
     asio::ip::tcp::endpoint endpoint_;
 };
 
+}  // namespace impl
 }  // namespace tcp
 }  // namespace transport
 }  // namespace mprpc

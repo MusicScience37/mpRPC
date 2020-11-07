@@ -26,6 +26,7 @@
 namespace mprpc {
 namespace transport {
 namespace udp {
+namespace impl {
 
 /*!
  * \brief class of sessions on UDP sockets
@@ -88,6 +89,7 @@ private:
     message_data data_;
 };
 
+}  // namespace impl
 }  // namespace udp
 }  // namespace transport
 }  // namespace mprpc

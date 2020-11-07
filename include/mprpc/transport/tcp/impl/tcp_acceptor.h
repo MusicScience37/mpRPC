@@ -38,6 +38,7 @@
 namespace mprpc {
 namespace transport {
 namespace tcp {
+namespace impl {
 
 /*!
  * \brief class of acceptors on TCP sockets
@@ -138,6 +139,7 @@ private:
     tcp_acceptor_config config_;
 };
 
+}  // namespace impl
 }  // namespace tcp
 }  // namespace transport
 }  // namespace mprpc

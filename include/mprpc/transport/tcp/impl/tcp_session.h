@@ -36,6 +36,7 @@
 namespace mprpc {
 namespace transport {
 namespace tcp {
+namespace impl {
 
 /*!
  * \brief class of sessions on TCP sockets
@@ -111,6 +112,7 @@ private:
     std::shared_ptr<logging::logger> logger_;
 };
 
+}  // namespace impl
 }  // namespace tcp
 }  // namespace transport
 }  // namespace mprpc

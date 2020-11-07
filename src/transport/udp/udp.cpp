@@ -46,7 +46,7 @@ std::shared_ptr<acceptor> create_udp_acceptor(
     try {
         auto socket = asio::ip::udp::socket(threads.context(), endpoint);
         auto acceptor =
-            std::make_shared<udp_acceptor>(logger, std::move(socket),
+            std::make_shared<impl::udp_acceptor>(logger, std::move(socket),
                 threads.context(), comp_factory->create_compressor(logger),
                 parser_factory_ptr->create_parser(logger), config);
         MPRPC_INFO(logger, "server started");
@@ -91,8 +91,8 @@ std::shared_ptr<connector> create_udp_connector(
     MPRPC_DEBUG(logger, "send UDP packets from {} to {}",
         socket.local_endpoint(), endpoint);
 
-    return std::make_shared<udp_connector>(logger, std::move(socket), endpoint,
-        threads.context(), comp_factory->create_compressor(logger),
+    return std::make_shared<impl::udp_connector>(logger, std::move(socket),
+        endpoint, threads.context(), comp_factory->create_compressor(logger),
         parser_factory_ptr->create_parser(logger), config);
 }
 

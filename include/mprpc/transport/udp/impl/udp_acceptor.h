@@ -35,6 +35,7 @@
 namespace mprpc {
 namespace transport {
 namespace udp {
+namespace impl {
 
 /*!
  * \brief class of acceptors on UDP socket
@@ -112,6 +113,7 @@ private:
     const udp_acceptor_config config_;
 };
 
+}  // namespace impl
 }  // namespace udp
 }  // namespace transport
 }  // namespace mprpc
