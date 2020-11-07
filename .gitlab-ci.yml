@@ -23,6 +23,10 @@ line count:
       --exclude-dir=extern,line_count
       --force-lang=C++,h
       --json --out=line_count/line_count.json
+    - cloc ./
+      --exclude-dir=extern,line_count,bench,cmake,doc,example,scripts,test
+      --force-lang=C++,h
+      --json --out=line_count/src_line_count.json
   artifacts:
     paths:
       - line_count
