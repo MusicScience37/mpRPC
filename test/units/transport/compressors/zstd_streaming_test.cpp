@@ -84,4 +84,28 @@ TEST_CASE("mprpc::transport::zstd with streaming") {
         REQUIRE(parser->parse_next(compressed_data.size()));
         REQUIRE(parser->get() == data);
     }
+
+    SECTION("compress and decompress separate data") {
+        const auto data_str = std::string({char(0x92), char(0x01), char(0x02)});
+        const auto data = mprpc::message_data(data_str.data(), data_str.size());
+
+        compressor->init();
+
+        const auto compressed_data = compressor->compress(data);
+        REQUIRE(compressed_data != data);
+
+        constexpr std::size_t first_data_size = 4;
+        REQUIRE(compressed_data.size() > first_data_size);
+
+        parser->prepare_buffer(compressed_data.size());
+        std::copy(compressed_data.data(),
+            compressed_data.data() + first_data_size, parser->buffer());
+        REQUIRE_FALSE(parser->parse_next(first_data_size));
+
+        parser->prepare_buffer(compressed_data.size());
+        std::copy(compressed_data.data() + first_data_size,
+            compressed_data.data() + compressed_data.size(), parser->buffer());
+        REQUIRE(parser->parse_next(compressed_data.size() - first_data_size));
+        REQUIRE(parser->get() == data);
+    }
 }
