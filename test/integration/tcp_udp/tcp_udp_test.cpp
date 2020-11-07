@@ -20,7 +20,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "mprpc/client_builder.h"
-#include "mprpc/logging/spdlog_logger.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/method_client.h"
 #include "mprpc/server_builder.h"
 

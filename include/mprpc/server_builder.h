@@ -24,7 +24,7 @@
 
 #include "mprpc/execution/function_method_executor.h"
 #include "mprpc/execution/simple_method_server.h"
-#include "mprpc/logging/spdlog_logger.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/server.h"
 #include "mprpc/transport.h"
 

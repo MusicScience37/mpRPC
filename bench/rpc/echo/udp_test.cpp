@@ -20,8 +20,8 @@
 #include "common.h"
 #include "mprpc/client_builder.h"
 #include "mprpc/generate_string.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/logging/logging_macros.h"
-#include "mprpc/logging/spdlog_logger.h"
 #include "mprpc/method_client.h"
 #include "mprpc/server_builder.h"
 

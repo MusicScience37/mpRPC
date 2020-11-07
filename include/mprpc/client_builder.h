@@ -23,7 +23,7 @@
 #include <memory>
 
 #include "mprpc/client.h"
-#include "mprpc/logging/spdlog_logger.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/transport.h"
 
 namespace mprpc {
