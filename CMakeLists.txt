@@ -58,6 +58,17 @@ target_include_directories(
 
 add_subdirectory(extern/cpp-stl-ext)
 
+set(ZSTD_MULTITHREAD_SUPPORT
+    OFF
+    CACHE BOOL "disable multithread of zstd" FORCE)
+set(ZSTD_BUILD_TESTS
+    OFF
+    CACHE BOOL "disable test of zstd" FORCE)
+add_subdirectory(extern/zstd/build/cmake EXCLUDE_FROM_ALL)
+target_include_directories(
+    libzstd_shared
+    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/extern/zstd/lib>)
+
 option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)
 if(MPRPC_BUILD_DOC)
     add_subdirectory(doc)
@@ -65,8 +76,14 @@ endif()
 
 add_library(
     mprpc SHARED
-    src/format_message.cpp src/logging/spdlog_logger.cpp src/thread_pool.cpp
-    src/transport/parsers/msgpack_parser.cpp src/transport/tcp/tcp.cpp
+    src/format_message.cpp
+    src/logging/spdlog_logger.cpp
+    src/thread_pool.cpp
+    src/transport/parsers/msgpack_parser.cpp
+    src/transport/compressors/zstd_compressor_config.cpp
+    src/transport/compressors/zstd_compressor.cpp
+    src/transport/parsers/zstd_parser.cpp
+    src/transport/tcp/tcp.cpp
     src/transport/udp/udp.cpp)
 target_include_directories(mprpc PUBLIC ${MPRPC_SOURCE_DIR}/include
                                         ${CMAKE_BINARY_DIR}/include)
@@ -79,7 +96,7 @@ include(GenerateExportHeader)
 generate_export_header(
     mprpc EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/include/mprpc/mprpc_export.h")
 target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt spdlog asio stl_ext)
-target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings)
+target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings libzstd_shared)
 target_check_clang_tidy(mprpc)
 
 set(BUILDNAME
