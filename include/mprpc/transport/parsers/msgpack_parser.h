@@ -48,7 +48,7 @@ MPRPC_EXPORT std::unique_ptr<streaming_parser> create_msgpack_streaming_parser(
 /*!
  * \brief class of factories of parsers using msgpack
  */
-class msgpack_parser_factory : public parser_factory {
+class msgpack_parser_factory final : public parser_factory {
 public:
     //! \copydoc mprpc::transport::parser_factory::create_parser
     std::unique_ptr<parser> create_parser(

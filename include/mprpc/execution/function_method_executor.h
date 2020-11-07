@@ -49,7 +49,7 @@ class function_method_executor;
  * \tparam ParamTypes parameter types
  */
 template <typename FunctionType, typename ResultType, typename... ParamTypes>
-class function_method_executor<FunctionType, ResultType(ParamTypes...)>
+class function_method_executor<FunctionType, ResultType(ParamTypes...)> final
     : public method_executor {
 public:
     //! type of function
@@ -142,7 +142,7 @@ private:
  * \tparam ParamTypes parameter types
  */
 template <typename FunctionType, typename... ParamTypes>
-class function_method_executor<FunctionType, void(ParamTypes...)>
+class function_method_executor<FunctionType, void(ParamTypes...)> final
     : public method_executor {
 public:
     //! type of function

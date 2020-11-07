@@ -33,7 +33,7 @@ namespace impl {
 /*!
  * \brief class of addresses for UDP sockets
  */
-class udp_address : public address {
+class udp_address final : public address {
 public:
     /*!
      * \brief construct

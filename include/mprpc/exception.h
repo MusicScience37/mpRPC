@@ -28,7 +28,7 @@ namespace mprpc {
 /*!
  * \brief class of exception in this project
  */
-class exception : public std::exception {
+class exception final : public std::exception {
 public:
     /*!
      * \brief construct

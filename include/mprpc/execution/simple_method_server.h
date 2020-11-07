@@ -35,7 +35,7 @@ namespace execution {
 /*!
  * \brief class of simple servers to execute methods
  */
-class simple_method_server : public method_server {
+class simple_method_server final : public method_server {
 public:
     /*!
      * \brief construct

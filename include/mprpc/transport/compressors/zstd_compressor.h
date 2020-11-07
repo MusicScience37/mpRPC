@@ -51,7 +51,7 @@ create_zstd_streaming_compressor(
 /*!
  * \brief class of factories of compressors using zstd library
  */
-class zstd_compressor_factory : public compressor_factory {
+class zstd_compressor_factory final : public compressor_factory {
 public:
     /*!
      * \brief construct

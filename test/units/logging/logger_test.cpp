@@ -23,7 +23,7 @@
 
 namespace {
 
-class test_logger : public mprpc::logging::logger {
+class test_logger final : public mprpc::logging::logger {
 public:
     explicit test_logger(mprpc::logging::log_level log_output_level)
         : mprpc::logging::logger(log_output_level) {}

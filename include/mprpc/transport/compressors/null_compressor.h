@@ -28,7 +28,7 @@ namespace compressors {
 /*!
  * \brief class of compressor without compression
  */
-class null_compressor : public compressor {
+class null_compressor final : public compressor {
 public:
     //! \copydoc mprpc::transport::compressor::compress
     message_data compress(message_data data) override { return data; }
@@ -37,7 +37,7 @@ public:
 /*!
  * \brief class of compressor without compression
  */
-class null_streaming_compressor : public streaming_compressor {
+class null_streaming_compressor final : public streaming_compressor {
 public:
     //! \copydoc mprpc::transport::streaming_compressor::init
     void init() override {}
@@ -49,7 +49,7 @@ public:
 /*!
  * \brief class of factories of compressors without compression
  */
-class null_compressor_factory : public compressor_factory {
+class null_compressor_factory final : public compressor_factory {
 public:
     /*!
      * \brief create a compressor without streaming

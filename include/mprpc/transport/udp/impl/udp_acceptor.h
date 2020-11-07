@@ -40,7 +40,7 @@ namespace impl {
 /*!
  * \brief class of acceptors on UDP socket
  */
-class udp_acceptor : public acceptor {
+class udp_acceptor final : public acceptor {
 public:
     /*!
      * \brief construct

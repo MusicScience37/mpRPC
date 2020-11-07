@@ -41,7 +41,7 @@ namespace impl {
 /*!
  * \brief class of connectors on TCP sockets
  */
-class tcp_connector : public connector {
+class tcp_connector final : public connector {
 public:
     /*!
      * \brief construct
