@@ -2,8 +2,8 @@
 #include <iostream>
 
 #include <lyra/lyra.hpp>
+#include <mprpc/logging/basic_loggers.h>
 #include <mprpc/logging/logging_macros.h>
-#include <mprpc/logging/spdlog_logger.h>
 
 int main(int argc, char* argv[]) {
     try {

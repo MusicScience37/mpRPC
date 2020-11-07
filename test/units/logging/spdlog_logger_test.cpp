@@ -17,7 +17,7 @@
  * \file
  * \brief test of spdlog_logger class
  */
-#include "mprpc/logging/spdlog_logger.h"
+#include "mprpc/logging/impl/spdlog_logger.h"
 
 #include <algorithm>
 #include <regex>
@@ -29,6 +29,7 @@
 #include <spdlog/sinks/ostream_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/logging/logging_macros.h"
 
 namespace {
@@ -51,12 +52,12 @@ std::string remove_line_feed(std::string str) {
 
 }  // namespace
 
-TEST_CASE("mprpc::logging::spdlog_logger") {
+TEST_CASE("mprpc::logging::impl::spdlog_logger") {
     SECTION("write log") {
         std::ostringstream stream;
         auto spdlog_logger = spdlog::synchronous_factory::template create<
             spdlog::sinks::ostream_sink_mt>("test_spdlog_logger", stream);
-        auto logger = mprpc::logging::create_spdlog_logger(
+        auto logger = std::make_shared<mprpc::logging::impl::spdlog_logger>(
             spdlog_logger, mprpc::logging::log_level::info);
 
         test_mprpc_log(logger);
@@ -81,7 +82,7 @@ TEST_CASE("mprpc::logging::spdlog_logger") {
         auto spdlog_logger = spdlog::synchronous_factory::template create<
             spdlog::sinks::ostream_sink_mt>(
             "test_spdlog_logger_log_level", stream);
-        auto logger = mprpc::logging::create_spdlog_logger(
+        auto logger = std::make_shared<mprpc::logging::impl::spdlog_logger>(
             spdlog_logger, log_level::trace);
 
         stream.str("");

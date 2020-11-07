@@ -37,3 +37,4 @@ add_executable(
     method_client_test.cpp
     client_builder_test.cpp)
 target_add_catch2(mprpc_test_units)
+target_link_libraries(mprpc_test_units PRIVATE spdlog)

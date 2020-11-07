@@ -69,6 +69,8 @@ target_include_directories(
     libzstd_shared
     INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/extern/zstd/lib>)
 
+find_package(Threads REQUIRED)
+
 option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)
 if(MPRPC_BUILD_DOC)
     add_subdirectory(doc)
@@ -77,7 +79,7 @@ endif()
 add_library(
     mprpc SHARED
     src/format_message.cpp
-    src/logging/spdlog_logger.cpp
+    src/logging/basic_loggers.cpp
     src/thread_pool.cpp
     src/transport/parsers/msgpack_parser.cpp
     src/transport/compressors/zstd_compressor_config.cpp
@@ -95,8 +97,9 @@ set_target_properties(
 include(GenerateExportHeader)
 generate_export_header(
     mprpc EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/include/mprpc/mprpc_export.h")
-target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt spdlog asio stl_ext)
-target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings libzstd_shared)
+target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt asio stl_ext
+                                   Threads::Threads)
+target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings spdlog libzstd_shared)
 target_check_clang_tidy(mprpc)
 
 set(BUILDNAME

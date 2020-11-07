@@ -15,11 +15,9 @@
  */
 /*!
  * \file
- * \brief declaration and implementation of spdlog_logger class
+ * \brief declaration of factory methods of basic loggers
  */
 #pragma once
-
-#include <spdlog/fwd.h>
 
 #include "mprpc/logging/logger.h"
 #include "mprpc/mprpc_export.h"
@@ -27,26 +25,11 @@
 namespace mprpc {
 namespace logging {
 
-namespace impl {
-
 //! default maximum size of a file
 static constexpr std::size_t default_max_file_size = 1024 * 1024 * 10;
 
 //! default maximum number of files
 static constexpr std::size_t default_max_files = 10;
-
-}  // namespace impl
-
-/*!
- * \brief create logger with spdlog
- *
- * \param spdlog_logger logger in spdlog
- * \param log_output_level log output level
- * \return logger
- */
-MPRPC_EXPORT std::shared_ptr<logger> create_spdlog_logger(
-    std::shared_ptr<spdlog::logger> spdlog_logger,
-    mprpc::logging::log_level log_output_level);
 
 /*!
  * \brief create logger to write logs to files
@@ -62,9 +45,8 @@ MPRPC_EXPORT std::shared_ptr<logger> create_spdlog_logger(
 MPRPC_EXPORT std::shared_ptr<logger> create_file_logger(
     const std::string& logger_name, const std::string& base_filename,
     log_level log_output_level = log_level::info,
-    std::size_t max_file_size = impl::default_max_file_size,
-    std::size_t max_files = impl::default_max_files,
-    bool rotate_on_open = false);
+    std::size_t max_file_size = default_max_file_size,
+    std::size_t max_files = default_max_files, bool rotate_on_open = false);
 
 /*!
  * \brief create logger to write logs to standard output
