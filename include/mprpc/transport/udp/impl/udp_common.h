@@ -39,6 +39,7 @@
 namespace mprpc {
 namespace transport {
 namespace udp {
+namespace impl {
 
 /*!
  * \brief class to perform common processes on UDP sockets
@@ -258,6 +259,7 @@ private:
     const udp_common_config& config_;
 };
 
+}  // namespace impl
 }  // namespace udp
 }  // namespace transport
 }  // namespace mprpc

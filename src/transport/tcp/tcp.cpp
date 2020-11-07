@@ -47,8 +47,8 @@ std::shared_ptr<acceptor> create_tcp_acceptor(
             error_code::failed_to_listen, "invalid IP address: " + ip_address));
     }
     const auto endpoint = asio::ip::tcp::endpoint(ip_address_parsed, port);
-    return std::make_unique<tcp_acceptor>(logger, endpoint, threads.context(),
-        comp_factory, parser_factory_ptr, config);
+    return std::make_unique<impl::tcp_acceptor>(logger, endpoint,
+        threads.context(), comp_factory, parser_factory_ptr, config);
 }
 
 std::shared_ptr<connector> create_tcp_connector(
@@ -77,7 +77,7 @@ std::shared_ptr<connector> create_tcp_connector(
             logger, "trying to connect to endpoint: {}", entry.endpoint());
         connector_socket.connect(entry.endpoint(), err);
         if (!err) {
-            return std::make_unique<tcp_connector>(logger,
+            return std::make_unique<impl::tcp_connector>(logger,
                 std::move(connector_socket), threads.context(),
                 comp_factory->create_streaming_compressor(logger),
                 parser_factory_ptr->create_streaming_parser(logger), config);

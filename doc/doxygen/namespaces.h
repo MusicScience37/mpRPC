@@ -62,10 +62,20 @@ namespace mprpc {
         namespace asio_helper {}
 
         //! namespace of classes for TCP transport
-        namespace tcp {}
+        namespace tcp {
+
+            //! namespace of internal implementations
+            namespace impl {}
+
+        }  // namespace tcp
 
         //! namespace of classes for UDP transport
-        namespace udp {}
+        namespace udp {
+
+            //! namespace of internal implementations
+            namespace impl {}
+
+        }  // namespace udp
 
     }  // namespace transport
 

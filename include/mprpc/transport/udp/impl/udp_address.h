@@ -28,6 +28,7 @@
 namespace mprpc {
 namespace transport {
 namespace udp {
+namespace impl {
 
 /*!
  * \brief class of addresses for UDP sockets
@@ -54,6 +55,7 @@ private:
     asio::ip::udp::endpoint endpoint_;
 };
 
+}  // namespace impl
 }  // namespace udp
 }  // namespace transport
 }  // namespace mprpc

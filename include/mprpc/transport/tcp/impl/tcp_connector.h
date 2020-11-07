@@ -36,6 +36,7 @@
 namespace mprpc {
 namespace transport {
 namespace tcp {
+namespace impl {
 
 /*!
  * \brief class of connectors on TCP sockets
@@ -120,6 +121,7 @@ private:
     tcp_connector_config config_;
 };
 
+}  // namespace impl
 }  // namespace tcp
 }  // namespace transport
 }  // namespace mprpc
