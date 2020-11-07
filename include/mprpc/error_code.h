@@ -83,6 +83,13 @@ enum config_errors : error_code_t {
     invalid_config_value = 500  //!< invalid configuration value
 };
 
+/*!
+ * \brief enumeration of client-specific error codes
+ */
+enum client_errors : error_code_t {
+    timeout = 600  //!< timeout
+};
+
 }  // namespace error_code
 
 }  // namespace mprpc

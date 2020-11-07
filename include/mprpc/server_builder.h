@@ -53,7 +53,18 @@ public:
      * \return this object
      */
     server_builder& num_threads(std::size_t num_threads) {
-        num_threads_ = num_threads;
+        server_config_.num_threads = num_threads;
+        return *this;
+    }
+
+    /*!
+     * \brief set client configuration
+     *
+     * \param config configuration
+     * \return this object
+     */
+    server_builder& client_config(mprpc::server_config config) {
+        server_config_ = config;
         return *this;
     }
 
@@ -160,8 +171,8 @@ public:
      * \return server
      */
     std::unique_ptr<server> create() {
-        const auto threads =
-            std::make_shared<thread_pool>(logger_, num_threads_);
+        const auto threads = std::make_shared<thread_pool>(
+            logger_, server_config_.num_threads.value());
 
         auto method_server = std::make_shared<execution::simple_method_server>(
             logger_, *threads, methods_);
@@ -173,8 +184,8 @@ public:
                 logger_, *threads, compressor_factory_, parser_factory_));
         }
 
-        auto srv = std::make_unique<server>(
-            logger_, threads, std::move(acceptors), std::move(method_server));
+        auto srv = std::make_unique<server>(logger_, threads,
+            std::move(acceptors), std::move(method_server), server_config_);
         srv->start();
 
         return srv;
@@ -185,8 +196,8 @@ private:
     std::shared_ptr<mprpc::logging::logger> logger_{
         logging::create_stdout_logger(mprpc::logging::log_level::info)};
 
-    //! number of threads
-    std::size_t num_threads_{1};
+    //! server configuration
+    mprpc::server_config server_config_{};
 
     //! compressor factory
     std::shared_ptr<transport::compressor_factory> compressor_factory_{

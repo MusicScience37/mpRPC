@@ -27,6 +27,7 @@
 #include "mprpc/execution/method_server.h"
 #include "mprpc/logging/logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/server_config.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
 
@@ -44,11 +45,13 @@ public:
      * \param threads thread pool
      * \param acceptors acceptors
      * \param method_server method server
+     * \param config configuration
      */
     server(std::shared_ptr<mprpc::logging::logger> logger,
         std::shared_ptr<mprpc::thread_pool> threads,
         std::vector<std::shared_ptr<transport::acceptor>> acceptors,
-        std::shared_ptr<execution::method_server> method_server)
+        std::shared_ptr<execution::method_server> method_server,
+        server_config config)
         : logger_(std::move(logger)),
           threads_(std::move(threads)),
           acceptors_(std::move(acceptors)),
@@ -221,6 +224,9 @@ private:
 
     //! method server
     std::shared_ptr<execution::method_server> method_server_;
+
+    //! server configuration
+    server_config config_;
 };
 
 }  // namespace mprpc

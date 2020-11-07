@@ -51,7 +51,18 @@ public:
      * \return this object
      */
     client_builder& num_threads(std::size_t num_threads) {
-        num_threads_ = num_threads;
+        client_config_.num_threads = num_threads;
+        return *this;
+    }
+
+    /*!
+     * \brief set client configuration
+     *
+     * \param config configuration
+     * \return this object
+     */
+    client_builder& client_config(mprpc::client_config config) {
+        client_config_ = config;
         return *this;
     }
 
@@ -126,14 +137,14 @@ public:
      * \return client
      */
     std::unique_ptr<client> create() {
-        const auto threads =
-            std::make_shared<thread_pool>(logger_, num_threads_);
+        const auto threads = std::make_shared<thread_pool>(
+            logger_, client_config_.num_threads.value());
 
         auto connector = connector_factory_(
             logger_, *threads, compressor_factory_, parser_factory_);
 
-        auto res =
-            std::make_unique<client>(logger_, threads, std::move(connector));
+        auto res = std::make_unique<client>(
+            logger_, threads, std::move(connector), client_config_);
         res->start();
 
         return res;
@@ -144,8 +155,8 @@ private:
     std::shared_ptr<mprpc::logging::logger> logger_{
         logging::create_stdout_logger(mprpc::logging::log_level::warn)};
 
-    //! number of threads
-    std::size_t num_threads_{1};
+    //! client configuration
+    mprpc::client_config client_config_{};
 
     //! compressor factory
     std::shared_ptr<transport::compressor_factory> compressor_factory_{

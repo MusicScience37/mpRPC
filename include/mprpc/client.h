@@ -23,6 +23,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "mprpc/client_config.h"
 #include "mprpc/logging/logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/pack_data.h"
@@ -43,13 +44,15 @@ public:
      * \param logger logger
      * \param threads threads
      * \param connector connector
+     * \param config configuration
      */
     client(std::shared_ptr<logging::logger> logger,
         std::shared_ptr<thread_pool> threads,
-        std::shared_ptr<transport::connector> connector)
+        std::shared_ptr<transport::connector> connector, client_config config)
         : logger_(std::move(logger)),
           threads_(std::move(threads)),
-          connector_(std::move(connector)) {}
+          connector_(std::move(connector)),
+          config_(config) {}
 
     /*!
      * \brief start process
@@ -111,7 +114,16 @@ public:
      */
     template <typename Result, typename... Params>
     Result request(const std::string& method, const Params&... params) {
-        return async_request<Result>(method, params...).get_future().get();
+        auto future = async_request<Result>(method, params...).get_future();
+        if (future.wait_for(std::chrono::milliseconds(
+                config_.sync_request_timeout_ms.value())) !=
+            std::future_status::ready) {
+            MPRPC_ERROR(
+                logger_, "timeout in synchronous request for {}", method);
+            throw exception(error_info(error_code::timeout,
+                "timeout in synchronous request for " + method));
+        }
+        return future.get();
     }
 
     /*!
@@ -238,6 +250,9 @@ private:
 
     //! mutex
     std::unique_ptr<std::mutex> mutex_{std::make_unique<std::mutex>()};
+
+    //! configuration
+    const client_config config_;
 };
 
 }  // namespace mprpc
