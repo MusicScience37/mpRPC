@@ -123,6 +123,6 @@ if(MPRPC_ENABLE_BENCH)
 endif()
 
 option(MPRPC_BUILD_EXAMPLE "build examples of mpRPC" OFF)
-if(MPRPC_TESTING)
+if(MPRPC_BUILD_EXAMPLE)
     add_subdirectory(example)
 endif()
