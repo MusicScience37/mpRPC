@@ -190,7 +190,7 @@ private:
         const message_data& msg, const on_write_handler_type& handler) {
         MPRPC_TRACE(logger_, "send a message");
         const auto data = compressor_->compress(msg);
-        socket_.async_send_to(asio::buffer(msg.data(), msg.size()), endpoint,
+        socket_.async_send_to(asio::buffer(data.data(), data.size()), endpoint,
             asio::bind_executor(strand_,
                 [weak_self = weak_from_this(), msg, data, handler](
                     const asio::error_code& error, std::size_t num_bytes) {

@@ -56,6 +56,23 @@ public:
     }
 
     /*!
+     * \brief set to use compression with zstd library
+     *
+     * \param config configuration
+     * \return this object
+     */
+    client_builder& use_zstd_compression(
+        transport::compressors::zstd_compressor_config config =
+            transport::compressors::zstd_compressor_config()) {
+        compressor_factory_ =
+            std::make_shared<transport::compressors::zstd_compressor_factory>(
+                config);
+        parser_factory_ =
+            std::make_shared<transport::parsers::zstd_parser_factory>();
+        return *this;
+    }
+
+    /*!
      * \brief set to connect to a TCP port
      *
      * \param host host address to connect to
