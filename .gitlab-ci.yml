@@ -171,6 +171,20 @@ gcc-10-debug:
   variables:
     BUILD_DIR: build_gcc10_debug
 
+clang-10-release:
+  extends: .release-test-base
+  stage: Test with Clang
+  image: musicscience37/clang-ci:clang10-v3.0
+  variables:
+    BUILD_DIR: build_clang10_release
+
+clang-10-debug:
+  extends: .debug-test-base
+  stage: Test with Clang
+  image: musicscience37/clang-ci:clang10-v3.0
+  variables:
+    BUILD_DIR: build_clang10_debug
+
 doc:
   extends: .retry setting
   stage: Build Documentation
