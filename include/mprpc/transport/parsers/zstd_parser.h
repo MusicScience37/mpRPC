@@ -43,7 +43,7 @@ MPRPC_EXPORT std::unique_ptr<parser> create_zstd_parser(
  * \return parser
  */
 MPRPC_EXPORT std::unique_ptr<streaming_parser> create_zstd_streaming_parser(
-    std::shared_ptr<logging::logger> logger);
+    const std::shared_ptr<logging::logger>& logger);
 
 /*!
  * \brief class of factories of parsers using zstd library
@@ -59,7 +59,7 @@ public:
     //! \copydoc mprpc::transport::parser_factory::create_streaming_parser
     std::unique_ptr<streaming_parser> create_streaming_parser(
         std::shared_ptr<logging::logger> logger) override {
-        return create_zstd_streaming_parser(std::move(logger));
+        return create_zstd_streaming_parser(logger);
     }
 
     //! construct

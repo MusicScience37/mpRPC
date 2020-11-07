@@ -31,9 +31,9 @@ std::unique_ptr<compressor> create_zstd_compressor(
 }
 
 std::unique_ptr<streaming_compressor> create_zstd_streaming_compressor(
-    // NOLINTNEXTLINE: temporary
     std::shared_ptr<logging::logger> logger, zstd_compressor_config config) {
-    return nullptr;
+    return std::make_unique<impl::zstd_streaming_compressor>(
+        std::move(logger), config);
 }
 
 }  // namespace compressors

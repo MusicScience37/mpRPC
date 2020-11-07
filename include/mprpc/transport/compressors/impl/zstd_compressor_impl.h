@@ -47,6 +47,8 @@ public:
         std::shared_ptr<logging::logger> logger, zstd_compressor_config config)
         : logger_(std::move(logger)), config_(config) {
         context_ = ZSTD_createCCtx();
+        ZSTD_CCtx_setParameter(context_, ZSTD_c_compressionLevel,
+            config_.compression_level.value());
     }
 
     //! \copydoc mprpc::transport::compressor::compress
@@ -55,9 +57,8 @@ public:
 
         MPRPC_TRACE(logger_, "compressing a message using zstd library");
 
-        auto result =
-            ZSTD_compressCCtx(context_, buffer_.data(), buffer_.size(),
-                data.data(), data.size(), config_.compression_level.value());
+        auto result = ZSTD_compress2(
+            context_, buffer_.data(), buffer_.size(), data.data(), data.size());
         if (ZSTD_isError(result) != 0U) {
             MPRPC_ERROR(logger_, "error in compression with zstd library: {}",
                 ZSTD_getErrorName(result));
@@ -80,6 +81,94 @@ public:
     zstd_compressor(zstd_compressor&&) = delete;
     zstd_compressor& operator=(const zstd_compressor&) = delete;
     zstd_compressor& operator=(zstd_compressor&&) = delete;
+
+private:
+    //! logger
+    std::shared_ptr<logging::logger> logger_;
+
+    //! buffer
+    mprpc::buffer buffer_{};
+
+    //! context
+    ZSTD_CCtx* context_{nullptr};
+
+    //! configuration
+    zstd_compressor_config config_;
+};
+
+/*!
+ * \brief class of compressors of messages using zstd with streaming
+ */
+class zstd_streaming_compressor final : public streaming_compressor {
+public:
+    /*!
+     * \brief construct
+     *
+     * \param logger logger
+     * \param config configuration
+     */
+    zstd_streaming_compressor(
+        std::shared_ptr<logging::logger> logger, zstd_compressor_config config)
+        : logger_(std::move(logger)), config_(config) {
+        context_ = ZSTD_createCCtx();
+        ZSTD_CCtx_setParameter(context_, ZSTD_c_compressionLevel,
+            config_.compression_level.value());
+    }
+
+    //! \copydoc mprpc::transport::streaming_compressor::init
+    void init() override {
+        ZSTD_CCtx_reset(context_, ZSTD_reset_session_only);
+        ZSTD_CCtx_setParameter(context_, ZSTD_c_compressionLevel,
+            config_.compression_level.value());
+    }
+
+    //! \copydoc mprpc::transport::streaming_compressor::compress
+    message_data compress(message_data data) override {
+        buffer_.resize(ZSTD_compressBound(data.size()));
+
+        MPRPC_TRACE(logger_, "compressing a message using zstd library");
+
+        auto input = ZSTD_inBuffer{data.data(), data.size(), 0};
+        auto output = ZSTD_outBuffer{buffer_.data(), buffer_.size(), 0};
+        while (true) {
+            auto result =
+                ZSTD_compressStream2(context_, &output, &input, ZSTD_e_flush);
+            if (ZSTD_isError(result) != 0U) {
+                MPRPC_ERROR(logger_,
+                    "error in compression with zstd library: {}",
+                    ZSTD_getErrorName(result));
+                throw exception(error_info(error_code::unexpected_error,
+                    std::string() + "error in compression with zstd library: " +
+                        ZSTD_getErrorName(result)));
+            }
+
+            if (result == 0) {
+                // completed
+                break;
+            }
+
+            MPRPC_TRACE(logger_,
+                "flushing in zstd library failed, retrying with larger buffer");
+            buffer_.resize(buffer_.size() + result);
+            output.dst = buffer_.data();
+            output.size = buffer_.size();
+        }
+
+        MPRPC_TRACE(logger_,
+            "compressed a message from {} bytes to {} bytes using zstd library",
+            data.size(), output.pos);
+
+        return message_data(buffer_.data(), output.pos);
+    }
+
+    //! destruct
+    ~zstd_streaming_compressor() override { ZSTD_freeCCtx(context_); }
+
+    zstd_streaming_compressor(const zstd_streaming_compressor&) = delete;
+    zstd_streaming_compressor(zstd_streaming_compressor&&) = delete;
+    zstd_streaming_compressor& operator=(
+        const zstd_streaming_compressor&) = delete;
+    zstd_streaming_compressor& operator=(zstd_streaming_compressor&&) = delete;
 
 private:
     //! logger

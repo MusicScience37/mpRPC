@@ -31,9 +31,8 @@ std::unique_ptr<parser> create_zstd_parser(
 }
 
 std::unique_ptr<streaming_parser> create_zstd_streaming_parser(
-    // NOLINTNEXTLINE: temporary
-    std::shared_ptr<logging::logger> logger) {
-    return nullptr;
+    const std::shared_ptr<logging::logger>& logger) {
+    return std::make_unique<impl::zstd_streaming_parser>(logger);
 }
 
 }  // namespace parsers

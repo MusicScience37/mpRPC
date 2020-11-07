@@ -19,6 +19,7 @@ add_executable(
     transport/mock/mock_address_test.cpp
     transport/parsers/msgpack_parser_test.cpp
     transport/compressors/zstd_non_streaming_test.cpp
+    transport/compressors/zstd_streaming_test.cpp
     transport/asio_helper/basic_endpoint_test.cpp
     transport/tcp/tcp_address_test.cpp
     transport/tcp/tcp_test.cpp
