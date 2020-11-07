@@ -74,7 +74,7 @@ TEST_CASE("RPC on UDP using zstd compression") {
 
     SECTION("request echo with large data") {
         // larger than UDP packet limit
-        constexpr std::size_t size = 70000;
+        constexpr std::size_t size = 1024 * 1024;
         const auto str = std::string(size, 'a');
         std::string res;
         REQUIRE_NOTHROW(res = echo_client(str));
@@ -120,7 +120,7 @@ TEST_CASE("RPC on TCP using zstd compression") {
     }
 
     SECTION("request echo with large data") {
-        constexpr std::size_t size = 100000;
+        constexpr std::size_t size = 1024 * 1024;
         const auto str = std::string(size, 'a');
         std::string res;
         REQUIRE_NOTHROW(res = echo_client(str));

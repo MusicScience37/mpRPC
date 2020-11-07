@@ -127,8 +127,11 @@ public:
 
         MPRPC_TRACE(logger_, "decompressing a message using zstd library");
 
+        std::size_t decompressed_bytes = 0;
         while (input_.pos < input_.size) {
             static const auto zstd_default_output_size = ZSTD_DStreamOutSize();
+            MPRPC_TRACE(logger_, "preparing buffer with {} bytes",
+                zstd_default_output_size);
             msgpack_parser_.prepare_buffer(zstd_default_output_size);
 
             auto output = ZSTD_outBuffer{
@@ -144,17 +147,22 @@ public:
                         ZSTD_getErrorName(result)));
             }
 
+            MPRPC_TRACE(
+                logger_, "output of ZSTD_decompressStream is {}", result);
+
             if (output.pos > 0) {
+                decompressed_bytes += output.pos;
                 msgpack_parser_.consumed(output.pos);
             }
 
-            if (output.pos < output.size) {
+            if ((input_.pos == input_.size) || (output.pos < output.size)) {
                 // completed current input
                 break;
             }
         }
 
-        MPRPC_TRACE(logger_, "decompressed {} bytes in inputs", input_.pos);
+        MPRPC_TRACE(logger_, "decompressed {} bytes in inputs to {} bytes",
+            input_.pos, decompressed_bytes);
 
         buffer_.consume(input_.pos);
         input_.size -= input_.pos;

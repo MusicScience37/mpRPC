@@ -124,35 +124,25 @@ public:
 
     //! \copydoc mprpc::transport::streaming_compressor::compress
     message_data compress(message_data data) override {
-        buffer_.resize(ZSTD_compressBound(data.size()));
+        const auto buffer_size = ZSTD_compressBound(data.size());
+        MPRPC_TRACE(logger_, "preparing buffer with {} bytes", buffer_size);
+        buffer_.resize(buffer_size);
 
         MPRPC_TRACE(logger_, "compressing a message using zstd library");
 
         auto input = ZSTD_inBuffer{data.data(), data.size(), 0};
         auto output = ZSTD_outBuffer{buffer_.data(), buffer_.size(), 0};
-        while (true) {
-            auto result =
-                ZSTD_compressStream2(context_, &output, &input, ZSTD_e_flush);
-            if (ZSTD_isError(result) != 0U) {
-                MPRPC_ERROR(logger_,
-                    "error in compression with zstd library: {}",
-                    ZSTD_getErrorName(result));
-                throw exception(error_info(error_code::unexpected_error,
-                    std::string() + "error in compression with zstd library: " +
-                        ZSTD_getErrorName(result)));
-            }
 
-            if (result == 0) {
-                // completed
-                break;
-            }
-
-            MPRPC_TRACE(logger_,
-                "flushing in zstd library failed, retrying with larger buffer");
-            buffer_.resize(buffer_.size() + result);
-            output.dst = buffer_.data();
-            output.size = buffer_.size();
+        auto result =
+            ZSTD_compressStream2(context_, &output, &input, ZSTD_e_end);
+        if (ZSTD_isError(result) != 0U) {
+            MPRPC_ERROR(logger_, "error in compression with zstd library: {}",
+                ZSTD_getErrorName(result));
+            throw exception(error_info(error_code::unexpected_error,
+                std::string() + "error in compression with zstd library: " +
+                    ZSTD_getErrorName(result)));
         }
+        MPRPC_TRACE(logger_, "output of ZSTD_compressStream2 is {}", result);
 
         MPRPC_TRACE(logger_,
             "compressed a message from {} bytes to {} bytes using zstd library",
