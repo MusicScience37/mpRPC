@@ -19,24 +19,57 @@
  */
 #pragma once
 
-/*!
- * \brief namespace of this project
- */
+//! namespace of this project
 namespace mprpc {
 
-/*!
- * \brief namespace of internal implementations
- */
-namespace impl {}
+    //! namespace of internal implementations
+    namespace impl {}
 
-/*!
- * \brief namespace of logging functions
- */
-namespace logging {
+    //! namespace of error codes
+    namespace error_code {}
 
-/*!
- * \brief namespace of internal implementations
- */
-namespace impl {}
-}  // namespace logging
+    //! namespace of logging functions
+    namespace logging {
+
+        //! namespace of internal implementations
+        namespace impl {}
+
+    }  // namespace logging
+
+    //! namespace of classes for configurations
+    namespace config {}
+
+    //! namespace of classes to transport data
+    namespace transport {
+
+        //! namespace of classes of compressors
+        namespace compressors {
+
+            //! namespace of internal implementations
+            namespace impl {}
+
+        }  // namespace compressors
+
+        //! namespace of classes of parsers
+        namespace parsers {
+
+            //! namespace of internal implementations
+            namespace impl {}
+
+        }  // namespace parsers
+
+        //! helper classes for asio library
+        namespace asio_helper {}
+
+        //! namespace of classes for TCP transport
+        namespace tcp {}
+
+        //! namespace of classes for UDP transport
+        namespace udp {}
+
+    }  // namespace transport
+
+    //! namespace of classes to execute methods
+    namespace execution {}
+
 }  // namespace mprpc
