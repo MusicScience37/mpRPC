@@ -101,6 +101,8 @@ def plot_trials_for_types(bench: Benchmark, rows: int, cols: int, output: str):
         []
     )
     fig, axes = plt.subplots(nrows=rows, ncols=cols,
+                             figsize=[max(cols * 2, 6.4),
+                                      max(rows * 2 + 1, 4.8)],
                              sharex=True, sharey=True, squeeze=False)
 
     fig.suptitle('Time of RPC Calls ({})'.format(bench.test_name))
@@ -166,6 +168,8 @@ def plot_cdf_for_types(bench: Benchmark, rows: int, cols: int, output: str):
         []
     )
     fig, axes = plt.subplots(nrows=rows, ncols=cols,
+                             figsize=[max(cols * 2, 6.4),
+                                      max(rows * 2 + 1, 4.8)],
                              sharex=True, sharey=True, squeeze=False)
 
     fig.suptitle('CDF of Time of RPC Calls ({})'.format(bench.test_name))
