@@ -27,6 +27,7 @@
 
 #include "../../create_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/transport/compressors/null_compressor.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
 
 TEST_CASE("mprpc::transport::tcp") {
@@ -34,6 +35,9 @@ TEST_CASE("mprpc::transport::tcp") {
 
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 2);
     threads->start();
+
+    const auto comp_factory = std::make_shared<
+        mprpc::transport::compressors::null_compressor_factory>();
 
     const auto parser_factory =
         std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
@@ -43,7 +47,7 @@ TEST_CASE("mprpc::transport::tcp") {
 
     SECTION("communicate") {
         auto acceptor = mprpc::transport::tcp::create_tcp_acceptor(
-            logger, host, port, *threads, parser_factory);
+            logger, host, port, *threads, comp_factory, parser_factory);
         auto session_promise =
             std::promise<std::shared_ptr<mprpc::transport::session>>();
         auto session_future = session_promise.get_future();
@@ -62,7 +66,7 @@ TEST_CASE("mprpc::transport::tcp") {
         std::this_thread::sleep_for(wait_duration);
 
         auto connector = mprpc::transport::tcp::create_tcp_connector(
-            logger, host, port, *threads, parser_factory);
+            logger, host, port, *threads, comp_factory, parser_factory);
 
         const auto timeout = std::chrono::seconds(15);
         REQUIRE(session_future.wait_for(timeout) == std::future_status::ready);

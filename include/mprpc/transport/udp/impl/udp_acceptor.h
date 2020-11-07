@@ -47,15 +47,17 @@ public:
      * \param logger logger
      * \param socket socket
      * \param io_context io_context
+     * \param comp compressor
      * \param parser_ptr parser
      * \param config configuration
      */
     udp_acceptor(const std::shared_ptr<mprpc::logging::logger>& logger,
         asio::ip::udp::socket socket, asio::io_context& io_context,
-        std::shared_ptr<parser> parser_ptr, udp_acceptor_config config)
+        std::shared_ptr<compressor> comp, std::shared_ptr<parser> parser_ptr,
+        udp_acceptor_config config)
         : logger_(logger),
           helper_(std::make_shared<udp_common>(logger, std::move(socket),
-              io_context, std::move(parser_ptr), config_)),
+              io_context, std::move(comp), std::move(parser_ptr), config_)),
           config_(config) {
         helper_->init();
     }

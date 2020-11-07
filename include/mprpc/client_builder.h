@@ -56,6 +56,23 @@ public:
     }
 
     /*!
+     * \brief set to use compression with zstd library
+     *
+     * \param config configuration
+     * \return this object
+     */
+    client_builder& use_zstd_compression(
+        transport::compressors::zstd_compressor_config config =
+            transport::compressors::zstd_compressor_config()) {
+        compressor_factory_ =
+            std::make_shared<transport::compressors::zstd_compressor_factory>(
+                config);
+        parser_factory_ =
+            std::make_shared<transport::parsers::zstd_parser_factory>();
+        return *this;
+    }
+
+    /*!
      * \brief set to connect to a TCP port
      *
      * \param host host address to connect to
@@ -70,9 +87,11 @@ public:
             [host, port, config](
                 const std::shared_ptr<mprpc::logging::logger>& logger,
                 thread_pool& threads,
+                const std::shared_ptr<transport::compressor_factory>&
+                    comp_factory,
                 const std::shared_ptr<transport::parser_factory>& factory) {
                 return transport::tcp::create_tcp_connector(
-                    logger, host, port, threads, factory, config);
+                    logger, host, port, threads, comp_factory, factory, config);
             };
         return *this;
     }
@@ -92,9 +111,11 @@ public:
             [host, port, config](
                 const std::shared_ptr<mprpc::logging::logger>& logger,
                 thread_pool& threads,
+                const std::shared_ptr<transport::compressor_factory>&
+                    comp_factory,
                 const std::shared_ptr<transport::parser_factory>& factory) {
                 return transport::udp::create_udp_connector(
-                    logger, host, port, threads, factory, config);
+                    logger, host, port, threads, comp_factory, factory, config);
             };
         return *this;
     }
@@ -108,7 +129,8 @@ public:
         const auto threads =
             std::make_shared<thread_pool>(logger_, num_threads_);
 
-        auto connector = connector_factory_(logger_, *threads, parser_factory_);
+        auto connector = connector_factory_(
+            logger_, *threads, compressor_factory_, parser_factory_);
 
         auto res =
             std::make_unique<client>(logger_, threads, std::move(connector));
@@ -125,6 +147,10 @@ private:
     //! number of threads
     std::size_t num_threads_{1};
 
+    //! compressor factory
+    std::shared_ptr<transport::compressor_factory> compressor_factory_{
+        std::make_shared<transport::compressors::null_compressor_factory>()};
+
     //! parser factory
     std::shared_ptr<transport::parser_factory> parser_factory_{
         std::make_shared<transport::parsers::msgpack_parser_factory>()};
@@ -133,6 +159,7 @@ private:
     using connector_factory_type =
         std::function<std::shared_ptr<transport::connector>(
             const std::shared_ptr<mprpc::logging::logger>&, thread_pool&,
+            const std::shared_ptr<transport::compressor_factory>&,
             const std::shared_ptr<transport::parser_factory>&)>;
 
     //! connector factories

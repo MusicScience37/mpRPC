@@ -48,14 +48,17 @@ public:
      * \param logger logger
      * \param socket socket
      * \param io_context io_context
+     * \param comp compressor
      * \param parser parser
      * \param config configuration
      */
     tcp_connector(const std::shared_ptr<logging::logger>& logger,
         asio::ip::tcp::socket socket, asio::io_context& io_context,
+        std::shared_ptr<streaming_compressor> comp,
         std::shared_ptr<streaming_parser> parser, tcp_connector_config config)
-        : socket_helper_(std::make_shared<socket_helper_type>(logger,
-              std::move(socket), io_context, std::move(parser), config_)),
+        : socket_helper_(
+              std::make_shared<socket_helper_type>(logger, std::move(socket),
+                  io_context, std::move(comp), std::move(parser), config_)),
           logger_(logger),
           config_(config) {
         MPRPC_INFO(logger, "conencted {} to {}",

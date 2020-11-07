@@ -36,6 +36,7 @@ std::shared_ptr<acceptor> create_tcp_acceptor(
     const std::shared_ptr<mprpc::logging::logger>& logger,
     const std::string& ip_address, const std::uint16_t& port,
     thread_pool& threads,
+    const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     tcp_acceptor_config config) {
     asio::error_code err;
@@ -46,13 +47,14 @@ std::shared_ptr<acceptor> create_tcp_acceptor(
             error_code::failed_to_listen, "invalid IP address: " + ip_address));
     }
     const auto endpoint = asio::ip::tcp::endpoint(ip_address_parsed, port);
-    return std::make_unique<tcp_acceptor>(
-        logger, endpoint, threads.context(), parser_factory_ptr, config);
+    return std::make_unique<tcp_acceptor>(logger, endpoint, threads.context(),
+        comp_factory, parser_factory_ptr, config);
 }
 
 std::shared_ptr<connector> create_tcp_connector(
     const std::shared_ptr<mprpc::logging::logger>& logger,
     const std::string& host, const std::uint16_t& port, thread_pool& threads,
+    const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     tcp_connector_config config) {
     asio::ip::tcp::resolver resolver{threads.context()};
@@ -77,6 +79,7 @@ std::shared_ptr<connector> create_tcp_connector(
         if (!err) {
             return std::make_unique<tcp_connector>(logger,
                 std::move(connector_socket), threads.context(),
+                comp_factory->create_streaming_compressor(logger),
                 parser_factory_ptr->create_streaming_parser(logger), config);
         }
 

@@ -9,6 +9,13 @@
         ->RangeMultiplier(32)     \
         ->Range(1, 1024 * 1024)
 
+#define BENCH_ECHO_UDP(FUNCTION)  \
+    BENCHMARK(FUNCTION)           \
+        ->MeasureProcessCPUTime() \
+        ->UseRealTime()           \
+        ->RangeMultiplier(32)     \
+        ->Range(1, 32 * 1024)
+
 inline void set_counters(benchmark::State& state) {
     state.counters["MessageRate"] =
         benchmark::Counter(1, benchmark::Counter::kIsIterationInvariantRate);

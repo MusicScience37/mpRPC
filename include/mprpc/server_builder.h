@@ -58,6 +58,23 @@ public:
     }
 
     /*!
+     * \brief set to use compression with zstd library
+     *
+     * \param config configuration
+     * \return this object
+     */
+    server_builder& use_zstd_compression(
+        transport::compressors::zstd_compressor_config config =
+            transport::compressors::zstd_compressor_config()) {
+        compressor_factory_ =
+            std::make_shared<transport::compressors::zstd_compressor_factory>(
+                config);
+        parser_factory_ =
+            std::make_shared<transport::parsers::zstd_parser_factory>();
+        return *this;
+    }
+
+    /*!
      * \brief set to listen a TCP port
      *
      * \param ip_address IP address string (IPv4 or IPv6)
@@ -73,10 +90,12 @@ public:
             [ip_address, port, config](
                 const std::shared_ptr<mprpc::logging::logger>& logger,
                 thread_pool& threads,
+                const std::shared_ptr<transport::compressor_factory>&
+                    comp_factory,
                 const std::shared_ptr<transport::parser_factory>&
                     parser_factory) {
-                return transport::tcp::create_tcp_acceptor(
-                    logger, ip_address, port, threads, parser_factory, config);
+                return transport::tcp::create_tcp_acceptor(logger, ip_address,
+                    port, threads, comp_factory, parser_factory, config);
             });
         return *this;
     }
@@ -97,10 +116,12 @@ public:
             [ip_address, port, config](
                 const std::shared_ptr<mprpc::logging::logger>& logger,
                 thread_pool& threads,
+                const std::shared_ptr<transport::compressor_factory>&
+                    comp_factory,
                 const std::shared_ptr<transport::parser_factory>&
                     parser_factory) {
-                return transport::udp::create_udp_acceptor(
-                    logger, ip_address, port, threads, parser_factory, config);
+                return transport::udp::create_udp_acceptor(logger, ip_address,
+                    port, threads, comp_factory, parser_factory, config);
             });
         return *this;
     }
@@ -148,7 +169,8 @@ public:
         std::vector<std::shared_ptr<transport::acceptor>> acceptors;
         acceptors.reserve(acceptor_factories_.size());
         for (const auto& factory : acceptor_factories_) {
-            acceptors.push_back(factory(logger_, *threads, parser_factory_));
+            acceptors.push_back(factory(
+                logger_, *threads, compressor_factory_, parser_factory_));
         }
 
         auto srv = std::make_unique<server>(
@@ -166,6 +188,10 @@ private:
     //! number of threads
     std::size_t num_threads_{1};
 
+    //! compressor factory
+    std::shared_ptr<transport::compressor_factory> compressor_factory_{
+        std::make_shared<transport::compressors::null_compressor_factory>()};
+
     //! parser factory
     std::shared_ptr<transport::parser_factory> parser_factory_{
         std::make_shared<transport::parsers::msgpack_parser_factory>()};
@@ -174,6 +200,7 @@ private:
     using acceptor_factory_type =
         std::function<std::shared_ptr<transport::acceptor>(
             const std::shared_ptr<mprpc::logging::logger>&, thread_pool&,
+            const std::shared_ptr<transport::compressor_factory>&,
             const std::shared_ptr<transport::parser_factory>&)>;
 
     //! acceptor factories

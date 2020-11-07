@@ -27,7 +27,7 @@ def main():
                    cwd=prefix, check=True)
 
     test_name = 'echo'
-    test_types = ['tcp', 'udp']
+    test_types = ['tcp', 'tcp_zstd', 'udp', 'udp_zstd']
     data_sizes = [1, 32, 1024, 32 * 1024, 1024 * 1024]
 
     fullnames = make_fullnames(test_name, test_types, data_sizes)
@@ -35,8 +35,10 @@ def main():
 
     bench = Benchmark(test_name, test_types, data_sizes, results)
 
-    plot_trials_for_types(bench, 1, 2, prefix + 'echo_trials_types.png')
-    plot_cdf_for_types(bench, 2, 1, prefix + 'echo_cdf_types.png')
+    plot_trials_for_types(bench, 1, len(test_types),
+                          prefix + 'echo_trials_types.png')
+    plot_cdf_for_types(bench, len(test_types), 1,
+                       prefix + 'echo_cdf_types.png')
 
 
 if __name__ == '__main__':

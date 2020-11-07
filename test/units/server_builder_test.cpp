@@ -47,11 +47,14 @@ TEST_CASE("mprpc::server_builder") {
         const auto threads = std::make_shared<mprpc::thread_pool>(logger, 3);
         threads->start();
 
+        const auto comp_factory = std::make_shared<
+            mprpc::transport::compressors::null_compressor_factory>();
+
         const auto parser_factory = std::make_shared<
             mprpc::transport::parsers::msgpack_parser_factory>();
 
         const auto connector = mprpc::transport::tcp::create_tcp_connector(
-            logger, host, port, *threads, parser_factory);
+            logger, host, port, *threads, comp_factory, parser_factory);
 
         const mprpc::msgid_t msgid = 37;
         const auto str = std::string("abcde");

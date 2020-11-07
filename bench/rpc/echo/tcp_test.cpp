@@ -66,3 +66,47 @@ static void echo_tcp(benchmark::State& state) {
     set_counters(state);
 }
 BENCH_ECHO(echo_tcp);
+
+static void echo_tcp_zstd(benchmark::State& state) {
+    static const auto logger =
+        mprpc::logging::create_stdout_logger(mprpc::logging::log_level::warn);
+
+    const auto host = std::string("127.0.0.1");
+    constexpr std::uint16_t port = 3780;
+
+    const auto size = static_cast<std::size_t>(state.range());
+    const auto data = mprpc::generate_string(size);
+
+    try {
+        auto server = mprpc::server_builder(logger)
+                          .num_threads(2)
+                          .use_zstd_compression()
+                          .listen_tcp(host, port)
+                          .method<std::string(std::string)>(
+                              "echo", [](std::string str) { return str; })
+                          .create();
+
+        const auto duration = std::chrono::milliseconds(100);
+        std::this_thread::sleep_for(duration);
+
+        auto client = mprpc::client_builder(logger)
+                          .num_threads(2)
+                          .use_zstd_compression()
+                          .connect_tcp(host, port)
+                          .create();
+
+        auto echo_client =
+            mprpc::method_client<std::string(std::string)>(*client, "echo");
+
+        for (auto _ : state) {
+            const auto res = echo_client(data);
+            benchmark::DoNotOptimize(res);
+        }
+    } catch (const std::exception& err) {
+        MPRPC_ERROR(logger, err.what());
+        state.SkipWithError(err.what());
+    }
+
+    set_counters(state);
+}
+BENCH_ECHO(echo_tcp_zstd);
