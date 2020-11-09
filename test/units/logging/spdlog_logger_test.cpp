@@ -64,7 +64,7 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
         auto log = remove_line_feed(stream.str());
         REQUIRE_THAT(log,
             Catch::Matchers::Matches(
-                R"***(\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
+                R"***(\[\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
                 R"***(\[info\]  \(thread \d*\) value: 37 \(test.cpp:5\))***"));
 
         stream.str("");
@@ -72,7 +72,7 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
         log = remove_line_feed(stream.str());
         REQUIRE_THAT(log,
             Catch::Matchers::Matches(
-                R"***(\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
+                R"***(\[\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
                 R"***(\[error\] \(thread \d*\) message)***"));
     }
 

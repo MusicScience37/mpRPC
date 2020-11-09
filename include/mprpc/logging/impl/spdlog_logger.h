@@ -131,7 +131,7 @@ public:
 
         auto formatter = std::make_unique<spdlog::pattern_formatter>();
         formatter->add_flag<impl::log_level_flag>('k');
-        formatter->set_pattern("[%Y-%m-%d %H:%M:%S.%f] %^%k%$ (thread %t) %v");
+        formatter->set_pattern("[%Y-%m-%dT%H:%M:%S.%f] %^%k%$ (thread %t) %v");
         spdlog_logger_->set_formatter(std::move(formatter));
     }
 
