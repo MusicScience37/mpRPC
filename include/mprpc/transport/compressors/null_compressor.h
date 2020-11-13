@@ -31,7 +31,9 @@ namespace compressors {
 class null_compressor final : public compressor {
 public:
     //! \copydoc mprpc::transport::compressor::compress
-    shared_binary compress(message_data data) override { return data; }
+    shared_binary compress(message_data data) override {
+        return std::move(data);
+    }
 };
 
 /*!
@@ -43,7 +45,9 @@ public:
     void init() override {}
 
     //! \copydoc mprpc::transport::streaming_compressor::compress
-    shared_binary compress(message_data data) override { return data; }
+    shared_binary compress(message_data data) override {
+        return std::move(data);
+    }
 };
 
 /*!
