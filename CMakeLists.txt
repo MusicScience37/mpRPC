@@ -78,6 +78,7 @@ endif()
 
 add_library(
     mprpc SHARED
+    src/shared_binary.cpp
     src/format_message.cpp
     src/logging/basic_loggers.cpp
     src/thread_pool.cpp

@@ -52,7 +52,7 @@ public:
     }
 
     //! \copydoc mprpc::transport::compressor::compress
-    message_data compress(message_data data) override {
+    shared_binary compress(message_data data) override {
         buffer_.resize(ZSTD_compressBound(data.size()));
 
         MPRPC_TRACE(logger_, "compressing a message using zstd library");
@@ -71,7 +71,7 @@ public:
             "compressed a message from {} bytes to {} bytes using zstd library",
             data.size(), result);
 
-        return message_data(buffer_.data(), result);
+        return shared_binary(buffer_.data(), result);
     }
 
     //! destruct
@@ -123,7 +123,7 @@ public:
     }
 
     //! \copydoc mprpc::transport::streaming_compressor::compress
-    message_data compress(message_data data) override {
+    shared_binary compress(message_data data) override {
         const auto buffer_size = ZSTD_compressBound(data.size());
         MPRPC_TRACE(logger_, "preparing buffer with {} bytes", buffer_size);
         buffer_.resize(buffer_size);
@@ -148,7 +148,7 @@ public:
             "compressed a message from {} bytes to {} bytes using zstd library",
             data.size(), output.pos);
 
-        return message_data(buffer_.data(), output.pos);
+        return shared_binary(buffer_.data(), output.pos);
     }
 
     //! destruct
