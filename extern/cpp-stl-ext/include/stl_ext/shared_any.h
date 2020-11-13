@@ -75,9 +75,13 @@ public:
      * \param args arguments
      */
     template <typename... Args>
-    static void create(shared_any_data& output, Args&&... args) {
+    static void create(shared_any_data& output, Args&&... args) {  // NOLINT
+        // clang cannot find corresponding "delete" statement and output
+        // false-positive warnings, so silence them here.
+#ifndef __clang_analyzer__
         output.obj_ptr = new (std::nothrow) Object(std::forward<Args>(args)...);
         output.mng_ptr = new (std::nothrow) manager_data();
+#endif
         if (output.obj_ptr == nullptr || output.mng_ptr == nullptr) {
             throw std::bad_alloc();
         }
