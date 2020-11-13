@@ -24,6 +24,7 @@
 #include "mprpc/exception.h"
 #include "mprpc/logging/logger.h"
 #include "mprpc/message_data.h"
+#include "mprpc/shared_binary.h"
 
 namespace mprpc {
 namespace transport {
@@ -37,9 +38,9 @@ public:
      * \brief compress data
      *
      * \param data data
-     * \return message data
+     * \return compressed data
      */
-    virtual message_data compress(message_data data) = 0;
+    virtual shared_binary compress(message_data data) = 0;
 
     //! construct
     compressor() noexcept = default;
@@ -67,9 +68,9 @@ public:
      * \brief compress data
      *
      * \param data data
-     * \return message data
+     * \return compressed data
      */
-    virtual message_data compress(message_data data) = 0;
+    virtual shared_binary compress(message_data data) = 0;
 
     //! construct
     streaming_compressor() noexcept = default;
