@@ -61,7 +61,7 @@ set(DOXYGEN_CREATE_SUBDIRS YES)
 set(DOXYGEN_PROJECT_NAME "mpRPC")
 
 doxygen_add_docs(
-    mprpc_doc_doxygen "include" "src" "doc/doxygen" "README.md"
+    mprpc_doc_doxygen "include" "impl" "src" "doc/doxygen" "README.md"
     WORKING_DIRECTORY "${MPRPC_SOURCE_DIR}"
     ALL
     COMMENT "Generate Doxygen API documentation for ${PROJECT_NAME}")
