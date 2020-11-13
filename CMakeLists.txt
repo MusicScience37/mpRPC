@@ -90,6 +90,7 @@ add_library(
     src/transport/udp/udp.cpp)
 target_include_directories(mprpc PUBLIC ${MPRPC_SOURCE_DIR}/include
                                         ${CMAKE_BINARY_DIR}/include)
+target_include_directories(mprpc PRIVATE ${MPRPC_SOURCE_DIR}/impl)
 set_target_properties(
     mprpc
     PROPERTIES CXX_VISIBILITY_PRESET hidden
@@ -102,6 +103,10 @@ target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt asio stl_ext
                                    Threads::Threads)
 target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings spdlog libzstd_shared)
 target_check_clang_tidy(mprpc)
+
+add_library(mprpc_impl INTERFACE)
+target_link_libraries(mprpc_impl INTERFACE mprpc)
+target_include_directories(mprpc_impl INTERFACE ${MPRPC_SOURCE_DIR}/impl)
 
 set(BUILDNAME
     "${CMAKE_HOST_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}-${CMAKE_BUILD_TYPE}"
