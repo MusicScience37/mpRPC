@@ -19,72 +19,18 @@
  */
 #pragma once
 
-#include <algorithm>
-#include <memory>
-#include <vector>
+#include "mprpc/mprpc_export.h"
+#include "mprpc/shared_binary.h"
 
 namespace mprpc {
 
 /*!
  * \brief class of message data
  */
-class message_data {
+class MPRPC_EXPORT message_data : public mprpc::shared_binary {
 public:
-    /*!
-     * \brief construct
-     */
-    message_data() = default;
-
-    /*!
-     * \brief construct
-     *
-     * \param data pointer to the message data
-     * \param size size of the message data
-     */
-    message_data(const char* data, std::size_t size)
-        : data_(std::make_shared<std::vector<char>>(data, data + size)) {}
-
-    /*!
-     * \brief get pointer to the message data
-     *
-     * \return pointer to the message data
-     */
-    const char* data() const noexcept { return data_->data(); }
-
-    /*!
-     * \brief get size of the message data
-     *
-     * \return size of the message data
-     */
-    std::size_t size() const noexcept { return data_->size(); }
-
-private:
-    //! message data
-    std::shared_ptr<std::vector<char>> data_{
-        std::make_shared<std::vector<char>>()};
+    // use same constructors
+    using mprpc::shared_binary::shared_binary;
 };
-
-/*!
- * \brief compare two messages
- *
- * \param left left-hand-side object
- * \param right right-hand-side object
- * \return whether two messages are same
- */
-inline bool operator==(const message_data& left, const message_data& right) {
-    return std::equal(left.data(), left.data() + left.size(), right.data(),
-        right.data() + right.size());
-}
-
-/*!
- * \brief compare two messages
- *
- * \param left left-hand-side object
- * \param right right-hand-side object
- * \return whether two messages are distinct
- */
-inline bool operator!=(const message_data& left, const message_data& right) {
-    return !operator==(left, right);
-}
 
 }  // namespace mprpc
