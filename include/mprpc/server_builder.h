@@ -88,25 +88,59 @@ public:
     /*!
      * \brief set to listen a TCP port
      *
-     * \param ip_address IP address string (IPv4 or IPv6)
-     * \param port port number
      * \param config configuration
      * \return this object
      */
-    server_builder& listen_tcp(const std::string& ip_address,
-        std::uint16_t port,
-        transport::tcp::tcp_acceptor_config config =
+    server_builder& listen_tcp(
+        const transport::tcp::tcp_acceptor_config& config =
             transport::tcp::tcp_acceptor_config()) {
         acceptor_factories_.emplace_back(
-            [ip_address, port, config](
-                const std::shared_ptr<mprpc::logging::logger>& logger,
+            [config](const std::shared_ptr<mprpc::logging::logger>& logger,
                 thread_pool& threads,
                 const std::shared_ptr<transport::compressor_factory>&
                     comp_factory,
                 const std::shared_ptr<transport::parser_factory>&
                     parser_factory) {
-                return transport::tcp::create_tcp_acceptor(logger, ip_address,
-                    port, threads, comp_factory, parser_factory, config);
+                return transport::tcp::create_tcp_acceptor(
+                    logger, threads, comp_factory, parser_factory, config);
+            });
+        return *this;
+    }
+
+    /*!
+     * \brief set to listen a TCP port
+     *
+     * \param ip_address IP address string (IPv4 or IPv6)
+     * \param port port number
+     * \return this object
+     */
+    server_builder& listen_tcp(
+        const std::string& ip_address, std::uint16_t port) {
+        transport::tcp::tcp_acceptor_config config;
+        config.host = ip_address;
+        config.port = port;
+        listen_tcp(config);
+        return *this;
+    }
+
+    /*!
+     * \brief set to listen a UDP port
+     *
+     * \param config configuration
+     * \return this object
+     */
+    server_builder& listen_udp(
+        const transport::udp::udp_acceptor_config& config =
+            transport::udp::udp_acceptor_config()) {
+        acceptor_factories_.emplace_back(
+            [config](const std::shared_ptr<mprpc::logging::logger>& logger,
+                thread_pool& threads,
+                const std::shared_ptr<transport::compressor_factory>&
+                    comp_factory,
+                const std::shared_ptr<transport::parser_factory>&
+                    parser_factory) {
+                return transport::udp::create_udp_acceptor(
+                    logger, threads, comp_factory, parser_factory, config);
             });
         return *this;
     }
@@ -116,24 +150,14 @@ public:
      *
      * \param ip_address IP address string (IPv4 or IPv6)
      * \param port port number
-     * \param config configuration
      * \return this object
      */
-    server_builder& listen_udp(const std::string& ip_address,
-        std::uint16_t port,
-        transport::udp::udp_acceptor_config config =
-            transport::udp::udp_acceptor_config()) {
-        acceptor_factories_.emplace_back(
-            [ip_address, port, config](
-                const std::shared_ptr<mprpc::logging::logger>& logger,
-                thread_pool& threads,
-                const std::shared_ptr<transport::compressor_factory>&
-                    comp_factory,
-                const std::shared_ptr<transport::parser_factory>&
-                    parser_factory) {
-                return transport::udp::create_udp_acceptor(logger, ip_address,
-                    port, threads, comp_factory, parser_factory, config);
-            });
+    server_builder& listen_udp(
+        const std::string& ip_address, std::uint16_t port) {
+        transport::udp::udp_acceptor_config config;
+        config.host = ip_address;
+        config.port = port;
+        listen_udp(config);
         return *this;
     }
 

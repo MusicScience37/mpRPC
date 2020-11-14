@@ -19,9 +19,7 @@
  */
 #pragma once
 
-#include <cstdint>
 #include <memory>
-#include <string>
 
 #include "mprpc/logging/logger.h"
 #include "mprpc/mprpc_export.h"
@@ -41,8 +39,6 @@ namespace udp {
  * \brief create a UDP acceptor
  *
  * \param logger logger
- * \param ip_address host IP address string to listen (IPv4 or IPv6)
- * \param port port number to listen
  * \param threads thread pool
  * \param comp_factory compressor factory
  * \param parser_factory_ptr parser factory
@@ -50,19 +46,15 @@ namespace udp {
  * \return UDP acceptor
  */
 MPRPC_EXPORT std::shared_ptr<acceptor> create_udp_acceptor(
-    const std::shared_ptr<mprpc::logging::logger>& logger,
-    const std::string& ip_address, const std::uint16_t& port,
-    thread_pool& threads,
+    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
-    udp_acceptor_config config = udp_acceptor_config());
+    const udp_acceptor_config& config = udp_acceptor_config());
 
 /*!
  * \brief create a UDP connector
  *
  * \param logger logger
- * \param host host address to connect to
- * \param port port number to connect to
  * \param threads thread pool
  * \param comp_factory compressor factory
  * \param parser_factory_ptr parser factory
@@ -70,11 +62,10 @@ MPRPC_EXPORT std::shared_ptr<acceptor> create_udp_acceptor(
  * \return UDP connector
  */
 MPRPC_EXPORT std::shared_ptr<connector> create_udp_connector(
-    const std::shared_ptr<mprpc::logging::logger>& logger,
-    const std::string& host, const std::uint16_t& port, thread_pool& threads,
+    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
-    udp_connector_config config = udp_connector_config());
+    const udp_connector_config& config = udp_connector_config());
 
 }  // namespace udp
 }  // namespace transport

@@ -54,7 +54,7 @@ TEST_CASE("mprpc::server_builder") {
             mprpc::transport::parsers::msgpack_parser_factory>();
 
         const auto connector = mprpc::transport::tcp::create_tcp_connector(
-            logger, host, port, *threads, comp_factory, parser_factory);
+            logger, *threads, comp_factory, parser_factory);
 
         const mprpc::msgid_t msgid = 37;
         const auto str = std::string("abcde");

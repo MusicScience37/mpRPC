@@ -33,12 +33,12 @@ namespace transport {
 namespace tcp {
 
 std::shared_ptr<acceptor> create_tcp_acceptor(
-    const std::shared_ptr<mprpc::logging::logger>& logger,
-    const std::string& ip_address, const std::uint16_t& port,
-    thread_pool& threads,
+    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
-    tcp_acceptor_config config) {
+    const tcp_acceptor_config& config) {
+    const auto& ip_address = config.host.value();
+    const auto port = config.port.value();
     asio::error_code err;
     const auto ip_address_parsed = asio::ip::make_address(ip_address, err);
     if (err) {
@@ -52,11 +52,12 @@ std::shared_ptr<acceptor> create_tcp_acceptor(
 }
 
 std::shared_ptr<connector> create_tcp_connector(
-    const std::shared_ptr<mprpc::logging::logger>& logger,
-    const std::string& host, const std::uint16_t& port, thread_pool& threads,
+    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
-    tcp_connector_config config) {
+    const tcp_connector_config& config) {
+    const auto& host = config.host.value();
+    const auto port = config.port.value();
     asio::ip::tcp::resolver resolver{threads.context()};
     asio::error_code err;
     MPRPC_DEBUG(logger, "resloving {}:{}", host, port);

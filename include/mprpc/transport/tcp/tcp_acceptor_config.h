@@ -20,6 +20,7 @@
 #pragma once
 
 #include "mprpc/transport/asio_helper/stream_socket_config.h"
+#include "mprpc/transport/common/ip_common_config.h"
 
 namespace mprpc {
 namespace transport {
@@ -28,7 +29,8 @@ namespace tcp {
 /*!
  * \brief configuration of TCP acceptor
  */
-struct tcp_acceptor_config : asio_helper::stream_socket_config {};
+struct tcp_acceptor_config : asio_helper::stream_socket_config,
+                             common::ip_common_config {};
 
 }  // namespace tcp
 }  // namespace transport

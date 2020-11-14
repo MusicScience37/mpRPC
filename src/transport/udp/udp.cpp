@@ -29,12 +29,12 @@ namespace transport {
 namespace udp {
 
 std::shared_ptr<acceptor> create_udp_acceptor(
-    const std::shared_ptr<mprpc::logging::logger>& logger,
-    const std::string& ip_address, const std::uint16_t& port,
-    thread_pool& threads,
+    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
-    udp_acceptor_config config) {
+    const udp_acceptor_config& config) {
+    const auto& ip_address = config.host.value();
+    const auto port = config.port.value();
     asio::error_code err;
     const auto ip_address_parsed = asio::ip::make_address(ip_address, err);
     if (err) {
@@ -59,11 +59,12 @@ std::shared_ptr<acceptor> create_udp_acceptor(
 }
 
 std::shared_ptr<connector> create_udp_connector(
-    const std::shared_ptr<mprpc::logging::logger>& logger,
-    const std::string& host, const std::uint16_t& port, thread_pool& threads,
+    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
-    udp_connector_config config) {
+    const udp_connector_config& config) {
+    const auto& host = config.host.value();
+    const auto port = config.port.value();
     asio::ip::udp::resolver resolver(threads.context());
     asio::error_code err;
     MPRPC_DEBUG(logger, "resloving {}:{}", host, port);
