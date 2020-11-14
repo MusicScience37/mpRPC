@@ -109,9 +109,6 @@ static void transport_binary_msgpack_tcp(benchmark::State& state) {
     const auto size = static_cast<std::size_t>(state.range());
     const auto data = mprpc::generate_binary_data(size);
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
-
     const auto comp_factory = std::make_shared<
         mprpc::transport::compressors::null_compressor_factory>();
 
@@ -120,7 +117,7 @@ static void transport_binary_msgpack_tcp(benchmark::State& state) {
 
     try {
         auto acceptor = mprpc::transport::tcp::create_tcp_acceptor(
-            logger, host, port, *threads, comp_factory, parser_factory);
+            logger, *threads, comp_factory, parser_factory);
         auto server = std::make_shared<mprpc_server>(acceptor);
         server->start();
 
@@ -128,7 +125,7 @@ static void transport_binary_msgpack_tcp(benchmark::State& state) {
         std::this_thread::sleep_for(wait_duration);
 
         auto client = mprpc::transport::tcp::create_tcp_connector(
-            logger, host, port, *threads, comp_factory, parser_factory);
+            logger, *threads, comp_factory, parser_factory);
 
         for (auto _ : state) {
             {

@@ -42,12 +42,9 @@ TEST_CASE("mprpc::transport::udp") {
     const auto parser_factory =
         std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
-
     SECTION("communicate") {
         auto acceptor = mprpc::transport::udp::create_udp_acceptor(
-            logger, host, port, *threads, comp_factory, parser_factory);
+            logger, *threads, comp_factory, parser_factory);
         auto session_promise =
             std::promise<std::shared_ptr<mprpc::transport::session>>();
         auto session_future = session_promise.get_future();
@@ -66,7 +63,7 @@ TEST_CASE("mprpc::transport::udp") {
         std::this_thread::sleep_for(wait_duration);
 
         auto connector = mprpc::transport::udp::create_udp_connector(
-            logger, host, port, *threads, comp_factory, parser_factory);
+            logger, *threads, comp_factory, parser_factory);
 
         MPRPC_INFO(logger, "client to server transport");
         auto send_result_promise = std::promise<void>();

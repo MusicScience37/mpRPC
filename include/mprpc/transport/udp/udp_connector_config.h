@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include "mprpc/transport/common/ip_common_config.h"
 #include "mprpc/transport/udp/udp_common_config.h"
 
 namespace mprpc {
@@ -28,7 +29,7 @@ namespace udp {
 /*!
  * \brief configuration for UDP connectors
  */
-struct udp_connector_config : udp_common_config {};
+struct udp_connector_config : udp_common_config, common::ip_common_config {};
 
 }  // namespace udp
 }  // namespace transport
