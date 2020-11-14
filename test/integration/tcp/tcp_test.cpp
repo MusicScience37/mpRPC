@@ -31,14 +31,11 @@ TEST_CASE("RPC on TCP") {
         "mprpc_test_integ_tcp", "mprpc_test_integ_tcp.log",
         mprpc::logging::log_level::trace, max_file_size, max_files, true);
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
-
     std::atomic<int> counter{0};
 
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
-                      .listen_tcp(host, port)
+                      .listen_tcp()
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
                       .method<void()>("count", [&counter] { ++counter; })
@@ -47,10 +44,8 @@ TEST_CASE("RPC on TCP") {
     const auto duration = std::chrono::milliseconds(100);
     std::this_thread::sleep_for(duration);
 
-    auto client = mprpc::client_builder(logger)
-                      .num_threads(2)
-                      .connect_tcp(host, port)
-                      .create();
+    auto client =
+        mprpc::client_builder(logger).num_threads(2).connect_tcp().create();
 
     auto echo_client =
         mprpc::method_client<std::string(std::string)>(*client, "echo");

@@ -36,14 +36,11 @@ static void echo_tcp(std::size_t num_repetitions, std::size_t data_size,
     static const auto logger =
         mprpc::logging::create_stdout_logger(mprpc::logging::log_level::warn);
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
-
     const auto data = mprpc::generate_string(data_size);
 
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
-                      .listen_tcp(host, port)
+                      .listen_tcp()
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
                       .create();
@@ -51,10 +48,8 @@ static void echo_tcp(std::size_t num_repetitions, std::size_t data_size,
     const auto duration = std::chrono::milliseconds(100);
     std::this_thread::sleep_for(duration);
 
-    auto client = mprpc::client_builder(logger)
-                      .num_threads(2)
-                      .connect_tcp(host, port)
-                      .create();
+    auto client =
+        mprpc::client_builder(logger).num_threads(2).connect_tcp().create();
 
     auto echo_client =
         mprpc::method_client<std::string(std::string)>(*client, "echo");
@@ -71,15 +66,12 @@ static void echo_tcp_zstd(std::size_t num_repetitions, std::size_t data_size,
     static const auto logger =
         mprpc::logging::create_stdout_logger(mprpc::logging::log_level::warn);
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
-
     const auto data = mprpc::generate_string(data_size);
 
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
                       .use_zstd_compression()
-                      .listen_tcp(host, port)
+                      .listen_tcp()
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
                       .create();
@@ -90,7 +82,7 @@ static void echo_tcp_zstd(std::size_t num_repetitions, std::size_t data_size,
     auto client = mprpc::client_builder(logger)
                       .num_threads(2)
                       .use_zstd_compression()
-                      .connect_tcp(host, port)
+                      .connect_tcp()
                       .create();
 
     auto echo_client =
@@ -108,14 +100,11 @@ static void echo_udp(std::size_t num_repetitions, std::size_t data_size,
     static const auto logger =
         mprpc::logging::create_stdout_logger(mprpc::logging::log_level::warn);
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
-
     const auto data = mprpc::generate_string(data_size);
 
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
-                      .listen_udp(host, port)
+                      .listen_udp()
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
                       .create();
@@ -123,10 +112,8 @@ static void echo_udp(std::size_t num_repetitions, std::size_t data_size,
     const auto duration = std::chrono::milliseconds(100);
     std::this_thread::sleep_for(duration);
 
-    auto client = mprpc::client_builder(logger)
-                      .num_threads(2)
-                      .connect_udp(host, port)
-                      .create();
+    auto client =
+        mprpc::client_builder(logger).num_threads(2).connect_udp().create();
 
     auto echo_client =
         mprpc::method_client<std::string(std::string)>(*client, "echo");
@@ -143,15 +130,12 @@ static void echo_udp_zstd(std::size_t num_repetitions, std::size_t data_size,
     static const auto logger =
         mprpc::logging::create_stdout_logger(mprpc::logging::log_level::warn);
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
-
     const auto data = mprpc::generate_string(data_size);
 
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
                       .use_zstd_compression()
-                      .listen_udp(host, port)
+                      .listen_udp()
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
                       .create();
@@ -162,7 +146,7 @@ static void echo_udp_zstd(std::size_t num_repetitions, std::size_t data_size,
     auto client = mprpc::client_builder(logger)
                       .num_threads(2)
                       .use_zstd_compression()
-                      .connect_udp(host, port)
+                      .connect_udp()
                       .create();
 
     auto echo_client =

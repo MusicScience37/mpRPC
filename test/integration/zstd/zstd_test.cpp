@@ -44,12 +44,9 @@ TEST_CASE("RPC on UDP using zstd compression") {
     logger->write(
         mprpc::logging::log_level::info, std::string(line_length, '-'));
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
-
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
-                      .listen_udp(host, port)
+                      .listen_udp()
                       .use_zstd_compression()
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
@@ -61,7 +58,7 @@ TEST_CASE("RPC on UDP using zstd compression") {
     auto client = mprpc::client_builder(logger)
                       .num_threads(2)
                       .use_zstd_compression()
-                      .connect_udp(host, port)
+                      .connect_udp()
                       .create();
 
     auto echo_client =
@@ -91,12 +88,9 @@ TEST_CASE("RPC on TCP using zstd compression") {
     logger->write(
         mprpc::logging::log_level::info, std::string(line_length, '-'));
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
-
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
-                      .listen_tcp(host, port)
+                      .listen_tcp()
                       .use_zstd_compression()
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
@@ -108,7 +102,7 @@ TEST_CASE("RPC on TCP using zstd compression") {
     auto client = mprpc::client_builder(logger)
                       .num_threads(2)
                       .use_zstd_compression()
-                      .connect_tcp(host, port)
+                      .connect_tcp()
                       .create();
 
     auto echo_client =
