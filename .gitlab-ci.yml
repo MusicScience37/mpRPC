@@ -70,6 +70,7 @@ static analysis:
   cache:
     paths:
       - .venv
+      - Pipfile.lock
     key:
       files:
         - Pipfile
@@ -103,6 +104,7 @@ static analysis:
   cache:
     paths:
       - .venv
+      - Pipfile.lock
     key:
       files:
         - Pipfile
@@ -220,6 +222,7 @@ doc:
   cache:
     paths:
       - .venv
+      - Pipfile.lock
     key:
       files:
         - Pipfile
