@@ -51,8 +51,10 @@ static analysis:
       -DMPRPC_ENABLE_BENCH:BOOL=ON
       -DMPRPC_BUILD_EXAMPLE:BOOL=ON
       -DMPRPC_ENABLE_CPP_WARNINGS:BOOL=ON
-    - cmake --build build_static_analysis
-      --target mprpc_clang_tidy
+      -DMPRPC_USE_PCH:BOOL=OFF
+    - cd build_static_analysis
+    - ctest -V -M Experimental -T Configure -T Build
+    - ctest -M Experimental -T Submit
     - scripts/check_clang_tidy.sh build_static_analysis/clang_tidy
   after_script:
     - cd build_static_analysis/clang_tidy
