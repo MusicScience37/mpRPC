@@ -55,6 +55,7 @@ static analysis:
     - cd build_static_analysis
     - ctest -V -M Experimental -T Configure -T Build
     - ctest -M Experimental -T Submit
+    - cd ../
     - scripts/check_clang_tidy.sh build_static_analysis/clang_tidy
   after_script:
     - cd build_static_analysis/clang_tidy
