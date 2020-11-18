@@ -76,6 +76,15 @@ if(MPRPC_BUILD_DOC)
     add_subdirectory(doc)
 endif()
 
+add_library(mprpc_pch INTERFACE)
+if(NOT CMAKE_VERSION VERSION_LESS 3.16)
+    option(MPRPC_USE_PCH "use precompiled headers in mpRPC" ON)
+    if(MPRPC_USE_PCH)
+        target_link_libraries(mprpc_pch INTERFACE msgpackc-cxx)
+        target_precompile_headers(mprpc_pch INTERFACE <msgpack.hpp>)
+    endif()
+endif()
+
 add_library(
     mprpc SHARED
     src/shared_binary.cpp
@@ -101,7 +110,8 @@ generate_export_header(
     mprpc EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/include/mprpc/mprpc_export.h")
 target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt asio stl_ext
                                    Threads::Threads)
-target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings spdlog libzstd_shared)
+target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings mprpc_pch spdlog
+                                    libzstd_shared)
 target_check_clang_tidy(mprpc)
 
 add_library(mprpc_impl INTERFACE)
