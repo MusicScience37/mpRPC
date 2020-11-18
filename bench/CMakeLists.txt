@@ -10,7 +10,7 @@ option(MPRPC_BENCH_IN_TEST "perform benchmarks in tests" OFF)
 macro(add_mprpc_bench _TARGET)
     target_link_libraries(
         ${_TARGET} PRIVATE benchmark_main mprpc mprpc_bench_utils
-                           mprpc_cpp_warnings)
+                           mprpc_cpp_warnings mprpc_pch)
     target_check_clang_tidy(${_TARGET})
 
     set(BENCH_RESULT_PATH ${MPRPC_BENCH_DIR}/${_TARGET}.json)
