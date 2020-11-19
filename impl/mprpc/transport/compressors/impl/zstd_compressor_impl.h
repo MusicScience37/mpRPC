@@ -93,7 +93,7 @@ private:
     ZSTD_CCtx* context_{nullptr};
 
     //! configuration
-    compression_config config_;
+    const compression_config config_;
 };
 
 /*!
@@ -171,7 +171,7 @@ private:
     ZSTD_CCtx* context_{nullptr};
 
     //! configuration
-    compression_config config_;
+    const compression_config config_;
 };
 
 }  // namespace impl

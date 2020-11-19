@@ -75,7 +75,7 @@ public:
 
 private:
     //! configuration
-    compression_config config_;
+    const compression_config config_;
 };
 
 }  // namespace compressors

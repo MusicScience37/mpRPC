@@ -65,7 +65,7 @@ public:
           io_context_(io_context),
           compressor_factory_(std::move(comp_factory)),
           parser_factory_(std::move(parser_factory_ptr)),
-          config_(config) {
+          config_(std::move(config)) {
         try {
             socket_ = asio::ip::tcp::acceptor(io_context, endpoint);
         } catch (const std::system_error& e) {
@@ -136,7 +136,7 @@ private:
     std::shared_ptr<parser_factory> parser_factory_;
 
     //! configuration
-    tcp_acceptor_config config_;
+    const tcp_acceptor_config config_;
 };
 
 }  // namespace impl

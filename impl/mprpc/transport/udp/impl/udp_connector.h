@@ -62,7 +62,7 @@ public:
               std::make_shared<udp_common>(std::move(logger), std::move(socket),
                   io_context, std::move(comp), std::move(parser_ptr), config_)),
           endpoint_(std::move(endpoint)),
-          config_(config) {
+          config_(std::move(config)) {
         helper_->init();
     }
 

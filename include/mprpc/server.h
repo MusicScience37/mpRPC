@@ -55,7 +55,8 @@ public:
         : logger_(std::move(logger)),
           threads_(std::move(threads)),
           acceptors_(std::move(acceptors)),
-          method_server_(std::move(method_server)) {}
+          method_server_(std::move(method_server)),
+          config_(std::move(config)) {}
 
     /*!
      * \brief start process
@@ -226,7 +227,7 @@ private:
     std::shared_ptr<execution::method_server> method_server_;
 
     //! server configuration
-    server_config config_;
+    const server_config config_;
 };
 
 }  // namespace mprpc
