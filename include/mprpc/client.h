@@ -52,7 +52,7 @@ public:
         : logger_(std::move(logger)),
           threads_(std::move(threads)),
           connector_(std::move(connector)),
-          config_(config) {}
+          config_(std::move(config)) {}
 
     /*!
      * \brief start process

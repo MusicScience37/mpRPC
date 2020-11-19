@@ -15,45 +15,31 @@
  */
 /*!
  * \file
- * \brief declaration and implementation of configuration of zstd-based
- * compressors
+ * \brief declaration and implementation of compression_config class
  */
 #pragma once
 
+#include <string>
+
 #include "mprpc/config/option.h"
-#include "mprpc/mprpc_export.h"
+#include "mprpc/transport/compressors/zstd_compressor_config.h"
 
 namespace mprpc {
 namespace transport {
-namespace compressors {
-namespace impl {
 
 /*!
- * \brief validate compression levels in zstd library
- *
- * \param level compression level
- * \return whether the compression level is valid
+ * \brief configuration option type for compression types
  */
-MPRPC_EXPORT bool validate_zstd_compression_level(int level);
-
-}  // namespace impl
-
-/*!
- * \brief configuration option type for compression levels in zstd library
- */
-struct zstd_compression_level_type {
+struct compression_type_type {
     //! value type
-    using value_type = int;
+    using value_type = std::string;
 
     /*!
      * \brief get default value
      *
      * \return default value
      */
-    static value_type default_value() noexcept {
-        constexpr int value = 3;
-        return value;
-    }
+    static value_type default_value() { return "none"; }
 
     /*!
      * \brief validate a value
@@ -61,8 +47,14 @@ struct zstd_compression_level_type {
      * \param value value
      * \return whether the value is valid
      */
-    static bool validate(value_type value) noexcept {
-        return impl::validate_zstd_compression_level(value);
+    static bool validate(const value_type& value) {
+        if (value == "none") {
+            return true;
+        }
+        if (value == "zstd") {
+            return true;
+        }
+        return false;
     }
 
     /*!
@@ -70,9 +62,20 @@ struct zstd_compression_level_type {
      *
      * \return option name
      */
-    static std::string name() { return "zstd_compression_level"; }
+    static std::string name() { return "compression_type"; }
 };
 
-}  // namespace compressors
+/*!
+ * \brief configuration for compression
+ */
+struct compression_config {
+    //! compression type
+    config::option<compression_type_type> compression_type{};
+
+    //! compression level
+    config::option<compressors::zstd_compression_level_type>
+        zstd_compression_level{};
+};
+
 }  // namespace transport
 }  // namespace mprpc

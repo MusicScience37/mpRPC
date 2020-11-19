@@ -25,6 +25,11 @@
 #include "mprpc/client.h"
 #include "mprpc/logging/basic_loggers.h"
 #include "mprpc/transport.h"
+#include "mprpc/transport/connector.h"
+#include "mprpc/transport/create_compressor_factory.h"
+#include "mprpc/transport/create_parser_factory.h"
+#include "mprpc/transport/tcp/tcp.h"
+#include "mprpc/transport/udp/udp.h"
 
 namespace mprpc {
 
@@ -62,24 +67,7 @@ public:
      * \return this object
      */
     client_builder& client_config(mprpc::client_config config) {
-        client_config_ = config;
-        return *this;
-    }
-
-    /*!
-     * \brief set to use compression with zstd library
-     *
-     * \param config configuration
-     * \return this object
-     */
-    client_builder& use_zstd_compression(
-        transport::compressors::zstd_compressor_config config =
-            transport::compressors::zstd_compressor_config()) {
-        compressor_factory_ =
-            std::make_shared<transport::compressors::zstd_compressor_factory>(
-                config);
-        parser_factory_ =
-            std::make_shared<transport::parsers::zstd_parser_factory>();
+        client_config_ = std::move(config);
         return *this;
     }
 
@@ -92,15 +80,8 @@ public:
     client_builder& connect_tcp(
         const transport::tcp::tcp_connector_config& config =
             transport::tcp::tcp_connector_config()) {
-        connector_factory_ =
-            [config](const std::shared_ptr<mprpc::logging::logger>& logger,
-                thread_pool& threads,
-                const std::shared_ptr<transport::compressor_factory>&
-                    comp_factory,
-                const std::shared_ptr<transport::parser_factory>& factory) {
-                return transport::tcp::create_tcp_connector(
-                    logger, threads, comp_factory, factory, config);
-            };
+        client_config_.transport_type = "TCP";
+        client_config_.tcp_connector = config;
         return *this;
     }
 
@@ -109,12 +90,15 @@ public:
      *
      * \param host host address to connect to
      * \param port port number to connect to
+     * \param compression_type compression type
      * \return this object
      */
-    client_builder& connect_tcp(const std::string& host, std::uint16_t port) {
+    client_builder& connect_tcp(const std::string& host, std::uint16_t port,
+        const std::string& compression_type = "none") {
         transport::tcp::tcp_connector_config config;
         config.host = host;
         config.port = port;
+        config.compression.compression_type = compression_type;
         connect_tcp(config);
         return *this;
     }
@@ -128,15 +112,8 @@ public:
     client_builder& connect_udp(
         const transport::udp::udp_connector_config& config =
             transport::udp::udp_connector_config()) {
-        connector_factory_ =
-            [config](const std::shared_ptr<mprpc::logging::logger>& logger,
-                thread_pool& threads,
-                const std::shared_ptr<transport::compressor_factory>&
-                    comp_factory,
-                const std::shared_ptr<transport::parser_factory>& factory) {
-                return transport::udp::create_udp_connector(
-                    logger, threads, comp_factory, factory, config);
-            };
+        client_config_.transport_type = "UDP";
+        client_config_.udp_connector = config;
         return *this;
     }
 
@@ -145,12 +122,15 @@ public:
      *
      * \param host host address to connect to
      * \param port port number to connect to
+     * \param compression_type compression type
      * \return this object
      */
-    client_builder& connect_udp(const std::string& host, std::uint16_t port) {
+    client_builder& connect_udp(const std::string& host, std::uint16_t port,
+        const std::string& compression_type = "none") {
         transport::udp::udp_connector_config config;
         config.host = host;
         config.port = port;
+        config.compression.compression_type = compression_type;
         connect_udp(config);
         return *this;
     }
@@ -164,8 +144,23 @@ public:
         const auto threads = std::make_shared<thread_pool>(
             logger_, client_config_.num_threads.value());
 
-        auto connector = connector_factory_(
-            logger_, *threads, compressor_factory_, parser_factory_);
+        std::shared_ptr<transport::connector> connector;
+        if (client_config_.transport_type.value() == "TCP") {
+            connector = transport::tcp::create_tcp_connector(logger_, *threads,
+                transport::create_compressor_factory(
+                    client_config_.tcp_connector.compression),
+                transport::create_parser_factory(
+                    client_config_.tcp_connector.compression),
+                client_config_.tcp_connector);
+        } else {
+            // UDP
+            connector = transport::udp::create_udp_connector(logger_, *threads,
+                transport::create_compressor_factory(
+                    client_config_.udp_connector.compression),
+                transport::create_parser_factory(
+                    client_config_.udp_connector.compression),
+                client_config_.udp_connector);
+        }
 
         auto res = std::make_unique<client>(
             logger_, threads, std::move(connector), client_config_);
@@ -181,24 +176,6 @@ private:
 
     //! client configuration
     mprpc::client_config client_config_{};
-
-    //! compressor factory
-    std::shared_ptr<transport::compressor_factory> compressor_factory_{
-        std::make_shared<transport::compressors::null_compressor_factory>()};
-
-    //! parser factory
-    std::shared_ptr<transport::parser_factory> parser_factory_{
-        std::make_shared<transport::parsers::msgpack_parser_factory>()};
-
-    //! type of connector factory method
-    using connector_factory_type =
-        std::function<std::shared_ptr<transport::connector>(
-            const std::shared_ptr<mprpc::logging::logger>&, thread_pool&,
-            const std::shared_ptr<transport::compressor_factory>&,
-            const std::shared_ptr<transport::parser_factory>&)>;
-
-    //! connector factories
-    connector_factory_type connector_factory_{};
 };
 
 }  // namespace mprpc

@@ -27,7 +27,7 @@
 TEST_CASE("mprpc::transport::zstd with streaming") {
     const auto logger = create_logger("mprpc::transport::zstd with streaming");
 
-    mprpc::transport::compressors::zstd_compressor_config compressor_config;
+    mprpc::transport::compression_config compressor_config;
     const auto compressor = std::make_shared<
         mprpc::transport::compressors::zstd_compressor_factory>(
         compressor_config)

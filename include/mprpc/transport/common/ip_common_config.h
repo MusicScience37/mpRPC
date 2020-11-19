@@ -24,6 +24,7 @@
 #include <string>
 
 #include "mprpc/config/option.h"
+#include "mprpc/transport//common/transport_common_config.h"
 
 namespace mprpc {
 namespace transport {
@@ -93,7 +94,7 @@ struct port_type {
 /*!
  * \brief common configuration for transport on IP
  */
-struct ip_common_config {
+struct ip_common_config : public transport_common_config {
     //! host address
     config::option<host_type> host{};
 

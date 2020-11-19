@@ -15,28 +15,25 @@
  */
 /*!
  * \file
- * \brief implementation of zstd-based compressor classes
+ * \brief declaration and implementation of transport_common_config class
+ * class
  */
-#include "mprpc/transport/compressors/zstd_compressor.h"
+#pragma once
 
-#include "mprpc/transport/compressors/impl/zstd_compressor_impl.h"
+#include "mprpc/transport/compression_config.h"
 
 namespace mprpc {
 namespace transport {
-namespace compressors {
+namespace common {
 
-std::unique_ptr<compressor> create_zstd_compressor(
-    std::shared_ptr<logging::logger> logger, compression_config config) {
-    return std::make_unique<impl::zstd_compressor>(
-        std::move(logger), std::move(config));
-}
+/*!
+ * \brief common configuration for transport
+ */
+struct transport_common_config {
+    //! configuration of compression
+    compression_config compression{};
+};
 
-std::unique_ptr<streaming_compressor> create_zstd_streaming_compressor(
-    std::shared_ptr<logging::logger> logger, compression_config config) {
-    return std::make_unique<impl::zstd_streaming_compressor>(
-        std::move(logger), std::move(config));
-}
-
-}  // namespace compressors
+}  // namespace common
 }  // namespace transport
 }  // namespace mprpc

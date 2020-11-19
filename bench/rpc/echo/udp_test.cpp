@@ -25,6 +25,13 @@
 #include "mprpc/method_client.h"
 #include "mprpc/server_builder.h"
 
+namespace {
+
+const auto host = "127.0.0.1";
+constexpr std::uint16_t port = 3780;
+
+}  // namespace
+
 static void echo_udp(benchmark::State& state) {
     static const auto logger =
         mprpc::logging::create_stdout_logger(mprpc::logging::log_level::warn);
@@ -35,9 +42,7 @@ static void echo_udp(benchmark::State& state) {
     try {
         auto server = mprpc::server_builder(logger)
                           .num_threads(2)
-                          .listen_udp(
-
-                              )
+                          .listen_udp(host, port)
                           .method<std::string(std::string)>(
                               "echo", [](std::string str) { return str; })
                           .create();
@@ -74,8 +79,7 @@ static void echo_udp_zstd(benchmark::State& state) {
     try {
         auto server = mprpc::server_builder(logger)
                           .num_threads(2)
-                          .use_zstd_compression()
-                          .listen_udp()
+                          .listen_udp(host, port, "zstd")
                           .method<std::string(std::string)>(
                               "echo", [](std::string str) { return str; })
                           .create();
@@ -85,8 +89,7 @@ static void echo_udp_zstd(benchmark::State& state) {
 
         auto client = mprpc::client_builder(logger)
                           .num_threads(2)
-                          .use_zstd_compression()
-                          .connect_udp()
+                          .connect_udp(host, port, "zstd")
                           .create();
 
         auto echo_client =

@@ -23,6 +23,8 @@
 #include "mprpc/logging/basic_loggers.h"
 #include "mprpc/method_client.h"
 #include "mprpc/server_builder.h"
+#include "mprpc/transport/udp/udp_acceptor_config.h"
+#include "mprpc/transport/udp/udp_connector_config.h"
 
 namespace {
 
@@ -35,6 +37,9 @@ auto create_logger() {
     return logger;
 }
 
+const auto host = "127.0.0.1";
+constexpr std::uint16_t port = 3780;
+
 }  // namespace
 
 TEST_CASE("RPC on UDP using zstd compression") {
@@ -46,8 +51,7 @@ TEST_CASE("RPC on UDP using zstd compression") {
 
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
-                      .listen_udp()
-                      .use_zstd_compression()
+                      .listen_udp(host, port, "zstd")
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
                       .create();
@@ -57,8 +61,7 @@ TEST_CASE("RPC on UDP using zstd compression") {
 
     auto client = mprpc::client_builder(logger)
                       .num_threads(2)
-                      .use_zstd_compression()
-                      .connect_udp()
+                      .connect_udp(host, port, "zstd")
                       .create();
 
     auto echo_client =
@@ -90,8 +93,7 @@ TEST_CASE("RPC on TCP using zstd compression") {
 
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
-                      .listen_tcp()
-                      .use_zstd_compression()
+                      .listen_tcp(host, port, "zstd")
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
                       .create();
@@ -101,8 +103,7 @@ TEST_CASE("RPC on TCP using zstd compression") {
 
     auto client = mprpc::client_builder(logger)
                       .num_threads(2)
-                      .use_zstd_compression()
-                      .connect_tcp()
+                      .connect_tcp(host, port, "zstd")
                       .create();
 
     auto echo_client =

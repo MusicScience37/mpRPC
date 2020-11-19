@@ -29,6 +29,8 @@
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/transport/compressors/null_compressor.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
+#include "mprpc/transport/udp/udp_acceptor_config.h"
+#include "mprpc/transport/udp/udp_connector_config.h"
 
 TEST_CASE("mprpc::transport::udp") {
     const auto logger = create_logger("mprpc::transport::udp");
@@ -43,8 +45,9 @@ TEST_CASE("mprpc::transport::udp") {
         std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
 
     SECTION("communicate") {
-        auto acceptor = mprpc::transport::udp::create_udp_acceptor(
-            logger, *threads, comp_factory, parser_factory);
+        auto acceptor = mprpc::transport::udp::create_udp_acceptor(logger,
+            *threads, comp_factory, parser_factory,
+            mprpc::transport::udp::udp_acceptor_config());
         auto session_promise =
             std::promise<std::shared_ptr<mprpc::transport::session>>();
         auto session_future = session_promise.get_future();
@@ -62,8 +65,9 @@ TEST_CASE("mprpc::transport::udp") {
         const auto wait_duration = std::chrono::milliseconds(100);
         std::this_thread::sleep_for(wait_duration);
 
-        auto connector = mprpc::transport::udp::create_udp_connector(
-            logger, *threads, comp_factory, parser_factory);
+        auto connector = mprpc::transport::udp::create_udp_connector(logger,
+            *threads, comp_factory, parser_factory,
+            mprpc::transport::udp::udp_connector_config());
 
         MPRPC_INFO(logger, "client to server transport");
         auto send_result_promise = std::promise<void>();

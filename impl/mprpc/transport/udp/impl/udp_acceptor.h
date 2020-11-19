@@ -59,7 +59,7 @@ public:
         : logger_(logger),
           helper_(std::make_shared<udp_common>(logger, std::move(socket),
               io_context, std::move(comp), std::move(parser_ptr), config_)),
-          config_(config) {
+          config_(std::move(config)) {
         helper_->init();
     }
 

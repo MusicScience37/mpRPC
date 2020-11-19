@@ -15,28 +15,32 @@
  */
 /*!
  * \file
- * \brief implementation of zstd-based compressor classes
+ * \brief declaration of create_compressor_factory function
  */
-#include "mprpc/transport/compressors/zstd_compressor.h"
+#pragma once
 
-#include "mprpc/transport/compressors/impl/zstd_compressor_impl.h"
+#include "mprpc/transport/compression_config.h"
+#include "mprpc/transport/compressor.h"
+#include "mprpc/transport/compressors/null_compressor.h"
+#include "mprpc/transport/compressors/zstd_compressor.h"
 
 namespace mprpc {
 namespace transport {
-namespace compressors {
 
-std::unique_ptr<compressor> create_zstd_compressor(
-    std::shared_ptr<logging::logger> logger, compression_config config) {
-    return std::make_unique<impl::zstd_compressor>(
-        std::move(logger), std::move(config));
+/*!
+ * \brief create a factory of compressors
+ *
+ * \param config configuration
+ * \return factory of compressors
+ */
+inline std::shared_ptr<compressor_factory> create_compressor_factory(
+    const compression_config& config) {
+    if (config.compression_type.value() == "zstd") {
+        return std::make_shared<compressors::zstd_compressor_factory>(config);
+    }
+    // compression type is validated, so assume valid
+    return std::make_shared<compressors::null_compressor_factory>();
 }
 
-std::unique_ptr<streaming_compressor> create_zstd_streaming_compressor(
-    std::shared_ptr<logging::logger> logger, compression_config config) {
-    return std::make_unique<impl::zstd_streaming_compressor>(
-        std::move(logger), std::move(config));
-}
-
-}  // namespace compressors
 }  // namespace transport
 }  // namespace mprpc

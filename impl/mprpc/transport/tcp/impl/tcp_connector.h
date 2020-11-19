@@ -61,7 +61,7 @@ public:
               std::make_shared<socket_helper_type>(logger, std::move(socket),
                   io_context, std::move(comp), std::move(parser), config_)),
           logger_(logger),
-          config_(config) {
+          config_(std::move(config)) {
         MPRPC_INFO(logger, "conencted {} to {}",
             socket_helper_->socket().local_endpoint(),
             socket_helper_->socket().remote_endpoint());
@@ -118,7 +118,7 @@ private:
     std::shared_ptr<logging::logger> logger_;
 
     //! configuration
-    tcp_connector_config config_;
+    const tcp_connector_config config_;
 };
 
 }  // namespace impl

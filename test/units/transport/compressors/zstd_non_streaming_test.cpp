@@ -21,6 +21,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "../../create_logger.h"
+#include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/compressors/zstd_compressor.h"
 #include "mprpc/transport/parsers/zstd_parser.h"
 
@@ -28,7 +29,7 @@ TEST_CASE("mprpc::transport::zstd without streaming") {
     const auto logger =
         create_logger("mprpc::transport::zstd without streaming");
 
-    mprpc::transport::compressors::zstd_compressor_config compressor_config;
+    mprpc::transport::compression_config compressor_config;
     const auto compressor = std::make_shared<
         mprpc::transport::compressors::zstd_compressor_factory>(
         compressor_config)

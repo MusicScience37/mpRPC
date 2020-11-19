@@ -24,8 +24,8 @@
 #include "mprpc/buffer.h"
 #include "mprpc/exception.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/compressor.h"
-#include "mprpc/transport/compressors/zstd_compressor_config.h"
 
 namespace mprpc {
 namespace transport {
@@ -44,11 +44,11 @@ public:
      * \param config configuration
      */
     zstd_compressor(
-        std::shared_ptr<logging::logger> logger, zstd_compressor_config config)
-        : logger_(std::move(logger)), config_(config) {
+        std::shared_ptr<logging::logger> logger, compression_config config)
+        : logger_(std::move(logger)), config_(std::move(config)) {
         context_ = ZSTD_createCCtx();
         ZSTD_CCtx_setParameter(context_, ZSTD_c_compressionLevel,
-            config_.compression_level.value());
+            config_.zstd_compression_level.value());
     }
 
     //! \copydoc mprpc::transport::compressor::compress
@@ -93,7 +93,7 @@ private:
     ZSTD_CCtx* context_{nullptr};
 
     //! configuration
-    zstd_compressor_config config_;
+    const compression_config config_;
 };
 
 /*!
@@ -108,18 +108,18 @@ public:
      * \param config configuration
      */
     zstd_streaming_compressor(
-        std::shared_ptr<logging::logger> logger, zstd_compressor_config config)
-        : logger_(std::move(logger)), config_(config) {
+        std::shared_ptr<logging::logger> logger, compression_config config)
+        : logger_(std::move(logger)), config_(std::move(config)) {
         context_ = ZSTD_createCCtx();
         ZSTD_CCtx_setParameter(context_, ZSTD_c_compressionLevel,
-            config_.compression_level.value());
+            config_.zstd_compression_level.value());
     }
 
     //! \copydoc mprpc::transport::streaming_compressor::init
     void init() override {
         ZSTD_CCtx_reset(context_, ZSTD_reset_session_only);
         ZSTD_CCtx_setParameter(context_, ZSTD_c_compressionLevel,
-            config_.compression_level.value());
+            config_.zstd_compression_level.value());
     }
 
     //! \copydoc mprpc::transport::streaming_compressor::compress
@@ -171,7 +171,7 @@ private:
     ZSTD_CCtx* context_{nullptr};
 
     //! configuration
-    zstd_compressor_config config_;
+    const compression_config config_;
 };
 
 }  // namespace impl
