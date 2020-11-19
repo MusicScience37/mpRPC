@@ -19,8 +19,13 @@
  */
 #pragma once
 
+#include <vector>
+
 #include "mprpc/config/option.h"
 #include "mprpc/num_threads.h"
+#include "mprpc/transport.h"
+#include "mprpc/transport/tcp/tcp_acceptor_config.h"
+#include "mprpc/transport/udp/udp_acceptor_config.h"
 
 namespace mprpc {
 
@@ -30,6 +35,12 @@ namespace mprpc {
 struct server_config {
     //! number of threads
     config::option<num_threads_type> num_threads{};
+
+    //! TCP acceptors
+    std::vector<transport::tcp::tcp_acceptor_config> tcp_acceptors{};
+
+    //! UDP acceptors
+    std::vector<transport::udp::udp_acceptor_config> udp_acceptors{};
 };
 
 }  // namespace mprpc

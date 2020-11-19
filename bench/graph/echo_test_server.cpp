@@ -51,11 +51,11 @@ void create_server(const std::string& host, const std::string& type) {
     if (type == "tcp") {
         builder.listen_tcp(host, echo_server_port);
     } else if (type == "tcp_zstd") {
-        builder.use_zstd_compression().listen_tcp(host, echo_server_port);
+        builder.listen_tcp(host, echo_server_port, "zstd");
     } else if (type == "udp") {
         builder.listen_udp(host, echo_server_port);
     } else if (type == "udp_zstd") {
-        builder.use_zstd_compression().listen_udp(host, echo_server_port);
+        builder.listen_udp(host, echo_server_port, "zstd");
     } else {
         throw std::runtime_error("unkown type " + type);
     }

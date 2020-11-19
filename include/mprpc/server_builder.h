@@ -22,11 +22,17 @@
 #include <functional>
 #include <memory>
 
+#include "mprpc/error_code.h"
+#include "mprpc/exception.h"
 #include "mprpc/execution/function_method_executor.h"
 #include "mprpc/execution/simple_method_server.h"
 #include "mprpc/logging/basic_loggers.h"
 #include "mprpc/server.h"
 #include "mprpc/transport.h"
+#include "mprpc/transport/create_compressor_factory.h"
+#include "mprpc/transport/create_parser_factory.h"
+#include "mprpc/transport/tcp/tcp.h"
+#include "mprpc/transport/udp/udp.h"
 
 namespace mprpc {
 
@@ -63,25 +69,8 @@ public:
      * \param config configuration
      * \return this object
      */
-    server_builder& client_config(mprpc::server_config config) {
-        server_config_ = config;
-        return *this;
-    }
-
-    /*!
-     * \brief set to use compression with zstd library
-     *
-     * \param config configuration
-     * \return this object
-     */
-    server_builder& use_zstd_compression(
-        transport::compressors::zstd_compressor_config config =
-            transport::compressors::zstd_compressor_config()) {
-        compressor_factory_ =
-            std::make_shared<transport::compressors::zstd_compressor_factory>(
-                config);
-        parser_factory_ =
-            std::make_shared<transport::parsers::zstd_parser_factory>();
+    server_builder& server_config(mprpc::server_config config) {
+        server_config_ = std::move(config);
         return *this;
     }
 
@@ -94,16 +83,7 @@ public:
     server_builder& listen_tcp(
         const transport::tcp::tcp_acceptor_config& config =
             transport::tcp::tcp_acceptor_config()) {
-        acceptor_factories_.emplace_back(
-            [config](const std::shared_ptr<mprpc::logging::logger>& logger,
-                thread_pool& threads,
-                const std::shared_ptr<transport::compressor_factory>&
-                    comp_factory,
-                const std::shared_ptr<transport::parser_factory>&
-                    parser_factory) {
-                return transport::tcp::create_tcp_acceptor(
-                    logger, threads, comp_factory, parser_factory, config);
-            });
+        server_config_.tcp_acceptors.push_back(config);
         return *this;
     }
 
@@ -112,13 +92,15 @@ public:
      *
      * \param ip_address IP address string (IPv4 or IPv6)
      * \param port port number
+     * \param compression_type compression type
      * \return this object
      */
-    server_builder& listen_tcp(
-        const std::string& ip_address, std::uint16_t port) {
+    server_builder& listen_tcp(const std::string& ip_address,
+        std::uint16_t port, const std::string& compression_type = "none") {
         transport::tcp::tcp_acceptor_config config;
         config.host = ip_address;
         config.port = port;
+        config.compression.compression_type = compression_type;
         listen_tcp(config);
         return *this;
     }
@@ -132,16 +114,7 @@ public:
     server_builder& listen_udp(
         const transport::udp::udp_acceptor_config& config =
             transport::udp::udp_acceptor_config()) {
-        acceptor_factories_.emplace_back(
-            [config](const std::shared_ptr<mprpc::logging::logger>& logger,
-                thread_pool& threads,
-                const std::shared_ptr<transport::compressor_factory>&
-                    comp_factory,
-                const std::shared_ptr<transport::parser_factory>&
-                    parser_factory) {
-                return transport::udp::create_udp_acceptor(
-                    logger, threads, comp_factory, parser_factory, config);
-            });
+        server_config_.udp_acceptors.push_back(config);
         return *this;
     }
 
@@ -150,13 +123,15 @@ public:
      *
      * \param ip_address IP address string (IPv4 or IPv6)
      * \param port port number
+     * \param compression_type compression type
      * \return this object
      */
-    server_builder& listen_udp(
-        const std::string& ip_address, std::uint16_t port) {
+    server_builder& listen_udp(const std::string& ip_address,
+        std::uint16_t port, const std::string& compression_type = "none") {
         transport::udp::udp_acceptor_config config;
         config.host = ip_address;
         config.port = port;
+        config.compression.compression_type = compression_type;
         listen_udp(config);
         return *this;
     }
@@ -201,11 +176,26 @@ public:
         auto method_server = std::make_shared<execution::simple_method_server>(
             logger_, *threads, methods_);
 
+        const std::size_t num_acceptors = server_config_.tcp_acceptors.size() +
+            server_config_.udp_acceptors.size();
+        if (num_acceptors == 0) {
+            throw exception(
+                error_info(error_code::invalid_config_value, "no acceptors"));
+        }
+
         std::vector<std::shared_ptr<transport::acceptor>> acceptors;
-        acceptors.reserve(acceptor_factories_.size());
-        for (const auto& factory : acceptor_factories_) {
-            acceptors.push_back(factory(
-                logger_, *threads, compressor_factory_, parser_factory_));
+        acceptors.reserve(num_acceptors);
+        for (const auto& config : server_config_.tcp_acceptors) {
+            acceptors.push_back(transport::tcp::create_tcp_acceptor(logger_,
+                *threads,
+                transport::create_compressor_factory(config.compression),
+                transport::create_parser_factory(config.compression), config));
+        }
+        for (const auto& config : server_config_.udp_acceptors) {
+            acceptors.push_back(transport::udp::create_udp_acceptor(logger_,
+                *threads,
+                transport::create_compressor_factory(config.compression),
+                transport::create_parser_factory(config.compression), config));
         }
 
         auto srv = std::make_unique<server>(logger_, threads,
@@ -222,24 +212,6 @@ private:
 
     //! server configuration
     mprpc::server_config server_config_{};
-
-    //! compressor factory
-    std::shared_ptr<transport::compressor_factory> compressor_factory_{
-        std::make_shared<transport::compressors::null_compressor_factory>()};
-
-    //! parser factory
-    std::shared_ptr<transport::parser_factory> parser_factory_{
-        std::make_shared<transport::parsers::msgpack_parser_factory>()};
-
-    //! type of acceptor factory method
-    using acceptor_factory_type =
-        std::function<std::shared_ptr<transport::acceptor>(
-            const std::shared_ptr<mprpc::logging::logger>&, thread_pool&,
-            const std::shared_ptr<transport::compressor_factory>&,
-            const std::shared_ptr<transport::parser_factory>&)>;
-
-    //! acceptor factories
-    std::vector<acceptor_factory_type> acceptor_factories_{};
 
     //! methods
     std::vector<std::shared_ptr<execution::method_executor>> methods_{};

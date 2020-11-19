@@ -49,7 +49,7 @@ MPRPC_EXPORT std::shared_ptr<acceptor> create_tcp_acceptor(
     const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
-    const tcp_acceptor_config& config = tcp_acceptor_config());
+    const tcp_acceptor_config& config);
 
 /*!
  * \brief create a TCP connector
@@ -65,7 +65,7 @@ MPRPC_EXPORT std::shared_ptr<connector> create_tcp_connector(
     const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
-    const tcp_connector_config& config = tcp_connector_config());
+    const tcp_connector_config& config);
 
 }  // namespace tcp
 }  // namespace transport

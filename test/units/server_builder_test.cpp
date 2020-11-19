@@ -26,6 +26,7 @@
 
 #include "create_logger.h"
 #include "mprpc/pack_data.h"
+#include "mprpc/transport/tcp/tcp_connector_config.h"
 
 TEST_CASE("mprpc::server_builder") {
     const auto logger = create_logger("mprpc::server_builder");
@@ -54,7 +55,8 @@ TEST_CASE("mprpc::server_builder") {
             mprpc::transport::parsers::msgpack_parser_factory>();
 
         const auto connector = mprpc::transport::tcp::create_tcp_connector(
-            logger, *threads, comp_factory, parser_factory);
+            logger, *threads, comp_factory, parser_factory,
+            mprpc::transport::tcp::tcp_connector_config());
 
         const mprpc::msgid_t msgid = 37;
         const auto str = std::string("abcde");

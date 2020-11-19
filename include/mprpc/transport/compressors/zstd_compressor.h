@@ -20,8 +20,8 @@
 #pragma once
 
 #include "mprpc/mprpc_export.h"
+#include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/compressor.h"
-#include "mprpc/transport/compressors/zstd_compressor_config.h"
 
 namespace mprpc {
 namespace transport {
@@ -35,7 +35,7 @@ namespace compressors {
  * \return compressor
  */
 MPRPC_EXPORT std::unique_ptr<compressor> create_zstd_compressor(
-    std::shared_ptr<logging::logger> logger, zstd_compressor_config config);
+    std::shared_ptr<logging::logger> logger, compression_config config);
 
 /*!
  * \brief create a compressor using zstd library with streaming
@@ -46,7 +46,7 @@ MPRPC_EXPORT std::unique_ptr<compressor> create_zstd_compressor(
  */
 MPRPC_EXPORT std::unique_ptr<streaming_compressor>
 create_zstd_streaming_compressor(
-    std::shared_ptr<logging::logger> logger, zstd_compressor_config config);
+    std::shared_ptr<logging::logger> logger, compression_config config);
 
 /*!
  * \brief class of factories of compressors using zstd library
@@ -58,8 +58,8 @@ public:
      *
      * \param config configuration
      */
-    explicit zstd_compressor_factory(zstd_compressor_config config)
-        : config_(config) {}
+    explicit zstd_compressor_factory(compression_config config)
+        : config_(std::move(config)) {}
 
     //! \copydoc mprpc::transport::compressor_factory::create_compressor
     std::unique_ptr<compressor> create_compressor(
@@ -75,7 +75,7 @@ public:
 
 private:
     //! configuration
-    zstd_compressor_config config_;
+    compression_config config_;
 };
 
 }  // namespace compressors
