@@ -112,6 +112,7 @@ target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt asio stl_ext
                                    Threads::Threads)
 target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings mprpc_pch spdlog
                                     libzstd_shared)
+set_target_properties(mprpc PROPERTIES VERSION ${PROJECT_VERSION})
 target_check_clang_tidy(mprpc)
 
 add_library(mprpc_impl INTERFACE)
