@@ -5,7 +5,16 @@ project(
     VERSION 0.1
     DESCRIPTION "An implementation of MessagePack-RPC in C++"
     LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 14)
+
+set(CMAKE_CXX_STANDARD
+    14
+    CACHE STRING "C++ standard")
+set(CMAKE_CXX_STANDARD_REQUIRED
+    ON
+    CACHE BOOL "require standard")
+set(CMAKE_CXX_EXTENSIONS
+    ON
+    CACHE BOOL "use compiler specific extensions")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(TargetLinkSystemLibrary)
@@ -69,6 +78,8 @@ target_include_directories(
     libzstd_shared
     INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/extern/zstd/lib>)
 
+add_subdirectory(extern/toml11)
+
 find_package(Threads REQUIRED)
 
 option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)
@@ -96,7 +107,8 @@ add_library(
     src/transport/compressors/zstd_compressor.cpp
     src/transport/parsers/zstd_parser.cpp
     src/transport/tcp/tcp.cpp
-    src/transport/udp/udp.cpp)
+    src/transport/udp/udp.cpp
+    src/config/load.cpp)
 target_include_directories(mprpc PUBLIC ${MPRPC_SOURCE_DIR}/include
                                         ${CMAKE_BINARY_DIR}/include)
 target_include_directories(mprpc PRIVATE ${MPRPC_SOURCE_DIR}/impl)
@@ -109,7 +121,7 @@ include(GenerateExportHeader)
 generate_export_header(
     mprpc EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/include/mprpc/mprpc_export.h")
 target_link_libraries(mprpc PUBLIC msgpackc-cxx fmt asio stl_ext
-                                   Threads::Threads)
+                                   Threads::Threads toml11::toml11)
 target_link_libraries(mprpc PRIVATE mprpc_cpp_warnings mprpc_pch spdlog
                                     libzstd_shared)
 set_target_properties(mprpc PROPERTIES VERSION ${PROJECT_VERSION})
