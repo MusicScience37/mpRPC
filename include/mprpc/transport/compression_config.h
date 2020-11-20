@@ -28,18 +28,26 @@ namespace mprpc {
 namespace transport {
 
 /*!
+ * \brief enumeration of compression types
+ */
+enum class compression_type {
+    none,  //!< no compression
+    zstd   //!< compression with zstd library
+};
+
+/*!
  * \brief configuration option type for compression types
  */
 struct compression_type_type {
     //! value type
-    using value_type = std::string;
+    using value_type = compression_type;
 
     /*!
      * \brief get default value
      *
      * \return default value
      */
-    static value_type default_value() { return "none"; }
+    static value_type default_value() { return compression_type::none; }
 
     /*!
      * \brief validate a value
@@ -48,13 +56,8 @@ struct compression_type_type {
      * \return whether the value is valid
      */
     static bool validate(const value_type& value) {
-        if (value == "none") {
-            return true;
-        }
-        if (value == "zstd") {
-            return true;
-        }
-        return false;
+        return (value == compression_type::none) ||
+            (value == compression_type::zstd);
     }
 
     /*!
@@ -62,7 +65,7 @@ struct compression_type_type {
      *
      * \return option name
      */
-    static std::string name() { return "compression_type"; }
+    static std::string name() { return "type"; }
 };
 
 /*!
@@ -70,7 +73,7 @@ struct compression_type_type {
  */
 struct compression_config {
     //! compression type
-    config::option<compression_type_type> compression_type{};
+    config::option<compression_type_type> type{};
 
     //! compression level
     config::option<compressors::zstd_compression_level_type>

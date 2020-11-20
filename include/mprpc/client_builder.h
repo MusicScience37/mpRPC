@@ -25,6 +25,7 @@
 #include "mprpc/client.h"
 #include "mprpc/logging/basic_loggers.h"
 #include "mprpc/transport.h"
+#include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/connector.h"
 #include "mprpc/transport/create_compressor_factory.h"
 #include "mprpc/transport/create_parser_factory.h"
@@ -94,11 +95,12 @@ public:
      * \return this object
      */
     client_builder& connect_tcp(const std::string& host, std::uint16_t port,
-        const std::string& compression_type = "none") {
+        transport::compression_type compression_type =
+            transport::compression_type::none) {
         transport::tcp::tcp_connector_config config;
         config.host = host;
         config.port = port;
-        config.compression.compression_type = compression_type;
+        config.compression.type = compression_type;
         connect_tcp(config);
         return *this;
     }
@@ -126,11 +128,12 @@ public:
      * \return this object
      */
     client_builder& connect_udp(const std::string& host, std::uint16_t port,
-        const std::string& compression_type = "none") {
+        transport::compression_type compression_type =
+            transport::compression_type::none) {
         transport::udp::udp_connector_config config;
         config.host = host;
         config.port = port;
-        config.compression.compression_type = compression_type;
+        config.compression.type = compression_type;
         connect_udp(config);
         return *this;
     }

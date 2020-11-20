@@ -19,6 +19,8 @@
  */
 #pragma once
 
+#include "mprpc/error_code.h"
+#include "mprpc/exception.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/compressor.h"
 #include "mprpc/transport/compressors/null_compressor.h"
@@ -35,11 +37,15 @@ namespace transport {
  */
 inline std::shared_ptr<compressor_factory> create_compressor_factory(
     const compression_config& config) {
-    if (config.compression_type.value() == "zstd") {
+    switch (config.type.value()) {
+    case compression_type::none:
+        return std::make_shared<compressors::null_compressor_factory>();
+    case compression_type::zstd:
         return std::make_shared<compressors::zstd_compressor_factory>(config);
+    default:
+        throw exception(error_info(
+            error_code::invalid_config_value, "invalid compression type"));
     }
-    // compression type is validated, so assume valid
-    return std::make_shared<compressors::null_compressor_factory>();
 }
 
 }  // namespace transport

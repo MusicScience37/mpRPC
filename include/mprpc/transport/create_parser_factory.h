@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include "mprpc/exception.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/parser.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
@@ -35,11 +36,15 @@ namespace transport {
  */
 inline std::shared_ptr<parser_factory> create_parser_factory(
     const compression_config& config) {
-    if (config.compression_type.value() == "zstd") {
+    switch (config.type.value()) {
+    case compression_type::none:
+        return std::make_shared<parsers::msgpack_parser_factory>();
+    case compression_type::zstd:
         return std::make_shared<parsers::zstd_parser_factory>();
+    default:
+        throw exception(error_info(
+            error_code::invalid_config_value, "invalid compression type"));
     }
-    // compression type is validated, so assume valid
-    return std::make_shared<parsers::msgpack_parser_factory>();
 }
 
 }  // namespace transport
