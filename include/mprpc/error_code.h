@@ -80,7 +80,8 @@ enum future_errors : error_code_t {
  * \brief enumeration of configuration-related error codes
  */
 enum config_errors : error_code_t {
-    invalid_config_value = 500  //!< invalid configuration value
+    invalid_config_value = 500,  //!< invalid configuration value
+    config_parse_error           //!< parse error of configuration files
 };
 
 /*!

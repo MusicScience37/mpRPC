@@ -107,7 +107,8 @@ add_library(
     src/transport/compressors/zstd_compressor.cpp
     src/transport/parsers/zstd_parser.cpp
     src/transport/tcp/tcp.cpp
-    src/transport/udp/udp.cpp)
+    src/transport/udp/udp.cpp
+    src/config/load.cpp)
 target_include_directories(mprpc PUBLIC ${MPRPC_SOURCE_DIR}/include
                                         ${CMAKE_BINARY_DIR}/include)
 target_include_directories(mprpc PRIVATE ${MPRPC_SOURCE_DIR}/impl)

@@ -14,6 +14,7 @@ add_executable(
     format_message_test.cpp
     config/option_test.cpp
     config/toml_helper_test.cpp
+    config/load_test.cpp
     thread_pool_test.cpp
     transport/mock/mock_session_test.cpp
     transport/mock/mock_acceptor_test.cpp
