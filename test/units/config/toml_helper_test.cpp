@@ -25,6 +25,7 @@
 #include <catch2/matchers/catch_matchers_string.hpp>
 
 #include "catch2/matchers/catch_matchers.hpp"
+#include "mprpc/client_config.h"
 #include "mprpc/server.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/compressors/zstd_compressor_config.h"
@@ -337,5 +338,103 @@ TEST_CASE("toml::from<mprpc::server_config>") {
         REQUIRE(config.udp_acceptors.size() == 2);
         REQUIRE(config.udp_acceptors.at(0).host.value() == "0.0.0.1");
         REQUIRE(config.udp_acceptors.at(1).host.value() == "0.0.0.2");
+    }
+
+    SECTION("non-related key") {
+        const auto data = read_toml_str(R"(
+            [server]
+            non_related = 0
+        )");
+        test_type config;
+        REQUIRE_THROWS_WITH(config = toml::get<test_type>(data.at("server")),
+            Catch::Matchers::Contains("invalid key non_related"));
+    }
+}
+
+TEST_CASE(
+    "toml::from<mprpc::config::option<mprpc::config::option<mprpc::connector_"
+    "type_type>>") {
+    using test_type = mprpc::config::option<mprpc::connector_type_type>;
+
+    SECTION("tcp") {
+        constexpr auto true_value = mprpc::transport_type::tcp;
+        const auto data = read_toml_str(R"(value = "tcp")");
+        test_type option;
+        REQUIRE_NOTHROW(option = toml::get<test_type>(data.at("value")));
+        REQUIRE(option.value() == true_value);
+    }
+
+    SECTION("TCP") {
+        constexpr auto true_value = mprpc::transport_type::tcp;
+        const auto data = read_toml_str(R"(value = "TCP")");
+        test_type option;
+        REQUIRE_NOTHROW(option = toml::get<test_type>(data.at("value")));
+        REQUIRE(option.value() == true_value);
+    }
+
+    SECTION("udp") {
+        constexpr auto true_value = mprpc::transport_type::udp;
+        const auto data = read_toml_str(R"(value = "udp")");
+        test_type option;
+        REQUIRE_NOTHROW(option = toml::get<test_type>(data.at("value")));
+        REQUIRE(option.value() == true_value);
+    }
+
+    SECTION("UDP") {
+        constexpr auto true_value = mprpc::transport_type::udp;
+        const auto data = read_toml_str(R"(value = "UDP")");
+        test_type option;
+        REQUIRE_NOTHROW(option = toml::get<test_type>(data.at("value")));
+        REQUIRE(option.value() == true_value);
+    }
+
+    SECTION("invalid") {
+        const auto data = read_toml_str(R"(value = "abc")");
+        test_type option;
+        REQUIRE_THROWS_WITH(option = toml::get<test_type>(data.at("value")),
+            Catch::Matchers::Contains(
+                "invalid value for transport type (TCP, UDP)"));
+    }
+}
+
+TEST_CASE("toml::from<mprpc::client_config>") {
+    using test_type = mprpc::client_config;
+
+    SECTION("empty") {
+        const auto data = read_toml_str(R"(
+            [client]
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data.at("client")));
+    }
+
+    SECTION("valid config") {
+        const auto data = read_toml_str(R"(
+            [client]
+            num_threads = 3
+            sync_request_timeout_ms = 5
+            connector_type = "UDP"
+            [client.tcp_connector]
+            host = "tcp_server"
+            [client.udp_connector]
+            host = "udp_server"
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data.at("client")));
+        REQUIRE(config.num_threads.value() == 3);
+        REQUIRE(config.sync_request_timeout_ms.value() == 5);
+        REQUIRE(config.connector_type.value() == mprpc::transport_type::udp);
+        REQUIRE(config.tcp_connector.host.value() == "tcp_server");
+        REQUIRE(config.udp_connector.host.value() == "udp_server");
+    }
+
+    SECTION("non-related key") {
+        const auto data = read_toml_str(R"(
+            [client]
+            non_related = 0
+        )");
+        test_type config;
+        REQUIRE_THROWS_WITH(config = toml::get<test_type>(data.at("client")),
+            Catch::Matchers::Contains("invalid key non_related"));
     }
 }

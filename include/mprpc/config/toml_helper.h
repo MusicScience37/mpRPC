@@ -23,6 +23,7 @@
 
 #include <toml.hpp>
 
+#include "mprpc/client_config.h"
 #include "mprpc/config/option.h"
 #include "mprpc/num_threads.h"
 #include "mprpc/server_config.h"
@@ -356,6 +357,86 @@ struct from<mprpc::server_config> {
                 config.udp_acceptors = toml::get<
                     std::vector<mprpc::transport::udp::udp_acceptor_config>>(
                     pair.second);
+            } else {
+                throw std::runtime_error(format_error(
+                    "invalid key " + pair.first, value, "invalid key exists"));
+            }
+        }
+        return config;
+    }
+};
+
+/*!
+ * \brief toml::from specialization for mprpc::transport_type
+ */
+template <>
+struct from<mprpc::transport_type> {
+    /*!
+     * \brief convert from toml value
+     *
+     * \tparam Comment comment type
+     * \tparam Table table type
+     * \tparam Array array type
+     * \param value toml value
+     * \return converted value
+     */
+    template <typename Comment, template <typename...> class Table,
+        template <typename...> class Array>
+    static mprpc::transport_type from_toml(
+        const basic_value<Comment, Table, Array>& value) {
+        const auto& str = value.as_string();
+        if ((str == "tcp") || (str == "TCP")) {
+            return mprpc::transport_type::tcp;
+        }
+        if ((str == "udp") || (str == "UDP")) {
+            return mprpc::transport_type::udp;
+        }
+        throw std::runtime_error(
+            format_error("invalid value for transport type (TCP, UDP)", value,
+                "invalid type"));
+    }
+};
+
+/*!
+ * \brief toml::from specialization for mprpc::client_config
+ */
+template <>
+struct from<mprpc::client_config> {
+    /*!
+     * \brief convert from toml value
+     *
+     * \tparam Comment comment type
+     * \tparam Table table type
+     * \tparam Array array type
+     * \param value toml value
+     * \return converted value
+     */
+    template <typename Comment, template <typename...> class Table,
+        template <typename...> class Array>
+    static mprpc::client_config from_toml(
+        const basic_value<Comment, Table, Array>& value) {
+        mprpc::client_config config;
+        for (const auto& pair : value.as_table()) {
+            if (pair.first == "num_threads") {
+                config.num_threads =
+                    toml::get<mprpc::config::option<mprpc::num_threads_type>>(
+                        pair.second);
+            } else if (pair.first == "sync_request_timeout_ms") {
+                config.sync_request_timeout_ms = toml::get<
+                    mprpc::config::option<mprpc::sync_request_timeout_ms_type>>(
+                    pair.second);
+            } else if (pair.first == "connector_type") {
+                config.connector_type = toml::get<
+                    mprpc::config::option<mprpc::connector_type_type>>(
+                    pair.second);
+            } else if (pair.first == "tcp_connector") {
+                config.tcp_connector =
+                    toml::get<mprpc::transport::tcp::tcp_connector_config>(
+                        pair.second);
+            } else if (pair.first == "udp_connector") {
+                config.udp_connector =
+                    toml::get<mprpc::transport::udp::udp_connector_config>(
+                        pair.second);
             } else {
                 throw std::runtime_error(format_error(
                     "invalid key " + pair.first, value, "invalid key exists"));
