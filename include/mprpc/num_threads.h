@@ -55,6 +55,13 @@ struct num_threads_type {
      * \return option name
      */
     static std::string name() { return "num_threads"; }
+
+    /*!
+     * \brief get description
+     *
+     * \return description
+     */
+    static std::string description() { return "number of threads"; }
 };
 
 }  // namespace mprpc

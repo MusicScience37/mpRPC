@@ -57,6 +57,15 @@ struct host_type {
      * \return option name
      */
     static std::string name() { return "host"; }
+
+    /*!
+     * \brief get description
+     *
+     * \return description
+     */
+    static std::string description() {
+        return "host address (IP address for server, common names for clients)";
+    }
 };
 
 /*!
@@ -89,6 +98,13 @@ struct port_type {
      * \return option name
      */
     static std::string name() { return "port"; }
+
+    /*!
+     * \brief get description
+     *
+     * \return description
+     */
+    static std::string description() { return "port number"; }
 };
 
 /*!

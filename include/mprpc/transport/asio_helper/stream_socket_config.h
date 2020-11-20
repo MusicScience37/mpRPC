@@ -58,6 +58,15 @@ struct streaming_min_buf_size_type {
      * \return option name
      */
     static std::string name() { return "streaming_min_buf_size"; }
+
+    /*!
+     * \brief get description
+     *
+     * \return description
+     */
+    static std::string description() {
+        return "minimum buffer size in streaming parser [bytes]";
+    }
 };
 
 /*!
