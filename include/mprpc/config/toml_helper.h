@@ -23,6 +23,7 @@
 
 #include <toml.hpp>
 
+#include "mprpc/client_config.h"
 #include "mprpc/config/option.h"
 #include "mprpc/transport/compression_config.h"
 
@@ -58,6 +59,37 @@ struct from<mprpc::config::option<OptionType>> {
         mprpc::config::option<OptionType> option;
         option = converted;
         return option;
+    }
+};
+
+/*!
+ * \brief toml::from specialization for mprpc::transport::compression_type
+ */
+template <>
+struct from<mprpc::transport::compression_type> {
+    /*!
+     * \brief convert from toml value
+     *
+     * \tparam Comment comment type
+     * \tparam Table table type
+     * \tparam Array array type
+     * \param value toml value
+     * \return converted value
+     */
+    template <typename Comment, template <typename...> class Table,
+        template <typename...> class Array>
+    static mprpc::transport::compression_type from_toml(
+        const basic_value<Comment, Table, Array>& value) {
+        const auto& str = value.as_string();
+        if (str == "none") {
+            return mprpc::transport::compression_type::none;
+        }
+        if (str == "zstd") {
+            return mprpc::transport::compression_type::zstd;
+        }
+        throw std::runtime_error(format_error(
+            "invalid value for type, compression type (none, zstd)", value,
+            "invalid type"));
     }
 };
 

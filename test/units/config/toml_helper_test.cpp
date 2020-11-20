@@ -25,6 +25,7 @@
 #include <catch2/matchers/catch_matchers_string.hpp>
 
 #include "catch2/matchers/catch_matchers.hpp"
+#include "mprpc/transport/compression_config.h"
 
 namespace {
 
@@ -48,13 +49,13 @@ toml::value read_toml_str(const std::string& str) {
 
 }  // namespace
 
-TEST_CASE("toml::from<mprpc::config::option>") {
+TEST_CASE("toml::from<mprpc::config::option<test_number>>") {
     using test_type = mprpc::config::option<test_number>;
 
     SECTION("normal value") {
         constexpr std::uint16_t true_value = 37;
         const auto data = read_toml_str("value = 37");
-        mprpc::config::option<test_number> option;
+        test_type option;
         REQUIRE_NOTHROW(option = toml::get<test_type>(data.at("value")));
         REQUIRE(option.value() == true_value);
     }
@@ -65,5 +66,36 @@ TEST_CASE("toml::from<mprpc::config::option>") {
         REQUIRE_THROWS_WITH(option = toml::get<test_type>(data.at("value")),
             Catch::Matchers::Contains(
                 "invalid value for test_config, configuration for test"));
+    }
+}
+
+TEST_CASE(
+    "toml::from<mprpc::config::option<mprpc::transport::compression_type_type>"
+    ">") {
+    using test_type =
+        mprpc::config::option<mprpc::transport::compression_type_type>;
+
+    SECTION("none") {
+        constexpr auto true_value = mprpc::transport::compression_type::none;
+        const auto data = read_toml_str(R"(value = "none")");
+        test_type option;
+        REQUIRE_NOTHROW(option = toml::get<test_type>(data.at("value")));
+        REQUIRE(option.value() == true_value);
+    }
+
+    SECTION("zstd") {
+        constexpr auto true_value = mprpc::transport::compression_type::zstd;
+        const auto data = read_toml_str(R"(value = "zstd")");
+        test_type option;
+        REQUIRE_NOTHROW(option = toml::get<test_type>(data.at("value")));
+        REQUIRE(option.value() == true_value);
+    }
+
+    SECTION("invalid") {
+        const auto data = read_toml_str(R"(value = "abc")");
+        test_type option;
+        REQUIRE_THROWS_WITH(option = toml::get<test_type>(data.at("value")),
+            Catch::Matchers::Contains(
+                "invalid value for type, compression type (none, zstd)"));
     }
 }
