@@ -224,3 +224,85 @@ TEST_CASE("toml::from<mprpc::transport::tcp::tcp_connector_config>") {
             Catch::Matchers::Contains("invalid key non_related"));
     }
 }
+
+TEST_CASE("toml::from<mprpc::transport::udp::udp_acceptor_config>") {
+    using test_type = mprpc::transport::udp::udp_acceptor_config;
+
+    SECTION("empty") {
+        const auto data = read_toml_str(R"(
+            [udp_acceptor]
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data.at("udp_acceptor")));
+    }
+
+    SECTION("valid config") {
+        const auto data = read_toml_str(R"(
+            [udp_acceptor]
+            host = "0.0.0.0"
+            port = 1
+            datagram_buf_size = 3
+            compression.type = "zstd"
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data.at("udp_acceptor")));
+        REQUIRE(config.host.value() == "0.0.0.0");
+        REQUIRE(config.port.value() == 1);
+        REQUIRE(config.datagram_buf_size.value() == 3);
+        REQUIRE(config.compression.type.value() ==
+            mprpc::transport::compression_type::zstd);
+    }
+
+    SECTION("non-related key") {
+        const auto data = read_toml_str(R"(
+            [udp_acceptor]
+            non_related = 0
+        )");
+        test_type config;
+        REQUIRE_THROWS_WITH(
+            config = toml::get<test_type>(data.at("udp_acceptor")),
+            Catch::Matchers::Contains("invalid key non_related"));
+    }
+}
+
+TEST_CASE("toml::from<mprpc::transport::udp::udp_connector_config>") {
+    using test_type = mprpc::transport::udp::udp_connector_config;
+
+    SECTION("empty") {
+        const auto data = read_toml_str(R"(
+            [udp_connector]
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(
+            config = toml::get<test_type>(data.at("udp_connector")));
+    }
+
+    SECTION("valid config") {
+        const auto data = read_toml_str(R"(
+            [udp_connector]
+            host = "0.0.0.0"
+            port = 1
+            datagram_buf_size = 3
+            compression.type = "zstd"
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(
+            config = toml::get<test_type>(data.at("udp_connector")));
+        REQUIRE(config.host.value() == "0.0.0.0");
+        REQUIRE(config.port.value() == 1);
+        REQUIRE(config.datagram_buf_size.value() == 3);
+        REQUIRE(config.compression.type.value() ==
+            mprpc::transport::compression_type::zstd);
+    }
+
+    SECTION("non-related key") {
+        const auto data = read_toml_str(R"(
+            [udp_connector]
+            non_related = 0
+        )");
+        test_type config;
+        REQUIRE_THROWS_WITH(
+            config = toml::get<test_type>(data.at("udp_connector")),
+            Catch::Matchers::Contains("invalid key non_related"));
+    }
+}
