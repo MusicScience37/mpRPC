@@ -61,18 +61,26 @@ struct sync_request_timeout_ms_type {
 };
 
 /*!
- * \brief configuration option type for transport types
+ * \brief enumeration of transport types
  */
-struct transport_type_type {
+enum class transport_type {
+    tcp,  //!< TCP
+    udp   //!< UDP
+};
+
+/*!
+ * \brief configuration option type for connector types
+ */
+struct connector_type_type {
     //! value type
-    using value_type = std::string;
+    using value_type = transport_type;
 
     /*!
      * \brief get default value
      *
      * \return default value
      */
-    static value_type default_value() { return "TCP"; }
+    static value_type default_value() { return transport_type::tcp; }
 
     /*!
      * \brief validate a value
@@ -81,13 +89,7 @@ struct transport_type_type {
      * \return whether the value is valid
      */
     static bool validate(const value_type& value) {
-        if (value == "TCP") {
-            return true;
-        }
-        if (value == "UDP") {
-            return true;
-        }
-        return false;
+        return (value == transport_type::tcp) || (value == transport_type::udp);
     }
 
     /*!
@@ -95,7 +97,7 @@ struct transport_type_type {
      *
      * \return option name
      */
-    static std::string name() { return "transport_type"; }
+    static std::string name() { return "connector_type"; }
 };
 
 /*!
@@ -109,7 +111,7 @@ struct client_config {
     config::option<sync_request_timeout_ms_type> sync_request_timeout_ms{};
 
     //! transport type
-    config::option<transport_type_type> transport_type{};
+    config::option<connector_type_type> connector_type{};
 
     //! TCP connector configuration
     transport::tcp::tcp_connector_config tcp_connector{};
