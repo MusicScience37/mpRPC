@@ -59,7 +59,7 @@ public:
      * \param config configuration
      */
     explicit zstd_compressor_factory(compression_config config)
-        : config_(std::move(config)) {}
+        : config_(config) {}
 
     //! \copydoc mprpc::transport::compressor_factory::create_compressor
     std::unique_ptr<compressor> create_compressor(
