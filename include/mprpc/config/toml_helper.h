@@ -29,6 +29,7 @@
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/compressors/zstd_compressor_config.h"
 #include "mprpc/transport/tcp/tcp_acceptor_config.h"
+#include "mprpc/transport/tcp/tcp_connector_config.h"
 
 namespace toml {
 
@@ -153,6 +154,53 @@ struct from<mprpc::transport::tcp::tcp_acceptor_config> {
     static mprpc::transport::tcp::tcp_acceptor_config from_toml(
         const basic_value<Comment, Table, Array>& value) {
         mprpc::transport::tcp::tcp_acceptor_config config;
+        for (const auto& pair : value.as_table()) {
+            if (pair.first == "compression") {
+                config.compression =
+                    toml::get<mprpc::transport::compression_config>(
+                        pair.second);
+            } else if (pair.first == "host") {
+                config.host = toml::get<
+                    mprpc::config::option<mprpc::transport::common::host_type>>(
+                    pair.second);
+            } else if (pair.first == "port") {
+                config.port = toml::get<
+                    mprpc::config::option<mprpc::transport::common::port_type>>(
+                    pair.second);
+            } else if (pair.first == "streaming_min_buf_size") {
+                config.streaming_min_buf_size =
+                    toml::get<mprpc::config::option<mprpc::transport::
+                            asio_helper::streaming_min_buf_size_type>>(
+                        pair.second);
+            } else {
+                throw std::runtime_error(format_error(
+                    "invalid key " + pair.first, value, "invalid key exists"));
+            }
+        }
+        return config;
+    }
+};
+
+/*!
+ * \brief toml::from specialization for
+ * mprpc::transport::tcp::tcp_connector_config
+ */
+template <>
+struct from<mprpc::transport::tcp::tcp_connector_config> {
+    /*!
+     * \brief convert from toml value
+     *
+     * \tparam Comment comment type
+     * \tparam Table table type
+     * \tparam Array array type
+     * \param value toml value
+     * \return converted value
+     */
+    template <typename Comment, template <typename...> class Table,
+        template <typename...> class Array>
+    static mprpc::transport::tcp::tcp_connector_config from_toml(
+        const basic_value<Comment, Table, Array>& value) {
+        mprpc::transport::tcp::tcp_connector_config config;
         for (const auto& pair : value.as_table()) {
             if (pair.first == "compression") {
                 config.compression =
