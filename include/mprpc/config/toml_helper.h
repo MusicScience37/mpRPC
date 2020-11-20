@@ -26,6 +26,8 @@
 #include "mprpc/client_config.h"
 #include "mprpc/config/option.h"
 #include "mprpc/transport/compression_config.h"
+#include "mprpc/transport/compressors/zstd_compressor_config.h"
+#include "toml/get.hpp"
 
 namespace toml {
 
@@ -90,6 +92,43 @@ struct from<mprpc::transport::compression_type> {
         throw std::runtime_error(format_error(
             "invalid value for type, compression type (none, zstd)", value,
             "invalid type"));
+    }
+};
+
+/*!
+ * \brief toml::from specialization for mprpc::transport::compression_config
+ */
+template <>
+struct from<mprpc::transport::compression_config> {
+    /*!
+     * \brief convert from toml value
+     *
+     * \tparam Comment comment type
+     * \tparam Table table type
+     * \tparam Array array type
+     * \param value toml value
+     * \return converted value
+     */
+    template <typename Comment, template <typename...> class Table,
+        template <typename...> class Array>
+    static mprpc::transport::compression_config from_toml(
+        const basic_value<Comment, Table, Array>& value) {
+        mprpc::transport::compression_config config;
+        for (const auto& pair : value.as_table()) {
+            if (pair.first == "type") {
+                config.type = toml::get<mprpc::config::option<
+                    mprpc::transport::compression_type_type>>(pair.second);
+            } else if (pair.first == "zstd_compression_level") {
+                config.zstd_compression_level =
+                    toml::get<mprpc::config::option<mprpc::transport::
+                            compressors::zstd_compression_level_type>>(
+                        pair.second);
+            } else {
+                throw std::runtime_error(format_error(
+                    "invalid key " + pair.first, value, "invalid key exists"));
+            }
+        }
+        return config;
     }
 };
 

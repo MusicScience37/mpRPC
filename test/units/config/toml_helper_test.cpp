@@ -26,6 +26,7 @@
 
 #include "catch2/matchers/catch_matchers.hpp"
 #include "mprpc/transport/compression_config.h"
+#include "mprpc/transport/compressors/zstd_compressor_config.h"
 
 namespace {
 
@@ -97,5 +98,46 @@ TEST_CASE(
         REQUIRE_THROWS_WITH(option = toml::get<test_type>(data.at("value")),
             Catch::Matchers::Contains(
                 "invalid value for type, compression type (none, zstd)"));
+    }
+}
+
+TEST_CASE("toml::from<mprpc::transport::compression_config>") {
+    using test_type = mprpc::transport::compression_config;
+
+    SECTION("empty") {
+        const auto data = read_toml_str(R"(
+            [compression]
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data.at("compression")));
+        REQUIRE(
+            config.type.value() == mprpc::transport::compression_type::none);
+        REQUIRE(config.zstd_compression_level.value() ==
+            mprpc::transport::compressors::zstd_compression_level_type::
+                default_value());
+    }
+
+    SECTION("valid config") {
+        const auto data = read_toml_str(R"(
+            [compression]
+            type = "zstd"
+            zstd_compression_level = 5
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data.at("compression")));
+        REQUIRE(
+            config.type.value() == mprpc::transport::compression_type::zstd);
+        REQUIRE(config.zstd_compression_level.value() == 5);
+    }
+
+    SECTION("non-related key") {
+        const auto data = read_toml_str(R"(
+            [compression]
+            non_related = 0
+        )");
+        test_type config;
+        REQUIRE_THROWS_WITH(
+            config = toml::get<test_type>(data.at("compression")),
+            Catch::Matchers::Contains("invalid key non_related"));
     }
 }
