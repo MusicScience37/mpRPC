@@ -58,6 +58,15 @@ struct sync_request_timeout_ms_type {
      * \return option name
      */
     static std::string name() { return "sync_request_timeout_ms"; }
+
+    /*!
+     * \brief get description
+     *
+     * \return description
+     */
+    static std::string description() {
+        return "timeout of synchronous requests [ms]";
+    }
 };
 
 /*!
@@ -98,6 +107,13 @@ struct connector_type_type {
      * \return option name
      */
     static std::string name() { return "connector_type"; }
+
+    /*!
+     * \brief get description
+     *
+     * \return description
+     */
+    static std::string description() { return "connector type (TCP, UDP)"; }
 };
 
 /*!

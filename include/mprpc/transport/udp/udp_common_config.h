@@ -56,6 +56,13 @@ struct datagram_buf_size_type {
      * \return option name
      */
     static std::string name() { return "datagram_buf_size"; }
+
+    /*!
+     * \brief get description
+     *
+     * \return description
+     */
+    static std::string description() { return "buffer size in datagrams"; }
 };
 
 /*!

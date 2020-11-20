@@ -71,6 +71,15 @@ struct zstd_compression_level_type {
      * \return option name
      */
     static std::string name() { return "zstd_compression_level"; }
+
+    /*!
+     * \brief get description
+     *
+     * \return description
+     */
+    static std::string description() {
+        return "compression levels in zstd library";
+    }
 };
 
 }  // namespace compressors

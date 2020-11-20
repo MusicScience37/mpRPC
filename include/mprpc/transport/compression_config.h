@@ -66,6 +66,13 @@ struct compression_type_type {
      * \return option name
      */
     static std::string name() { return "type"; }
+
+    /*!
+     * \brief get description
+     *
+     * \return description
+     */
+    static std::string description() { return "compression type (none, zstd)"; }
 };
 
 /*!
