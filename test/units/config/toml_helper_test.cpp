@@ -25,6 +25,7 @@
 #include <catch2/matchers/catch_matchers_string.hpp>
 
 #include "catch2/matchers/catch_matchers.hpp"
+#include "mprpc/server.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/compressors/zstd_compressor_config.h"
 #include "mprpc/transport/tcp/tcp_acceptor_config.h"
@@ -304,5 +305,37 @@ TEST_CASE("toml::from<mprpc::transport::udp::udp_connector_config>") {
         REQUIRE_THROWS_WITH(
             config = toml::get<test_type>(data.at("udp_connector")),
             Catch::Matchers::Contains("invalid key non_related"));
+    }
+}
+
+TEST_CASE("toml::from<mprpc::server_config>") {
+    using test_type = mprpc::server_config;
+
+    SECTION("empty") {
+        const auto data = read_toml_str(R"(
+            [server]
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data.at("server")));
+    }
+
+    SECTION("valid config") {
+        const auto data = read_toml_str(R"(
+            server.num_threads = 2
+            [[server.tcp_acceptors]]
+            host = "0.0.0.0"
+            [[server.udp_acceptors]]
+            host = "0.0.0.1"
+            [[server.udp_acceptors]]
+            host = "0.0.0.2"
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data.at("server")));
+        REQUIRE(config.num_threads.value() == 2);
+        REQUIRE(config.tcp_acceptors.size() == 1);
+        REQUIRE(config.tcp_acceptors.at(0).host.value() == "0.0.0.0");
+        REQUIRE(config.udp_acceptors.size() == 2);
+        REQUIRE(config.udp_acceptors.at(0).host.value() == "0.0.0.1");
+        REQUIRE(config.udp_acceptors.at(1).host.value() == "0.0.0.2");
     }
 }

@@ -24,6 +24,8 @@
 #include <toml.hpp>
 
 #include "mprpc/config/option.h"
+#include "mprpc/num_threads.h"
+#include "mprpc/server_config.h"
 #include "mprpc/transport/asio_helper/stream_socket_config.h"
 #include "mprpc/transport/common/ip_common_config.h"
 #include "mprpc/transport/compression_config.h"
@@ -312,6 +314,47 @@ struct from<mprpc::transport::udp::udp_connector_config> {
             } else if (pair.first == "datagram_buf_size") {
                 config.datagram_buf_size = toml::get<mprpc::config::option<
                     mprpc::transport::udp::datagram_buf_size_type>>(
+                    pair.second);
+            } else {
+                throw std::runtime_error(format_error(
+                    "invalid key " + pair.first, value, "invalid key exists"));
+            }
+        }
+        return config;
+    }
+};
+
+/*!
+ * \brief toml::from specialization for mprpc::server_config
+ */
+template <>
+struct from<mprpc::server_config> {
+    /*!
+     * \brief convert from toml value
+     *
+     * \tparam Comment comment type
+     * \tparam Table table type
+     * \tparam Array array type
+     * \param value toml value
+     * \return converted value
+     */
+    template <typename Comment, template <typename...> class Table,
+        template <typename...> class Array>
+    static mprpc::server_config from_toml(
+        const basic_value<Comment, Table, Array>& value) {
+        mprpc::server_config config;
+        for (const auto& pair : value.as_table()) {
+            if (pair.first == "num_threads") {
+                config.num_threads =
+                    toml::get<mprpc::config::option<mprpc::num_threads_type>>(
+                        pair.second);
+            } else if (pair.first == "tcp_acceptors") {
+                config.tcp_acceptors = toml::get<
+                    std::vector<mprpc::transport::tcp::tcp_acceptor_config>>(
+                    pair.second);
+            } else if (pair.first == "udp_acceptors") {
+                config.udp_acceptors = toml::get<
+                    std::vector<mprpc::transport::udp::udp_acceptor_config>>(
                     pair.second);
             } else {
                 throw std::runtime_error(format_error(
