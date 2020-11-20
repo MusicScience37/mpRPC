@@ -58,6 +58,7 @@ struct from<mprpc::config::option<OptionType>> {
         template <typename...> class Array>
     static mprpc::config::option<OptionType> from_toml(
         const basic_value<Comment, Table, Array>& value) {
+        // NOLINTNEXTLINE: copy is necessary for some types
         const auto converted =
             toml::get<typename OptionType::value_type>(value);
         if (!OptionType::validate(converted)) {
