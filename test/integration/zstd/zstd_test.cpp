@@ -23,6 +23,7 @@
 #include "mprpc/logging/basic_loggers.h"
 #include "mprpc/method_client.h"
 #include "mprpc/server_builder.h"
+#include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/udp/udp_acceptor_config.h"
 #include "mprpc/transport/udp/udp_connector_config.h"
 
@@ -49,20 +50,22 @@ TEST_CASE("RPC on UDP using zstd compression") {
     logger->write(
         mprpc::logging::log_level::info, std::string(line_length, '-'));
 
-    auto server = mprpc::server_builder(logger)
-                      .num_threads(2)
-                      .listen_udp(host, port, "zstd")
-                      .method<std::string(std::string)>(
-                          "echo", [](std::string str) { return str; })
-                      .create();
+    auto server =
+        mprpc::server_builder(logger)
+            .num_threads(2)
+            .listen_udp(host, port, mprpc::transport::compression_type::zstd)
+            .method<std::string(std::string)>(
+                "echo", [](std::string str) { return str; })
+            .create();
 
     const auto duration = std::chrono::milliseconds(100);
     std::this_thread::sleep_for(duration);
 
-    auto client = mprpc::client_builder(logger)
-                      .num_threads(2)
-                      .connect_udp(host, port, "zstd")
-                      .create();
+    auto client =
+        mprpc::client_builder(logger)
+            .num_threads(2)
+            .connect_udp(host, port, mprpc::transport::compression_type::zstd)
+            .create();
 
     auto echo_client =
         mprpc::method_client<std::string(std::string)>(*client, "echo");
@@ -91,20 +94,22 @@ TEST_CASE("RPC on TCP using zstd compression") {
     logger->write(
         mprpc::logging::log_level::info, std::string(line_length, '-'));
 
-    auto server = mprpc::server_builder(logger)
-                      .num_threads(2)
-                      .listen_tcp(host, port, "zstd")
-                      .method<std::string(std::string)>(
-                          "echo", [](std::string str) { return str; })
-                      .create();
+    auto server =
+        mprpc::server_builder(logger)
+            .num_threads(2)
+            .listen_tcp(host, port, mprpc::transport::compression_type::zstd)
+            .method<std::string(std::string)>(
+                "echo", [](std::string str) { return str; })
+            .create();
 
     const auto duration = std::chrono::milliseconds(100);
     std::this_thread::sleep_for(duration);
 
-    auto client = mprpc::client_builder(logger)
-                      .num_threads(2)
-                      .connect_tcp(host, port, "zstd")
-                      .create();
+    auto client =
+        mprpc::client_builder(logger)
+            .num_threads(2)
+            .connect_tcp(host, port, mprpc::transport::compression_type::zstd)
+            .create();
 
     auto echo_client =
         mprpc::method_client<std::string(std::string)>(*client, "echo");

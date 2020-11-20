@@ -79,7 +79,8 @@ static void echo_tcp_zstd(benchmark::State& state) {
     try {
         auto server = mprpc::server_builder(logger)
                           .num_threads(2)
-                          .listen_tcp(host, port, "zstd")
+                          .listen_tcp(host, port,
+                              mprpc::transport::compression_type::zstd)
                           .method<std::string(std::string)>(
                               "echo", [](std::string str) { return str; })
                           .create();
@@ -89,7 +90,8 @@ static void echo_tcp_zstd(benchmark::State& state) {
 
         auto client = mprpc::client_builder(logger)
                           .num_threads(2)
-                          .connect_tcp(host, port, "zstd")
+                          .connect_tcp(host, port,
+                              mprpc::transport::compression_type::zstd)
                           .create();
 
         auto echo_client =

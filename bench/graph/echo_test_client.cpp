@@ -42,11 +42,13 @@ void test(std::size_t num_repetitions, std::size_t data_size,
     if (type == "tcp") {
         builder.connect_tcp(host, echo_server_port);
     } else if (type == "tcp_zstd") {
-        builder.connect_tcp(host, echo_server_port, "zstd");
+        builder.connect_tcp(
+            host, echo_server_port, mprpc::transport::compression_type::zstd);
     } else if (type == "udp") {
         builder.connect_udp(host, echo_server_port);
     } else if (type == "udp_zstd") {
-        builder.connect_udp(host, echo_server_port, "zstd");
+        builder.connect_udp(
+            host, echo_server_port, mprpc::transport::compression_type::zstd);
     } else {
         throw std::runtime_error("unkown type " + type);
     }

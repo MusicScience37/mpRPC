@@ -45,7 +45,7 @@ public:
      */
     zstd_compressor(
         std::shared_ptr<logging::logger> logger, compression_config config)
-        : logger_(std::move(logger)), config_(std::move(config)) {
+        : logger_(std::move(logger)), config_(config) {
         context_ = ZSTD_createCCtx();
         ZSTD_CCtx_setParameter(context_, ZSTD_c_compressionLevel,
             config_.zstd_compression_level.value());
@@ -109,7 +109,7 @@ public:
      */
     zstd_streaming_compressor(
         std::shared_ptr<logging::logger> logger, compression_config config)
-        : logger_(std::move(logger)), config_(std::move(config)) {
+        : logger_(std::move(logger)), config_(config) {
         context_ = ZSTD_createCCtx();
         ZSTD_CCtx_setParameter(context_, ZSTD_c_compressionLevel,
             config_.zstd_compression_level.value());

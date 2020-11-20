@@ -23,8 +23,10 @@
 #include <memory>
 
 #include "mprpc/client.h"
+#include "mprpc/client_config.h"
 #include "mprpc/logging/basic_loggers.h"
 #include "mprpc/transport.h"
+#include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/connector.h"
 #include "mprpc/transport/create_compressor_factory.h"
 #include "mprpc/transport/create_parser_factory.h"
@@ -80,7 +82,7 @@ public:
     client_builder& connect_tcp(
         const transport::tcp::tcp_connector_config& config =
             transport::tcp::tcp_connector_config()) {
-        client_config_.transport_type = "TCP";
+        client_config_.connector_type = transport_type::tcp;
         client_config_.tcp_connector = config;
         return *this;
     }
@@ -94,11 +96,12 @@ public:
      * \return this object
      */
     client_builder& connect_tcp(const std::string& host, std::uint16_t port,
-        const std::string& compression_type = "none") {
+        transport::compression_type compression_type =
+            transport::compression_type::none) {
         transport::tcp::tcp_connector_config config;
         config.host = host;
         config.port = port;
-        config.compression.compression_type = compression_type;
+        config.compression.type = compression_type;
         connect_tcp(config);
         return *this;
     }
@@ -112,7 +115,7 @@ public:
     client_builder& connect_udp(
         const transport::udp::udp_connector_config& config =
             transport::udp::udp_connector_config()) {
-        client_config_.transport_type = "UDP";
+        client_config_.connector_type = transport_type::udp;
         client_config_.udp_connector = config;
         return *this;
     }
@@ -126,11 +129,12 @@ public:
      * \return this object
      */
     client_builder& connect_udp(const std::string& host, std::uint16_t port,
-        const std::string& compression_type = "none") {
+        transport::compression_type compression_type =
+            transport::compression_type::none) {
         transport::udp::udp_connector_config config;
         config.host = host;
         config.port = port;
-        config.compression.compression_type = compression_type;
+        config.compression.type = compression_type;
         connect_udp(config);
         return *this;
     }
@@ -145,21 +149,23 @@ public:
             logger_, client_config_.num_threads.value());
 
         std::shared_ptr<transport::connector> connector;
-        if (client_config_.transport_type.value() == "TCP") {
+        switch (client_config_.connector_type.value()) {
+        case transport_type::tcp:
             connector = transport::tcp::create_tcp_connector(logger_, *threads,
                 transport::create_compressor_factory(
                     client_config_.tcp_connector.compression),
                 transport::create_parser_factory(
                     client_config_.tcp_connector.compression),
                 client_config_.tcp_connector);
-        } else {
-            // UDP
+            break;
+        case transport_type::udp:
             connector = transport::udp::create_udp_connector(logger_, *threads,
                 transport::create_compressor_factory(
                     client_config_.udp_connector.compression),
                 transport::create_parser_factory(
                     client_config_.udp_connector.compression),
                 client_config_.udp_connector);
+            break;
         }
 
         auto res = std::make_unique<client>(
