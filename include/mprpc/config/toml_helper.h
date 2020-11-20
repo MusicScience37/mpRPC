@@ -25,6 +25,7 @@
 
 #include "mprpc/client_config.h"
 #include "mprpc/config/option.h"
+#include "mprpc/mprpc_config.h"
 #include "mprpc/num_threads.h"
 #include "mprpc/server_config.h"
 #include "mprpc/transport/asio_helper/stream_socket_config.h"
@@ -438,6 +439,39 @@ struct from<mprpc::client_config> {
                 config.udp_connector =
                     toml::get<mprpc::transport::udp::udp_connector_config>(
                         pair.second);
+            } else {
+                throw std::runtime_error(format_error(
+                    "invalid key " + pair.first, value, "invalid key exists"));
+            }
+        }
+        return config;
+    }
+};
+
+/*!
+ * \brief toml::from specialization for mprpc::mprpc_config
+ */
+template <>
+struct from<mprpc::mprpc_config> {
+    /*!
+     * \brief convert from toml value
+     *
+     * \tparam Comment comment type
+     * \tparam Table table type
+     * \tparam Array array type
+     * \param value toml value
+     * \return converted value
+     */
+    template <typename Comment, template <typename...> class Table,
+        template <typename...> class Array>
+    static mprpc::mprpc_config from_toml(
+        const basic_value<Comment, Table, Array>& value) {
+        mprpc::mprpc_config config;
+        for (const auto& pair : value.as_table()) {
+            if (pair.first == "client") {
+                config.client = toml::get<mprpc::client_config>(pair.second);
+            } else if (pair.first == "server") {
+                config.server = toml::get<mprpc::server_config>(pair.second);
             } else {
                 throw std::runtime_error(format_error(
                     "invalid key " + pair.first, value, "invalid key exists"));

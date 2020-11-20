@@ -26,6 +26,7 @@
 
 #include "catch2/matchers/catch_matchers.hpp"
 #include "mprpc/client_config.h"
+#include "mprpc/mprpc_config.h"
 #include "mprpc/server.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/compressors/zstd_compressor_config.h"
@@ -435,6 +436,38 @@ TEST_CASE("toml::from<mprpc::client_config>") {
         )");
         test_type config;
         REQUIRE_THROWS_WITH(config = toml::get<test_type>(data.at("client")),
+            Catch::Matchers::Contains("invalid key non_related"));
+    }
+}
+
+TEST_CASE("toml::from<mprpc::mprpc_config>") {
+    using test_type = mprpc::mprpc_config;
+
+    SECTION("empty") {
+        const auto data = read_toml_str("");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data));
+    }
+
+    SECTION("valid config") {
+        const auto data = read_toml_str(R"(
+            [client]
+            num_threads = 2
+            [server]
+            num_threads = 3
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data));
+        REQUIRE(config.client.num_threads.value() == 2);
+        REQUIRE(config.server.num_threads.value() == 3);
+    }
+
+    SECTION("non-related key") {
+        const auto data = read_toml_str(R"(
+            non_related = 0
+        )");
+        test_type config;
+        REQUIRE_THROWS_WITH(config = toml::get<test_type>(data),
             Catch::Matchers::Contains("invalid key non_related"));
     }
 }
