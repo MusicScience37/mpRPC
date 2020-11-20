@@ -51,8 +51,8 @@ struct from<mprpc::config::option<OptionType>> {
         template <typename...> class Array>
     static mprpc::config::option<OptionType> from_toml(
         const basic_value<Comment, Table, Array>& value) {
-        using value_type = typename OptionType::value_type;
-        const value_type converted = toml::get<value_type>(value);
+        const auto converted =
+            toml::get<typename OptionType::value_type>(value);
         if (!OptionType::validate(converted)) {
             throw std::runtime_error(format_error("invalid value for " +
                     OptionType::name() + ", " + OptionType::description(),
