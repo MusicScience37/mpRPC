@@ -27,6 +27,7 @@
 #include "catch2/matchers/catch_matchers.hpp"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/compressors/zstd_compressor_config.h"
+#include "mprpc/transport/tcp/tcp_acceptor_config.h"
 
 namespace {
 
@@ -138,6 +139,46 @@ TEST_CASE("toml::from<mprpc::transport::compression_config>") {
         test_type config;
         REQUIRE_THROWS_WITH(
             config = toml::get<test_type>(data.at("compression")),
+            Catch::Matchers::Contains("invalid key non_related"));
+    }
+}
+
+TEST_CASE("toml::from<mprpc::transport::tcp::tcp_acceptor_config>") {
+    using test_type = mprpc::transport::tcp::tcp_acceptor_config;
+
+    SECTION("empty") {
+        const auto data = read_toml_str(R"(
+            [tcp_acceptor]
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data.at("tcp_acceptor")));
+    }
+
+    SECTION("valid config") {
+        const auto data = read_toml_str(R"(
+            [tcp_acceptor]
+            host = "0.0.0.0"
+            port = 1
+            streaming_min_buf_size = 3
+            compression.type = "zstd"
+        )");
+        test_type config;
+        REQUIRE_NOTHROW(config = toml::get<test_type>(data.at("tcp_acceptor")));
+        REQUIRE(config.host.value() == "0.0.0.0");
+        REQUIRE(config.port.value() == 1);
+        REQUIRE(config.streaming_min_buf_size.value() == 3);
+        REQUIRE(config.compression.type.value() ==
+            mprpc::transport::compression_type::zstd);
+    }
+
+    SECTION("non-related key") {
+        const auto data = read_toml_str(R"(
+            [tcp_acceptor]
+            non_related = 0
+        )");
+        test_type config;
+        REQUIRE_THROWS_WITH(
+            config = toml::get<test_type>(data.at("tcp_acceptor")),
             Catch::Matchers::Contains("invalid key non_related"));
     }
 }
