@@ -69,7 +69,8 @@ struct thread_pool::impl {
 
 thread_pool::thread_pool(
     std::shared_ptr<logging::logger> logger, std::size_t num_threads)
-    : impl_(std::make_unique<impl>(std::move(logger), num_threads)) {}
+    // NOLINTNEXTLINE: required to export this class on MSVC
+    : impl_(new impl(std::move(logger), num_threads)) {}
 
 void thread_pool::on_error(on_error_handler_type handler) {
     impl_->on_error = std::move(handler);
@@ -104,7 +105,11 @@ void thread_pool::post(function_type function) {
     asio::post(impl_->context, std::move(function));
 }
 
-thread_pool::~thread_pool() { stop(); }
+thread_pool::~thread_pool() {
+    stop();
+    // NOLINTNEXTLINE: required to export this class on MSVC
+    delete impl_;
+}
 
 void thread_pool::process_in_thread() {
     try {

@@ -22,6 +22,7 @@
 #include <future>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
 
 #include "create_logger.h"
 #include "mprpc/transport/mock/mock_connector.h"
@@ -37,7 +38,8 @@ TEST_CASE("mprpc::client") {
             threads->context());
 
     SECTION("async_request") {
-        mprpc::client client{logger, threads, connector};
+        mprpc::client client{
+            logger, threads, connector, mprpc::client_config()};
         client.start();
 
         std::future<int> future;
@@ -62,7 +64,8 @@ TEST_CASE("mprpc::client") {
     }
 
     SECTION("request") {
-        mprpc::client client{logger, threads, connector};
+        mprpc::client client{
+            logger, threads, connector, mprpc::client_config()};
         client.start();
 
         auto future = std::async(
@@ -96,7 +99,8 @@ TEST_CASE("mprpc::client") {
     }
 
     SECTION("notify") {
-        mprpc::client client{logger, threads, connector};
+        mprpc::client client{
+            logger, threads, connector, mprpc::client_config()};
         client.start();
 
         REQUIRE_NOTHROW(client.notify("test", 1, 2, 3));
@@ -110,7 +114,8 @@ TEST_CASE("mprpc::client") {
     }
 
     SECTION("async_request for void result") {
-        mprpc::client client{logger, threads, connector};
+        mprpc::client client{
+            logger, threads, connector, mprpc::client_config()};
         client.start();
 
         std::future<void> future;
@@ -130,5 +135,37 @@ TEST_CASE("mprpc::client") {
         const auto timeout = std::chrono::seconds(3);
         REQUIRE(future.wait_for(timeout) == std::future_status::ready);
         REQUIRE_NOTHROW(future.get());
+    }
+
+    SECTION("timeout") {
+        mprpc::client_config config;
+        constexpr std::uint32_t client_timeout_ms = 100;
+        config.sync_request_timeout_ms = client_timeout_ms;
+        mprpc::client client{logger, threads, connector, config};
+        client.start();
+
+        auto future = std::async(
+            [&client] { return client.request<int>("test", 1, 2, 3); });
+
+        const auto duration = std::chrono::milliseconds(100);
+        constexpr std::size_t repetitions = 100;
+        mprpc::message_data request_data;
+        for (std::size_t i = 0; i < repetitions; ++i) {
+            request_data = connector->get_written_data();
+            if (request_data.size() > 0) {
+                break;
+            }
+            std::this_thread::sleep_for(duration);
+        }
+
+        mprpc::message request;
+        REQUIRE_NOTHROW(request = mprpc::message(request_data));
+        REQUIRE(request.method() == "test");
+        REQUIRE(request.params_as<std::tuple<int, int, int>>() ==
+            std::make_tuple(1, 2, 3));
+
+        const auto timeout = std::chrono::seconds(3);
+        REQUIRE(future.wait_for(timeout) == std::future_status::ready);
+        REQUIRE_THROWS_WITH(future.get(), Catch::Matchers::Contains("timeout"));
     }
 }

@@ -16,7 +16,7 @@ file(MAKE_DIRECTORY ${MPRPC_TEMP_TEST_DIR})
 macro(target_add_catch2 _TARGET)
     target_link_libraries(
         ${_TARGET} PRIVATE Catch2::Catch2WithMain mprpc mprpc_test_utils
-                           mprpc_cpp_warnings)
+                           mprpc_cpp_warnings mprpc_pch)
     target_check_clang_tidy(${_TARGET})
 
     if(MPRPC_WRITE_JUNIT)

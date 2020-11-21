@@ -14,7 +14,8 @@
         "${workspaceFolder}/extern/lyra/include",
         "${workspaceFolder}/extern/msgpack-c/include",
         "${workspaceFolder}/extern/spdlog/include",
-        "${workspaceFolder}/extern/cpp-stl-ext/include"
+        "${workspaceFolder}/extern/cpp-stl-ext/include",
+        "${workspaceFolder}/extern/zstd/lib"
       ],
       "defines": [],
       "compilerPath": "/usr/bin/g++",
@@ -36,7 +37,8 @@
         "${workspaceFolder}/extern/lyra/include",
         "${workspaceFolder}/extern/msgpack-c/include",
         "${workspaceFolder}/extern/spdlog/include",
-        "${workspaceFolder}/extern/cpp-stl-ext/include"
+        "${workspaceFolder}/extern/cpp-stl-ext/include",
+        "${workspaceFolder}/extern/zstd/lib"
       ],
       "defines": [],
       "compilerPath": "",

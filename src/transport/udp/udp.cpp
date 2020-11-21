@@ -29,11 +29,12 @@ namespace transport {
 namespace udp {
 
 std::shared_ptr<acceptor> create_udp_acceptor(
-    const std::shared_ptr<mprpc::logging::logger>& logger,
-    const std::string& ip_address, const std::uint16_t& port,
-    thread_pool& threads,
+    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
+    const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
-    udp_acceptor_config config) {
+    const udp_acceptor_config& config) {
+    const auto& ip_address = config.host.value();
+    const auto port = config.port.value();
     asio::error_code err;
     const auto ip_address_parsed = asio::ip::make_address(ip_address, err);
     if (err) {
@@ -44,9 +45,10 @@ std::shared_ptr<acceptor> create_udp_acceptor(
     const auto endpoint = asio::ip::udp::endpoint(ip_address_parsed, port);
     try {
         auto socket = asio::ip::udp::socket(threads.context(), endpoint);
-        auto acceptor = std::make_shared<udp_acceptor>(logger,
-            std::move(socket), threads.context(),
-            parser_factory_ptr->create_parser(logger), config);
+        auto acceptor =
+            std::make_shared<impl::udp_acceptor>(logger, std::move(socket),
+                threads.context(), comp_factory->create_compressor(logger),
+                parser_factory_ptr->create_parser(logger), config);
         MPRPC_INFO(logger, "server started");
         return acceptor;
     } catch (const std::system_error& e) {
@@ -57,10 +59,12 @@ std::shared_ptr<acceptor> create_udp_acceptor(
 }
 
 std::shared_ptr<connector> create_udp_connector(
-    const std::shared_ptr<mprpc::logging::logger>& logger,
-    const std::string& host, const std::uint16_t& port, thread_pool& threads,
+    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
+    const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
-    udp_connector_config config) {
+    const udp_connector_config& config) {
+    const auto& host = config.host.value();
+    const auto port = config.port.value();
     asio::ip::udp::resolver resolver(threads.context());
     asio::error_code err;
     MPRPC_DEBUG(logger, "resloving {}:{}", host, port);
@@ -88,8 +92,9 @@ std::shared_ptr<connector> create_udp_connector(
     MPRPC_DEBUG(logger, "send UDP packets from {} to {}",
         socket.local_endpoint(), endpoint);
 
-    return std::make_shared<udp_connector>(logger, std::move(socket), endpoint,
-        threads.context(), parser_factory_ptr->create_parser(logger), config);
+    return std::make_shared<impl::udp_connector>(logger, std::move(socket),
+        endpoint, threads.context(), comp_factory->create_compressor(logger),
+        parser_factory_ptr->create_parser(logger), config);
 }
 
 }  // namespace udp

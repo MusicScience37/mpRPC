@@ -33,7 +33,7 @@ namespace mock {
 /*!
  * \brief class to mock sessions
  */
-class mock_session : public session {
+class mock_session final : public session {
 public:
     /*!
      * \brief construct

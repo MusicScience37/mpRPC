@@ -23,3 +23,9 @@ This project includes benchmark library, which is available under a
 
 This project includes cpp-stl-ext library, which is available under a 
 "Apache License, Version 2.0." For details, see extern/cpp-stl-ext.
+
+This project includes zstd library, which is available under a 
+"BSD License." For details, see extern/zstd.
+
+This project includes toml11 library, which is available under a 
+"MIT License." For details, see extern/toml11.

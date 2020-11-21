@@ -23,8 +23,15 @@
 #include <memory>
 
 #include "mprpc/client.h"
-#include "mprpc/logging/spdlog_logger.h"
+#include "mprpc/client_config.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/transport.h"
+#include "mprpc/transport/compression_config.h"
+#include "mprpc/transport/connector.h"
+#include "mprpc/transport/create_compressor_factory.h"
+#include "mprpc/transport/create_parser_factory.h"
+#include "mprpc/transport/tcp/tcp.h"
+#include "mprpc/transport/udp/udp.h"
 
 namespace mprpc {
 
@@ -51,7 +58,32 @@ public:
      * \return this object
      */
     client_builder& num_threads(std::size_t num_threads) {
-        num_threads_ = num_threads;
+        client_config_.num_threads = num_threads;
+        return *this;
+    }
+
+    /*!
+     * \brief set client configuration
+     *
+     * \param config configuration
+     * \return this object
+     */
+    client_builder& client_config(mprpc::client_config config) {
+        client_config_ = std::move(config);
+        return *this;
+    }
+
+    /*!
+     * \brief set to connect to a TCP port
+     *
+     * \param config configuration
+     * \return this object
+     */
+    client_builder& connect_tcp(
+        const transport::tcp::tcp_connector_config& config =
+            transport::tcp::tcp_connector_config()) {
+        client_config_.connector_type = transport_type::tcp;
+        client_config_.tcp_connector = config;
         return *this;
     }
 
@@ -60,20 +92,31 @@ public:
      *
      * \param host host address to connect to
      * \param port port number to connect to
-     * \param config configuration
+     * \param compression_type compression type
      * \return this object
      */
     client_builder& connect_tcp(const std::string& host, std::uint16_t port,
-        transport::tcp::tcp_connector_config config =
-            transport::tcp::tcp_connector_config()) {
-        connector_factory_ =
-            [host, port, config](
-                const std::shared_ptr<mprpc::logging::logger>& logger,
-                thread_pool& threads,
-                const std::shared_ptr<transport::parser_factory>& factory) {
-                return transport::tcp::create_tcp_connector(
-                    logger, host, port, threads, factory, config);
-            };
+        transport::compression_type compression_type =
+            transport::compression_type::none) {
+        transport::tcp::tcp_connector_config config;
+        config.host = host;
+        config.port = port;
+        config.compression.type = compression_type;
+        connect_tcp(config);
+        return *this;
+    }
+
+    /*!
+     * \brief set to connect to a UDP port
+     *
+     * \param config configuration
+     * \return this object
+     */
+    client_builder& connect_udp(
+        const transport::udp::udp_connector_config& config =
+            transport::udp::udp_connector_config()) {
+        client_config_.connector_type = transport_type::udp;
+        client_config_.udp_connector = config;
         return *this;
     }
 
@@ -82,20 +125,17 @@ public:
      *
      * \param host host address to connect to
      * \param port port number to connect to
-     * \param config configuration
+     * \param compression_type compression type
      * \return this object
      */
     client_builder& connect_udp(const std::string& host, std::uint16_t port,
-        transport::udp::udp_connector_config config =
-            transport::udp::udp_connector_config()) {
-        connector_factory_ =
-            [host, port, config](
-                const std::shared_ptr<mprpc::logging::logger>& logger,
-                thread_pool& threads,
-                const std::shared_ptr<transport::parser_factory>& factory) {
-                return transport::udp::create_udp_connector(
-                    logger, host, port, threads, factory, config);
-            };
+        transport::compression_type compression_type =
+            transport::compression_type::none) {
+        transport::udp::udp_connector_config config;
+        config.host = host;
+        config.port = port;
+        config.compression.type = compression_type;
+        connect_udp(config);
         return *this;
     }
 
@@ -105,13 +145,31 @@ public:
      * \return client
      */
     std::unique_ptr<client> create() {
-        const auto threads =
-            std::make_shared<thread_pool>(logger_, num_threads_);
+        const auto threads = std::make_shared<thread_pool>(
+            logger_, client_config_.num_threads.value());
 
-        auto connector = connector_factory_(logger_, *threads, parser_factory_);
+        std::shared_ptr<transport::connector> connector;
+        switch (client_config_.connector_type.value()) {
+        case transport_type::tcp:
+            connector = transport::tcp::create_tcp_connector(logger_, *threads,
+                transport::create_compressor_factory(
+                    client_config_.tcp_connector.compression),
+                transport::create_parser_factory(
+                    client_config_.tcp_connector.compression),
+                client_config_.tcp_connector);
+            break;
+        case transport_type::udp:
+            connector = transport::udp::create_udp_connector(logger_, *threads,
+                transport::create_compressor_factory(
+                    client_config_.udp_connector.compression),
+                transport::create_parser_factory(
+                    client_config_.udp_connector.compression),
+                client_config_.udp_connector);
+            break;
+        }
 
-        auto res =
-            std::make_unique<client>(logger_, threads, std::move(connector));
+        auto res = std::make_unique<client>(
+            logger_, threads, std::move(connector), client_config_);
         res->start();
 
         return res;
@@ -122,21 +180,8 @@ private:
     std::shared_ptr<mprpc::logging::logger> logger_{
         logging::create_stdout_logger(mprpc::logging::log_level::warn)};
 
-    //! number of threads
-    std::size_t num_threads_{1};
-
-    //! parser factory
-    std::shared_ptr<transport::parser_factory> parser_factory_{
-        std::make_shared<transport::parsers::msgpack_parser_factory>()};
-
-    //! type of connector factory method
-    using connector_factory_type =
-        std::function<std::shared_ptr<transport::connector>(
-            const std::shared_ptr<mprpc::logging::logger>&, thread_pool&,
-            const std::shared_ptr<transport::parser_factory>&)>;
-
-    //! connector factories
-    connector_factory_type connector_factory_{};
+    //! client configuration
+    mprpc::client_config client_config_{};
 };
 
 }  // namespace mprpc

@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "mprpc/generate_string_data.h"
-#include "mprpc/logging/spdlog_logger.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
 
 static void parse_msgpack(benchmark::State& state) {

@@ -7,8 +7,8 @@
 
 #include "common.h"
 #include "mprpc/generate_binary.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/logging/logging_macros.h"
-#include "mprpc/logging/spdlog_logger.h"
 #include "mprpc/thread_pool.h"
 
 class session : public std::enable_shared_from_this<session> {

@@ -1,19 +1,22 @@
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-macro(add_mprpc_bench_graph _TARGET _SCRIPT)
-    target_link_libraries(${_TARGET} PRIVATE mprpc mprpc_bench_utils
-                                             mprpc_cpp_warnings lyra)
-    target_check_clang_tidy(${_TARGET})
+add_executable(mprpc_bench_graph_echo_server echo_test_server.cpp)
+target_link_libraries(
+    mprpc_bench_graph_echo_server PRIVATE mprpc mprpc_bench_utils
+                                          mprpc_cpp_warnings mprpc_pch lyra)
+target_check_clang_tidy(mprpc_bench_graph_echo_server)
 
-    set(BENCH_RESULT_PATH ${MPRPC_BENCH_DIR}/${_TARGET}.json)
-    if(MPRPC_BENCH_IN_TEST)
-        add_test(
-            NAME ${_TARGET}
-            COMMAND ${Python3_EXECUTABLE}
-                    "${CMAKE_CURRENT_SOURCE_DIR}/${_SCRIPT}" ${CMAKE_BINARY_DIR}
-            WORKING_DIRECTORY "${MPRPC_BENCH_DIR}")
-    endif()
-endmacro()
+add_executable(mprpc_bench_graph_echo_client echo_test_client.cpp)
+target_link_libraries(
+    mprpc_bench_graph_echo_client PRIVATE mprpc mprpc_bench_utils
+                                          mprpc_cpp_warnings mprpc_pch lyra)
+target_check_clang_tidy(mprpc_bench_graph_echo_client)
 
-add_executable(mprpc_bench_graph_echo echo_test.cpp)
-add_mprpc_bench_graph(mprpc_bench_graph_echo echo_graph.py)
+if(MPRPC_BENCH_IN_TEST)
+    add_test(
+        NAME mprpc_bench_graph_echo
+        COMMAND
+            ${Python3_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/echo_graph.py"
+            "-b" ${CMAKE_BINARY_DIR}
+        WORKING_DIRECTORY "${MPRPC_BENCH_DIR}")
+endif()
