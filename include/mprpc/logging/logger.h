@@ -41,6 +41,39 @@ public:
      *
      * \tparam Format format type
      * \tparam Data data type
+     * \param label label
+     * \param filename file name
+     * \param line line number
+     * \param function function name
+     * \param level log level
+     * \param format format
+     * \param data data
+     */
+    template <typename Format, typename... Data>
+    void write(const char* label, const char* filename, std::uint32_t line,
+        const char* function, log_level level, Format&& format,
+        Data&&... data) noexcept {
+        if (!is_outputted_level(level)) {
+            return;
+        }
+        try {
+            write_impl(label, filename, line, function, level,
+                format_log_data(
+                    std::forward<Format>(format), std::forward<Data>(data)...)
+                    .c_str());
+        } catch (...) {
+            write_impl(label, filename, line, function, level,
+                "ERROR IN FORMATTING LOG MESSAGE");
+        }
+    }
+
+    /*!
+     * \brief write log
+     *
+     * \note if no data given, format variable will be treated as log message.
+     *
+     * \tparam Format format type
+     * \tparam Data data type
      * \param filename file name
      * \param line line number
      * \param function function name
@@ -124,6 +157,20 @@ protected:
      */
     explicit logger(log_level log_output_level) noexcept
         : log_output_level_(log_output_level) {}
+
+    /*!
+     * \brief write log
+     *
+     * \param label label
+     * \param filename file name
+     * \param line line number
+     * \param function function name
+     * \param level log level
+     * \param message log message
+     */
+    virtual void write_impl(const char* label, const char* filename,
+        std::uint32_t line, const char* function, log_level level,
+        const char* message) noexcept = 0;
 
     /*!
      * \brief write log

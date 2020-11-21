@@ -138,6 +138,24 @@ public:
     /*!
      * \brief write log
      *
+     * \param label label
+     * \param filename file name
+     * \param line line number
+     * \param level log level
+     * \param message log message
+     */
+    void write_impl(const char* label, const char* filename, std::uint32_t line,
+        const char* /*function*/, log_level level,
+        const char* message) noexcept final {
+        write_impl(level,
+            fmt::format(
+                FMT_STRING("[{}] {} ({}:{})"), label, message, filename, line)
+                .c_str());
+    }
+
+    /*!
+     * \brief write log
+     *
      * \param filename file name
      * \param line line number
      * \param level log level
