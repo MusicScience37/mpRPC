@@ -35,6 +35,8 @@ struct test_number {
     static bool validate(value_type value) noexcept { return value != 0; }
 
     static std::string name() { return "test_config"; }
+
+    static std::string description() { return "configuration for test"; }
 };
 
 }  // namespace
@@ -56,6 +58,7 @@ TEST_CASE("mprpc::config::option") {
         constexpr std::uint16_t value = 37;
         REQUIRE_NOTHROW(opt = value);
         REQUIRE(opt.value() == value);
-        REQUIRE_THROWS_WITH(opt = 0, "invalid value for test_config");
+        REQUIRE_THROWS_WITH(
+            opt = 0, "invalid value for test_config, configuration for test");
     }
 }

@@ -28,7 +28,8 @@ TEST_CASE("mprpc::transport::tcp::tcp_address") {
         const auto endpoint = asio::ip::tcp::endpoint(address, port);
 
         const auto tcp_address =
-            std::make_shared<mprpc::transport::tcp::tcp_address>(endpoint);
+            std::make_shared<mprpc::transport::tcp::impl::tcp_address>(
+                endpoint);
         REQUIRE(tcp_address->full_address() == "192.0.2.0:12345");
     }
 
@@ -39,7 +40,8 @@ TEST_CASE("mprpc::transport::tcp::tcp_address") {
         const auto endpoint = asio::ip::tcp::endpoint(address, port);
 
         const auto tcp_address =
-            std::make_shared<mprpc::transport::tcp::tcp_address>(endpoint);
+            std::make_shared<mprpc::transport::tcp::impl::tcp_address>(
+                endpoint);
         REQUIRE(tcp_address->full_address() ==
             "[2001:db8:85a3::8a2e:370:7334]:4321");
     }

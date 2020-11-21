@@ -28,7 +28,7 @@ namespace mock {
 /*!
  * \brief class to mock addresses
  */
-class mock_address : public address {
+class mock_address final : public address {
 public:
     //! \copydoc mprpc::transport::address::full_address
     std::string full_address() const override { return "mock"; }

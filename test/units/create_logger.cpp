@@ -19,7 +19,7 @@
  */
 #include "create_logger.h"
 
-#include "mprpc/logging/spdlog_logger.h"
+#include "mprpc/logging/basic_loggers.h"
 
 std::shared_ptr<mprpc::logging::logger> create_logger_impl() {
     constexpr std::size_t max_file_size = 1024 * 1024;

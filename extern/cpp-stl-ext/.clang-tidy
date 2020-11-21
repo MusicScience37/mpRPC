@@ -1,7 +1,7 @@
 HeaderFilterRegex: "include/stl_ext/|test/"
 Checks: >
   clang-diagnostic-*,
-  clang-analyzer-*,-clang-analyzer-cplusplus.NewDelete,-clang-analyzer-cplusplus.NewDeleteLeaks,
+  clang-analyzer-*,-clang-analyzer-cplusplus.NewDeleteLeaks,
   cppcoreguidelines-*,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory,
   google-*,-google-runtime-references,
   performance-*,

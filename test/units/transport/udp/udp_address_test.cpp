@@ -28,7 +28,8 @@ TEST_CASE("mprpc::transport::udp::udp_address") {
         const auto endpoint = asio::ip::udp::endpoint(address, port);
 
         const auto udp_address =
-            std::make_shared<mprpc::transport::udp::udp_address>(endpoint);
+            std::make_shared<mprpc::transport::udp::impl::udp_address>(
+                endpoint);
         REQUIRE(udp_address->full_address() == "192.0.2.0:12345");
     }
 
@@ -39,7 +40,8 @@ TEST_CASE("mprpc::transport::udp::udp_address") {
         const auto endpoint = asio::ip::udp::endpoint(address, port);
 
         const auto udp_address =
-            std::make_shared<mprpc::transport::udp::udp_address>(endpoint);
+            std::make_shared<mprpc::transport::udp::impl::udp_address>(
+                endpoint);
         REQUIRE(udp_address->full_address() ==
             "[2001:db8:85a3::8a2e:370:7334]:4321");
     }

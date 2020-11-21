@@ -20,7 +20,7 @@ def test_write_log_default(writer: str):
     log_lines = call_writer(writer, [])
     log_iterator = log_lines.__iter__()
 
-    time_regex_str = R'\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d\d\d\d\]'
+    time_regex_str = R'\[\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d\]'
 
     line = log_iterator.__next__()
     assert re.match(
@@ -63,7 +63,7 @@ def test_write_log_verbose(writer: str):
     log_lines = call_writer(writer, ['-v'])
     log_iterator = log_lines.__iter__()
 
-    time_regex_str = R'\[\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d\d\d\d\d\d\]'
+    time_regex_str = R'\[\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d\]'
 
     line = log_iterator.__next__()
     assert re.match(

@@ -44,7 +44,7 @@ breathe_projects = {'mprpc': ''}
 
 breathe_default_project = 'mprpc'
 
-breathe_default_members = ('members', 'private-members')
+breathe_default_members = ('members')
 
 breathe_domain_by_extension = {
     "h": "cpp",

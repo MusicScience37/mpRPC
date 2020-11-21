@@ -23,7 +23,7 @@
 #include "mprpc/execution/function_method_executor.h"
 #include "mprpc/execution/simple_method_server.h"
 #include "mprpc/generate_string.h"
-#include "mprpc/logging/spdlog_logger.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/transport/mock/mock_session.h"
 
 static void echo_exec(benchmark::State& state) {

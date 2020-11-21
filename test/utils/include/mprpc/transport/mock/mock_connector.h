@@ -33,7 +33,7 @@ namespace mock {
 /*!
  * \brief class to mock connectors
  */
-class mock_connector : public connector {
+class mock_connector final : public connector {
 public:
     /*!
      * \brief construct

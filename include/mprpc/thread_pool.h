@@ -116,7 +116,7 @@ private:
     struct impl;
 
     //! internal data
-    std::unique_ptr<impl> impl_{};
+    impl* impl_{};
 };
 
 }  // namespace mprpc

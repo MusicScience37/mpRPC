@@ -22,6 +22,7 @@
 #include <memory>
 
 #include "mprpc/exception.h"
+#include "mprpc/logging/logger.h"
 #include "mprpc/message_data.h"
 
 namespace mprpc {

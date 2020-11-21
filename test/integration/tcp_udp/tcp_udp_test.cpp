@@ -20,7 +20,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "mprpc/client_builder.h"
-#include "mprpc/logging/spdlog_logger.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/method_client.h"
 #include "mprpc/server_builder.h"
 
@@ -31,13 +31,10 @@ TEST_CASE("RPC on TCP") {
         "mprpc_test_integ_tcp", "mprpc_test_integ_tcp_udp.log",
         mprpc::logging::log_level::trace, max_file_size, max_files, true);
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
-
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)
-                      .listen_tcp(host, port)
-                      .listen_udp(host, port)
+                      .listen_tcp()
+                      .listen_udp()
                       .method<std::string(std::string)>(
                           "echo", [](std::string str) { return str; })
                       .create();
@@ -46,10 +43,8 @@ TEST_CASE("RPC on TCP") {
     std::this_thread::sleep_for(duration);
 
     SECTION("TCP client") {
-        auto client = mprpc::client_builder(logger)
-                          .num_threads(2)
-                          .connect_tcp(host, port)
-                          .create();
+        auto client =
+            mprpc::client_builder(logger).num_threads(2).connect_tcp().create();
 
         auto echo_client =
             mprpc::method_client<std::string(std::string)>(*client, "echo");
@@ -63,10 +58,8 @@ TEST_CASE("RPC on TCP") {
     }
 
     SECTION("UDP client") {
-        auto client = mprpc::client_builder(logger)
-                          .num_threads(2)
-                          .connect_udp(host, port)
-                          .create();
+        auto client =
+            mprpc::client_builder(logger).num_threads(2).connect_udp().create();
 
         auto echo_client =
             mprpc::method_client<std::string(std::string)>(*client, "echo");

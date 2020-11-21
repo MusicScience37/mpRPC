@@ -35,6 +35,8 @@ namespace config {
  * - `value_type default_value()`: function to get default value
  * - `bool validate(value_type)`: function to validate a value
  * - `std::string name()`: function to get configuration name
+ * - `std::string description()`: function to get description of the
+ *   configuration
  */
 template <typename OptionType>
 class option {
@@ -59,7 +61,8 @@ public:
     option& operator=(const value_type& value) {
         if (!option_type::validate(value)) {
             throw exception(error_info(error_code::invalid_config_value,
-                "invalid value for " + option_type::name()));
+                "invalid value for " + option_type::name() + ", " +
+                    option_type::description()));
         }
         value_ = value;
         return *this;

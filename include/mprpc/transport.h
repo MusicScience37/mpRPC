@@ -19,6 +19,7 @@
  */
 #pragma once
 
-#include "mprpc/transport/parsers/msgpack_parser.h"
+#include "mprpc/transport/create_compressor_factory.h"
+#include "mprpc/transport/create_parser_factory.h"
 #include "mprpc/transport/tcp/tcp.h"
 #include "mprpc/transport/udp/udp.h"

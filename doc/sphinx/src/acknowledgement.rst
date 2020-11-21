@@ -9,6 +9,8 @@ This project uses the following external libraries in source codes:
 - `lyra <https://github.com/bfgroup/Lyra>`_
 - `asio <https://think-async.com/Asio/>`_
 - `cpp-stl-ext <https://gitlab.com/MusicScience37/cpp-stl-ext>`_
+- `zstd <https://github.com/facebook/zstd>`_
+- `toml11 <https://github.com/ToruNiina/toml11>`_
 
 This project uses the following external libraries in tests:
 

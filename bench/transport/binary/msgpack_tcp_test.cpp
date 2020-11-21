@@ -5,11 +5,14 @@
 
 #include "common.h"
 #include "mprpc/generate_binary_data.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/logging/logging_macros.h"
-#include "mprpc/logging/spdlog_logger.h"
 #include "mprpc/thread_pool.h"
+#include "mprpc/transport/compressors/null_compressor.h"
 #include "mprpc/transport/parsers/msgpack_parser.h"
 #include "mprpc/transport/tcp/tcp.h"
+#include "mprpc/transport/tcp/tcp_acceptor_config.h"
+#include "mprpc/transport/tcp/tcp_connector_config.h"
 
 class mprpc_session : public std::enable_shared_from_this<mprpc_session> {
 public:
@@ -108,23 +111,25 @@ static void transport_binary_msgpack_tcp(benchmark::State& state) {
     const auto size = static_cast<std::size_t>(state.range());
     const auto data = mprpc::generate_binary_data(size);
 
-    const auto host = std::string("127.0.0.1");
-    constexpr std::uint16_t port = 3780;
+    const auto comp_factory = std::make_shared<
+        mprpc::transport::compressors::null_compressor_factory>();
 
     const auto parser_factory =
         std::make_shared<mprpc::transport::parsers::msgpack_parser_factory>();
 
     try {
-        auto acceptor = mprpc::transport::tcp::create_tcp_acceptor(
-            logger, host, port, *threads, parser_factory);
+        auto acceptor = mprpc::transport::tcp::create_tcp_acceptor(logger,
+            *threads, comp_factory, parser_factory,
+            mprpc::transport::tcp::tcp_acceptor_config());
         auto server = std::make_shared<mprpc_server>(acceptor);
         server->start();
 
         const auto wait_duration = std::chrono::milliseconds(100);
         std::this_thread::sleep_for(wait_duration);
 
-        auto client = mprpc::transport::tcp::create_tcp_connector(
-            logger, host, port, *threads, parser_factory);
+        auto client = mprpc::transport::tcp::create_tcp_connector(logger,
+            *threads, comp_factory, parser_factory,
+            mprpc::transport::tcp::tcp_connector_config());
 
         for (auto _ : state) {
             {

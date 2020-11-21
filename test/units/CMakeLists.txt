@@ -7,17 +7,22 @@ add_executable(
     logging/spdlog_logger_test.cpp
     create_logger.cpp
     buffer_test.cpp
+    shared_binary_test.cpp
     message_data_test.cpp
     error_info_test.cpp
     exception_test.cpp
     format_message_test.cpp
     config/option_test.cpp
+    config/toml_helper_test.cpp
+    config/load_test.cpp
     thread_pool_test.cpp
     transport/mock/mock_session_test.cpp
     transport/mock/mock_acceptor_test.cpp
     transport/mock/mock_connector_test.cpp
     transport/mock/mock_address_test.cpp
     transport/parsers/msgpack_parser_test.cpp
+    transport/compressors/zstd_non_streaming_test.cpp
+    transport/compressors/zstd_streaming_test.cpp
     transport/asio_helper/basic_endpoint_test.cpp
     transport/tcp/tcp_address_test.cpp
     transport/tcp/tcp_test.cpp
@@ -35,3 +40,4 @@ add_executable(
     method_client_test.cpp
     client_builder_test.cpp)
 target_add_catch2(mprpc_test_units)
+target_link_libraries(mprpc_test_units PRIVATE spdlog mprpc_impl)

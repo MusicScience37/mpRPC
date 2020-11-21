@@ -8,8 +8,8 @@
 #include <msgpack.hpp>
 
 #include "mprpc/error_info.h"
+#include "mprpc/logging/basic_loggers.h"
 #include "mprpc/logging/logging_macros.h"
-#include "mprpc/logging/spdlog_logger.h"
 
 void write_with_log_levels(
     const std::shared_ptr<mprpc::logging::logger>& logger) {

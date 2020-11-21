@@ -48,7 +48,8 @@ TEST_CASE("mprpc::server") {
             threads->context());
 
     SECTION("request") {
-        mprpc::server server{logger, threads, {acceptor}, method_server};
+        mprpc::server server{
+            logger, threads, {acceptor}, method_server, mprpc::server_config()};
         server.start();
 
         const auto duration = std::chrono::milliseconds(100);
