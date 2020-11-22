@@ -6,6 +6,11 @@ project(
     DESCRIPTION "An implementation of MessagePack-RPC in C++"
     LANGUAGES CXX)
 
+option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)
+option(MPRPC_TESTING "enable testing of mpRPC" OFF)
+option(MPRPC_ENABLE_BENCH "enable benchmarks of mpRPC" OFF)
+option(MPRPC_BUILD_EXAMPLE "build examples of mpRPC" OFF)
+
 set(CMAKE_CXX_STANDARD
     14
     CACHE STRING "C++ standard")
@@ -82,7 +87,24 @@ add_subdirectory(extern/toml11)
 
 find_package(Threads REQUIRED)
 
-option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)
+if(MPRPC_BUILD_DOC
+   OR MPRPC_TESTING
+   OR MPRPC_ENABLE_BENCH)
+    find_program(PIPENV_EXECUTABLE NAMES pipenv)
+    if(NOT PIPENV_EXECUTABLE)
+        message(
+            FATAL_ERROR
+                "pipenv is required for MPRPC_BUILD_DOC, MPRPC_TESTING or MPRPC_ENABLE_BENCH"
+        )
+    endif()
+    message(STATUS "Found pipenv: ${PIPENV_EXECUTABLE}")
+    execute_process(
+        COMMAND ${PIPENV_EXECUTABLE} --venv
+        WORKING_DIRECTORY ${MPRPC_SOURCE_DIR}
+        OUTPUT_VARIABLE PIPENV_VENV_DIR)
+    message(STATUS "Virtualenv location: ${PIPENV_VENV_DIR}")
+endif()
+
 if(MPRPC_BUILD_DOC)
     add_subdirectory(doc)
 endif()
@@ -135,17 +157,15 @@ set(BUILDNAME
     "${CMAKE_HOST_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}-${CMAKE_BUILD_TYPE}"
 )
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.cmake
+               ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
 include(CTest)
 
-option(MPRPC_TESTING "enable testing of mpRPC" OFF)
-if(MPRPC_TESTING)
+if(MPRPC_TESTING OR MPRPC_ENABLE_BENCH)
     add_subdirectory(extern/Catch2)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.cmake
-                   ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
     add_subdirectory(test)
 endif()
 
-option(MPRPC_ENABLE_BENCH "enable benchmarks of mpRPC" OFF)
 if(MPRPC_ENABLE_BENCH)
     set(BENCHMARK_ENABLE_TESTING
         OFF
@@ -154,7 +174,6 @@ if(MPRPC_ENABLE_BENCH)
     add_subdirectory(bench)
 endif()
 
-option(MPRPC_BUILD_EXAMPLE "build examples of mpRPC" OFF)
 if(MPRPC_BUILD_EXAMPLE)
     add_subdirectory(example)
 endif()
