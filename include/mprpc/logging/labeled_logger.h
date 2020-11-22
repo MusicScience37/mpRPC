@@ -43,17 +43,14 @@ public:
         : logger_(std::move(logger)), label_(std::move(label)) {}
 
     /*!
-     * \brief add a level of the label
+     * \brief construct
      *
-     * \param name level name
+     * \param logger logger
+     * \param name additional level name
      */
-    void add_level(const std::string& name) {
-        if (label_.empty()) {
-            label_ = name;
-        } else {
-            label_ += '.';
-            label_ += name;
-        }
+    labeled_logger(labeled_logger logger, const std::string& name)
+        : labeled_logger(std::move(logger)) {
+        add_level(name);
     }
 
     /*!
@@ -83,6 +80,20 @@ public:
     }
 
 private:
+    /*!
+     * \brief add a level of the label
+     *
+     * \param name level name
+     */
+    void add_level(const std::string& name) {
+        if (label_.empty()) {
+            label_ = name;
+        } else {
+            label_ += '.';
+            label_ += name;
+        }
+    }
+
     //! logger
     std::shared_ptr<logger> logger_;
 

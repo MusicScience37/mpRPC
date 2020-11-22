@@ -128,8 +128,8 @@ TEST_CASE("logging macros in mpRPC") {
         test_logger logger(log_level::trace);
         const auto base_logger =
             std::make_shared<test_logger>(log_level::trace);
-        mprpc::logging::labeled_logger labeled_logger{base_logger};
-        labeled_logger.add_level("mprpc_test");
+        mprpc::logging::labeled_logger labeled_logger{
+            base_logger, "mprpc_test"};
 
         MPRPC_INFO(labeled_logger, "test");
         REQUIRE(base_logger->label == "mprpc_test");
