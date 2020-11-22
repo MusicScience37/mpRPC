@@ -24,7 +24,7 @@ sync pipenv:
   artifacts:
     paths:
       - .venv
-      - Pipenv.lock
+      - Pipfile.lock
     expire_in: "3 mos"
 
 line count:
