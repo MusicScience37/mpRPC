@@ -93,8 +93,6 @@ static analysis:
     - sync pipenv
   dependencies:
     - sync pipenv
-  before_script:
-    - pipenv install --dev
   script:
     - mkdir $BUILD_DIR
     - pipenv run
@@ -214,8 +212,6 @@ doc:
   dependencies:
     - sync pipenv
   image: musicscience37/sphinx-doxygen:v-3.0
-  before_script:
-    - pipenv install --dev
   script:
     - mkdir build_doc
     - pipenv run
