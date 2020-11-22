@@ -43,5 +43,5 @@ mprpc::logging::labeled_logger create_logger(const std::string& test_name) {
     logger->write(info_level, line);
     logger->write(info_level, "starting test {}", test_name);
 
-    return mprpc::logging::labeled_logger(logger, "mprpc_test");
+    return mprpc::logging::labeled_logger(logger);
 }
