@@ -76,7 +76,7 @@ struct thread_pool::impl {
         : context(static_cast<int>(num_threads_in)),
           work_guard(asio::make_work_guard(context)),
           num_threads(num_threads_in),
-          logger(std::move(logger_in)) {}
+          logger(std::move(logger_in), "thread_pool") {}
 };
 
 thread_pool::thread_pool(

@@ -19,7 +19,9 @@
  */
 #include "mprpc/transport/udp/udp.h"
 
+#include "fmt/core.h"
 #include "mprpc/exception.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/transport/udp/impl/udp_acceptor.h"
 #include "mprpc/transport/udp/impl/udp_connector.h"
@@ -28,8 +30,8 @@ namespace mprpc {
 namespace transport {
 namespace udp {
 
-std::shared_ptr<acceptor> create_udp_acceptor(logging::labeled_logger logger,
-    thread_pool& threads,
+std::shared_ptr<acceptor> create_udp_acceptor(
+    const logging::labeled_logger& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const udp_acceptor_config& config) {
@@ -45,10 +47,12 @@ std::shared_ptr<acceptor> create_udp_acceptor(logging::labeled_logger logger,
     const auto endpoint = asio::ip::udp::endpoint(ip_address_parsed, port);
     try {
         auto socket = asio::ip::udp::socket(threads.context(), endpoint);
-        auto acceptor =
-            std::make_shared<impl::udp_acceptor>(logger, std::move(socket),
-                threads.context(), comp_factory->create_compressor(logger),
-                parser_factory_ptr->create_parser(logger), config);
+        const auto acceptor_logger = logging::labeled_logger(
+            logger, fmt::format("udp({})", endpoint.port()));
+        auto acceptor = std::make_shared<impl::udp_acceptor>(acceptor_logger,
+            std::move(socket), threads.context(),
+            comp_factory->create_compressor(acceptor_logger),
+            parser_factory_ptr->create_parser(acceptor_logger), config);
         MPRPC_INFO(logger, "server started");
         return acceptor;
     } catch (const std::system_error& e) {
@@ -58,8 +62,8 @@ std::shared_ptr<acceptor> create_udp_acceptor(logging::labeled_logger logger,
     }
 }
 
-std::shared_ptr<connector> create_udp_connector(logging::labeled_logger logger,
-    thread_pool& threads,
+std::shared_ptr<connector> create_udp_connector(
+    const logging::labeled_logger& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const udp_connector_config& config) {
@@ -92,9 +96,12 @@ std::shared_ptr<connector> create_udp_connector(logging::labeled_logger logger,
     MPRPC_DEBUG(logger, "send UDP packets from {} to {}",
         socket.local_endpoint(), endpoint);
 
-    return std::make_shared<impl::udp_connector>(logger, std::move(socket),
-        endpoint, threads.context(), comp_factory->create_compressor(logger),
-        parser_factory_ptr->create_parser(logger), config);
+    const auto connector_logger = logging::labeled_logger(
+        logger, fmt::format("udp({})", socket.local_endpoint().port()));
+    return std::make_shared<impl::udp_connector>(connector_logger,
+        std::move(socket), endpoint, threads.context(),
+        comp_factory->create_compressor(connector_logger),
+        parser_factory_ptr->create_parser(connector_logger), config);
 }
 
 }  // namespace udp

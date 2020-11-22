@@ -22,6 +22,7 @@
 #include <zstd.h>
 
 #include "mprpc/buffer.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/transport/parser.h"
 #include "mprpc/transport/parsers/impl/msgpack_parser_impl.h"
@@ -42,7 +43,7 @@ public:
      * \param logger logger
      */
     explicit zstd_parser(logging::labeled_logger logger)
-        : logger_(std::move(logger)) {
+        : logger_(std::move(logger), "zstd_parser") {
         context_ = ZSTD_createDCtx();
     }
 
@@ -100,7 +101,9 @@ public:
      * \param logger logger
      */
     explicit zstd_streaming_parser(const logging::labeled_logger& logger)
-        : logger_(logger), msgpack_parser_(logger) {
+        : logger_(logger, "zstd_streaming_parser"),
+          msgpack_parser_(
+              logging::labeled_logger(logger, "zstd_streaming_parser")) {
         context_ = ZSTD_createDCtx();
         input_ = ZSTD_inBuffer{buffer_.data(), 0, 0};
     }

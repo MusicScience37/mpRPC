@@ -47,7 +47,7 @@ public:
     simple_method_server(logging::labeled_logger logger,
         mprpc::thread_pool& threads,
         const std::vector<std::shared_ptr<method_executor>>& methods)
-        : logger_(std::move(logger)), threads_(threads) {
+        : logger_(std::move(logger), "method_server"), threads_(threads) {
         for (const auto& method : methods) {
             methods_.emplace(method->name(), method);
         }

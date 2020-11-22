@@ -65,7 +65,7 @@ public:
      * \param logger logger
      */
     explicit msgpack_streaming_parser(logging::labeled_logger logger)
-        : logger_(std::move(logger)) {}
+        : logger_(std::move(logger), "msgpack_streaming_parser") {}
 
     //! \copydoc mprpc::transport::streaming_parser::prepare_buffer
     void prepare_buffer(std::size_t size) override {

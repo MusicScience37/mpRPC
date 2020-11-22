@@ -67,7 +67,7 @@ public:
      */
     function_method_executor(logging::labeled_logger logger, std::string name,
         function_type function)
-        : logger_(std::move(logger)),
+        : logger_(std::move(logger), fmt::format("method({})", name)),
           name_(std::move(name)),
           function_(std::move(function)) {}
 
@@ -160,7 +160,7 @@ public:
      */
     function_method_executor(logging::labeled_logger logger, std::string name,
         function_type function)
-        : logger_(std::move(logger)),
+        : logger_(std::move(logger), fmt::format("method({})", name)),
           name_(std::move(name)),
           function_(std::move(function)) {}
 
