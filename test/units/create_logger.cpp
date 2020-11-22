@@ -24,7 +24,7 @@
 std::shared_ptr<mprpc::logging::logger> create_logger_impl() {
     constexpr std::size_t max_file_size = 1024 * 1024;
     constexpr std::size_t max_files = 5;
-    const auto logger = mprpc::logging::create_file_logger("mprpc_test_units",
+    auto logger = mprpc::logging::create_file_logger("mprpc_test_units",
         "mprpc_test_units.log", mprpc::logging::log_level::trace, max_file_size,
         max_files, true);
 
