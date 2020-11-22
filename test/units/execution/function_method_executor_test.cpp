@@ -24,7 +24,7 @@
 #include "../create_logger.h"
 
 TEST_CASE("mprpc::execution::function_method_executor") {
-    auto logger =
+    const auto logger =
         create_logger("mprpc::execution::function_method_executor");
 
     SECTION("request to function with one parameter and result") {

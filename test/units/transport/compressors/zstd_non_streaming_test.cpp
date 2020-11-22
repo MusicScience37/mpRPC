@@ -27,7 +27,7 @@
 #include "mprpc/transport/parsers/zstd_parser.h"
 
 TEST_CASE("mprpc::transport::zstd without streaming") {
-    auto logger =
+    const auto logger =
         create_logger("mprpc::transport::zstd without streaming");
 
     mprpc::transport::compression_config compressor_config;

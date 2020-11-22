@@ -25,7 +25,7 @@
 #include "mprpc/server_builder.h"
 
 TEST_CASE("mprpc::client_builder") {
-    auto logger = create_logger("mprpc::client_builder");
+    const auto logger = create_logger("mprpc::client_builder");
 
     const auto host = std::string("127.0.0.1");
     constexpr std::uint16_t port = 3780;

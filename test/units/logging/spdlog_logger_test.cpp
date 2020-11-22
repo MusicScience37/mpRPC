@@ -57,7 +57,7 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
         std::ostringstream stream;
         auto spdlog_logger = spdlog::synchronous_factory::template create<
             spdlog::sinks::ostream_sink_mt>("test_spdlog_logger", stream);
-        auto logger = std::make_shared<mprpc::logging::impl::spdlog_logger>(
+        const auto logger = std::make_shared<mprpc::logging::impl::spdlog_logger>(
             spdlog_logger, mprpc::logging::log_level::info);
 
         test_mprpc_log(logger);
@@ -82,7 +82,7 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
         auto spdlog_logger = spdlog::synchronous_factory::template create<
             spdlog::sinks::ostream_sink_mt>(
             "test_spdlog_logger_log_level", stream);
-        auto logger = std::make_shared<mprpc::logging::impl::spdlog_logger>(
+        const auto logger = std::make_shared<mprpc::logging::impl::spdlog_logger>(
             spdlog_logger, log_level::trace);
 
         stream.str("");

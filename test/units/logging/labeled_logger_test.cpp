@@ -67,7 +67,7 @@ public:
 
 TEST_CASE("mprpc::logging::labeled_logger") {
     SECTION("check label") {
-        auto logger =
+        const auto logger =
             std::make_shared<test_logger>(mprpc::logging::log_level::info);
         auto labeled_logger = mprpc::logging::labeled_logger(logger);
 

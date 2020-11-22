@@ -31,7 +31,7 @@
 #include "mprpc/logging/logging_macros.h"
 
 TEST_CASE("mprpc::thread_pool") {
-    auto logger = create_logger("mprpc::thread_pool");
+    const auto logger = create_logger("mprpc::thread_pool");
 
     std::atomic<int> error_count{0};
     auto on_error = [&error_count](

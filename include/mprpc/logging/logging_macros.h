@@ -135,7 +135,7 @@ inline void write(const std::shared_ptr<logger>& l, const char* filename,
  * \param data data
  */
 template <typename Format, typename... Data>
-inline void write(labeled_logger& l, const char* filename, std::uint32_t line,
+inline void write(const labeled_logger& l, const char* filename, std::uint32_t line,
     const char* function, log_level level, Format&& format,
     Data&&... data) noexcept {
     l.write(filename, line, function, level, std::forward<Format>(format),

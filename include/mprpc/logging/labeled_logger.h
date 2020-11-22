@@ -72,7 +72,7 @@ public:
      */
     template <typename Format, typename... Data>
     void write(const char* filename, std::uint32_t line, const char* function,
-        log_level level, Format&& format, Data&&... data) noexcept {
+        log_level level, Format&& format, Data&&... data) const noexcept {
         if (label_.empty()) {
             logger_->write(filename, line, function, level,
                 std::forward<Format>(format), std::forward<Data>(data)...);

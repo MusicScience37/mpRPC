@@ -28,7 +28,7 @@
 #include "mprpc/transport/mock/mock_session.h"
 
 static void echo_exec(benchmark::State& state) {
-    static auto logger = mprpc::logging::labeled_logger(
+    static const auto logger = mprpc::logging::labeled_logger(
         mprpc::logging::create_stdout_logger(mprpc::logging::log_level::warn));
 
     const auto size = static_cast<std::size_t>(state.range());

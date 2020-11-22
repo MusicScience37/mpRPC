@@ -26,7 +26,7 @@
 #include "mprpc/pack_data.h"
 
 TEST_CASE("mprpc::typed_response_future") {
-    auto logger = create_logger("mprpc::response_promise");
+    const auto logger = create_logger("mprpc::response_promise");
 
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 1);
     threads->start();
@@ -172,7 +172,7 @@ TEST_CASE("mprpc::typed_response_future") {
 }
 
 TEST_CASE("mprpc::typed_response_future<void>") {
-    auto logger = create_logger("mprpc::response_promise<void>");
+    const auto logger = create_logger("mprpc::response_promise<void>");
 
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 1);
     threads->start();

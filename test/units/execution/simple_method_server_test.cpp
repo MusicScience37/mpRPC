@@ -28,7 +28,7 @@
 #include "mprpc/transport/mock/mock_session.h"
 
 TEST_CASE("mprpc::execution::simple_method_server") {
-    auto logger = create_logger("mprpc::execution::simple_method_server");
+    const auto logger = create_logger("mprpc::execution::simple_method_server");
 
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 2);
     threads->start();
