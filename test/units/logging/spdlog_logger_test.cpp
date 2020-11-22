@@ -57,8 +57,9 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
         std::ostringstream stream;
         auto spdlog_logger = spdlog::synchronous_factory::template create<
             spdlog::sinks::ostream_sink_mt>("test_spdlog_logger", stream);
-        const auto logger = std::make_shared<mprpc::logging::impl::spdlog_logger>(
-            spdlog_logger, mprpc::logging::log_level::info);
+        const auto logger =
+            std::make_shared<mprpc::logging::impl::spdlog_logger>(
+                spdlog_logger, mprpc::logging::log_level::info);
 
         test_mprpc_log(logger);
         auto log = remove_line_feed(stream.str());
@@ -82,8 +83,9 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
         auto spdlog_logger = spdlog::synchronous_factory::template create<
             spdlog::sinks::ostream_sink_mt>(
             "test_spdlog_logger_log_level", stream);
-        const auto logger = std::make_shared<mprpc::logging::impl::spdlog_logger>(
-            spdlog_logger, log_level::trace);
+        const auto logger =
+            std::make_shared<mprpc::logging::impl::spdlog_logger>(
+                spdlog_logger, log_level::trace);
 
         stream.str("");
         logger->write(log_level::trace, "message");
@@ -124,9 +126,8 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
 
     SECTION("create logger to write to file") {
         std::shared_ptr<mprpc::logging::logger> logger;
-        REQUIRE_NOTHROW(
-            logger = mprpc::logging::create_file_logger(
-                "test_spdlog_logger_file", "test_spdlog_logger.log"));
+        REQUIRE_NOTHROW(logger = mprpc::logging::create_file_logger(
+                            "test_spdlog_logger.log"));
 
         logger->write(mprpc::logging::log_level::error, "testing logger");
     }

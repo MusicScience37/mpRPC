@@ -94,8 +94,8 @@ int main(int argc, char* argv[]) {
         if (filename.empty()) {
             logger = mprpc::logging::create_stdout_logger(log_output_level);
         } else {
-            logger = mprpc::logging::create_file_logger(
-                "test_logger", filename, log_output_level);
+            logger =
+                mprpc::logging::create_file_logger(filename, log_output_level);
         }
 
         write_with_log_levels(logger);

@@ -27,9 +27,9 @@
 TEST_CASE("RPC on TCP") {
     static constexpr std::size_t max_file_size = 1024 * 1024;
     static constexpr std::size_t max_files = 5;
-    static const auto logger = mprpc::logging::create_file_logger(
-        "mprpc_test_integ_tcp", "mprpc_test_integ_tcp_udp.log",
-        mprpc::logging::log_level::trace, max_file_size, max_files, true);
+    static const auto logger =
+        mprpc::logging::create_file_logger("mprpc_test_integ_tcp_udp.log",
+            mprpc::logging::log_level::trace, max_file_size, max_files, true);
 
     auto server = mprpc::server_builder(logger)
                       .num_threads(2)

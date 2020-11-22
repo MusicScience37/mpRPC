@@ -34,7 +34,6 @@ static constexpr std::size_t default_max_files = 10;
 /*!
  * \brief create logger to write logs to files
  *
- * \param logger_name name of logger (unique in process)
  * \param base_filename base file name
  * \param log_output_level log output level
  * \param max_file_size maximum size of a file
@@ -43,7 +42,7 @@ static constexpr std::size_t default_max_files = 10;
  * \return logger
  */
 MPRPC_EXPORT std::shared_ptr<logger> create_file_logger(
-    const std::string& logger_name, const std::string& base_filename,
+    const std::string& base_filename,
     log_level log_output_level = log_level::warn,
     std::size_t max_file_size = default_max_file_size,
     std::size_t max_files = default_max_files, bool rotate_on_open = false);

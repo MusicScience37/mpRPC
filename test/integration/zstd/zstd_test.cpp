@@ -32,9 +32,9 @@ namespace {
 auto create_logger() {
     static constexpr std::size_t max_file_size = 1024 * 1024;
     static constexpr std::size_t max_files = 5;
-    static const auto logger = mprpc::logging::create_file_logger(
-        "mprpc_test_integ_zstd", "mprpc_test_integ_zstd.log",
-        mprpc::logging::log_level::trace, max_file_size, max_files, true);
+    static const auto logger =
+        mprpc::logging::create_file_logger("mprpc_test_integ_zstd.log",
+            mprpc::logging::log_level::trace, max_file_size, max_files, true);
     return logger;
 }
 
