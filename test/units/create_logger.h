@@ -19,7 +19,7 @@
  */
 #include <string>
 
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 
 /*!
  * \brief create logger for unit tests
@@ -28,5 +28,4 @@
  *
  * \return logger
  */
-std::shared_ptr<mprpc::logging::logger> create_logger(
-    const std::string& test_name);
+mprpc::logging::labeled_logger create_logger(const std::string& test_name);

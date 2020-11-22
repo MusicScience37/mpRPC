@@ -21,7 +21,7 @@
 
 #include <memory>
 
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/mprpc_export.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
@@ -46,7 +46,7 @@ namespace tcp {
  * \return TCP acceptor
  */
 MPRPC_EXPORT std::shared_ptr<acceptor> create_tcp_acceptor(
-    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
+    const logging::labeled_logger& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const tcp_acceptor_config& config);
@@ -62,7 +62,7 @@ MPRPC_EXPORT std::shared_ptr<acceptor> create_tcp_acceptor(
  * \return TCP connector
  */
 MPRPC_EXPORT std::shared_ptr<connector> create_tcp_connector(
-    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
+    const logging::labeled_logger& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const tcp_connector_config& config);

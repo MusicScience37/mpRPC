@@ -26,12 +26,12 @@ namespace transport {
 namespace compressors {
 
 std::unique_ptr<compressor> create_zstd_compressor(
-    std::shared_ptr<logging::logger> logger, compression_config config) {
+    logging::labeled_logger logger, compression_config config) {
     return std::make_unique<impl::zstd_compressor>(std::move(logger), config);
 }
 
 std::unique_ptr<streaming_compressor> create_zstd_streaming_compressor(
-    std::shared_ptr<logging::logger> logger, compression_config config) {
+    logging::labeled_logger logger, compression_config config) {
     return std::make_unique<impl::zstd_streaming_compressor>(
         std::move(logger), config);
 }

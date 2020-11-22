@@ -52,7 +52,7 @@ struct thread_pool::impl {
     on_error_handler_type on_error;
 
     //! logger
-    std::shared_ptr<logging::logger> logger;
+    logging::labeled_logger logger;
 
     /*!
      * \brief construct
@@ -64,11 +64,28 @@ struct thread_pool::impl {
         : context(static_cast<int>(num_threads_in)),
           work_guard(asio::make_work_guard(context)),
           num_threads(num_threads_in),
-          logger(std::move(logger_in)) {}
+          logger(std::move(logger_in), "mprpc.thread_pool") {}
+
+    /*!
+     * \brief construct
+     *
+     * \param logger_in logger
+     * \param num_threads_in number of threads
+     */
+    impl(logging::labeled_logger logger_in, std::size_t num_threads_in)
+        : context(static_cast<int>(num_threads_in)),
+          work_guard(asio::make_work_guard(context)),
+          num_threads(num_threads_in),
+          logger(std::move(logger_in), "thread_pool") {}
 };
 
 thread_pool::thread_pool(
     std::shared_ptr<logging::logger> logger, std::size_t num_threads)
+    // NOLINTNEXTLINE: required to export this class on MSVC
+    : impl_(new impl(std::move(logger), num_threads)) {}
+
+thread_pool::thread_pool(
+    logging::labeled_logger logger, std::size_t num_threads)
     // NOLINTNEXTLINE: required to export this class on MSVC
     : impl_(new impl(std::move(logger), num_threads)) {}
 

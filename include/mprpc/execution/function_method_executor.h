@@ -24,7 +24,7 @@
 #include <utility>
 
 #include "mprpc/execution/method_executor.h"
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/pack_data.h"
 
@@ -65,9 +65,9 @@ public:
      * \param name method name
      * \param function function
      */
-    function_method_executor(std::shared_ptr<logging::logger> logger,
-        std::string name, function_type function)
-        : logger_(std::move(logger)),
+    function_method_executor(logging::labeled_logger logger, std::string name,
+        function_type function)
+        : logger_(std::move(logger), fmt::format("method({})", name)),
           name_(std::move(name)),
           function_(std::move(function)) {}
 
@@ -125,7 +125,7 @@ private:
     }
 
     //! logger
-    std::shared_ptr<logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! method name
     std::string name_;
@@ -158,9 +158,9 @@ public:
      * \param name method name
      * \param function function
      */
-    function_method_executor(std::shared_ptr<logging::logger> logger,
-        std::string name, function_type function)
-        : logger_(std::move(logger)),
+    function_method_executor(logging::labeled_logger logger, std::string name,
+        function_type function)
+        : logger_(std::move(logger), fmt::format("method({})", name)),
           name_(std::move(name)),
           function_(std::move(function)) {}
 
@@ -217,7 +217,7 @@ private:
     }
 
     //! logger
-    std::shared_ptr<logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! method name
     std::string name_;
@@ -238,8 +238,8 @@ private:
  */
 template <typename FunctionSignature, typename Function>
 inline std::shared_ptr<function_method_executor<Function, FunctionSignature>>
-make_function_method_executor(std::shared_ptr<logging::logger> logger,
-    std::string name, Function&& function) {
+make_function_method_executor(
+    logging::labeled_logger logger, std::string name, Function&& function) {
     return std::make_shared<
         function_method_executor<Function, FunctionSignature>>(
         std::move(logger), std::move(name), std::forward<Function>(function));

@@ -25,7 +25,7 @@
 
 #include "mprpc/error_info.h"
 #include "mprpc/execution/method_server.h"
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/server_config.h"
 #include "mprpc/thread_pool.h"
@@ -47,7 +47,7 @@ public:
      * \param method_server method server
      * \param config configuration
      */
-    server(std::shared_ptr<mprpc::logging::logger> logger,
+    server(logging::labeled_logger logger,
         std::shared_ptr<mprpc::thread_pool> threads,
         std::vector<std::shared_ptr<transport::acceptor>> acceptors,
         std::shared_ptr<execution::method_server> method_server,
@@ -209,7 +209,7 @@ private:
     }
 
     //! logger
-    std::shared_ptr<mprpc::logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! thread pool
     std::shared_ptr<mprpc::thread_pool> threads_;

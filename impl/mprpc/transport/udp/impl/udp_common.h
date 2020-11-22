@@ -27,7 +27,7 @@
 #include <asio/strand.hpp>
 #include <stl_ext/shared_function.h>
 
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/asio_helper/basic_endpoint.h"
@@ -65,10 +65,9 @@ public:
      * \param parser_ptr parser
      * \param config configuration
      */
-    udp_common(std::shared_ptr<logging::logger> logger,
-        asio::ip::udp::socket socket, asio::io_context& io_context,
-        std::shared_ptr<compressor> comp, std::shared_ptr<parser> parser_ptr,
-        const udp_common_config& config)
+    udp_common(logging::labeled_logger logger, asio::ip::udp::socket socket,
+        asio::io_context& io_context, std::shared_ptr<compressor> comp,
+        std::shared_ptr<parser> parser_ptr, const udp_common_config& config)
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
           strand_(asio::make_strand(io_context)),
@@ -235,7 +234,7 @@ private:
     }
 
     //! logger
-    std::shared_ptr<logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! socket
     asio::ip::udp::socket socket_;

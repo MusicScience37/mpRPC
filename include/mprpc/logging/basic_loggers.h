@@ -44,7 +44,7 @@ static constexpr std::size_t default_max_files = 10;
  */
 MPRPC_EXPORT std::shared_ptr<logger> create_file_logger(
     const std::string& logger_name, const std::string& base_filename,
-    log_level log_output_level = log_level::info,
+    log_level log_output_level = log_level::warn,
     std::size_t max_file_size = default_max_file_size,
     std::size_t max_files = default_max_files, bool rotate_on_open = false);
 
@@ -55,7 +55,7 @@ MPRPC_EXPORT std::shared_ptr<logger> create_file_logger(
  * \return logger
  */
 MPRPC_EXPORT std::shared_ptr<logger> create_stdout_logger(
-    log_level log_output_level = log_level::info);
+    log_level log_output_level = log_level::warn);
 
 }  // namespace logging
 }  // namespace mprpc

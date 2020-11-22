@@ -22,7 +22,6 @@
 #include <msgpack.hpp>
 
 #include "mprpc/buffer.h"
-#include "mprpc/logging/logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/transport/parser.h"
 
@@ -65,8 +64,8 @@ public:
      *
      * \param logger logger
      */
-    explicit msgpack_streaming_parser(std::shared_ptr<logging::logger> logger)
-        : logger_(std::move(logger)) {}
+    explicit msgpack_streaming_parser(logging::labeled_logger logger)
+        : logger_(std::move(logger), "msgpack_streaming_parser") {}
 
     //! \copydoc mprpc::transport::streaming_parser::prepare_buffer
     void prepare_buffer(std::size_t size) override {
@@ -129,7 +128,7 @@ private:
     };
 
     //! logger
-    std::shared_ptr<logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! buffer
     mprpc::buffer buffer_{};

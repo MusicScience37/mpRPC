@@ -24,7 +24,7 @@
 #include <unordered_map>
 
 #include "mprpc/client_config.h"
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/pack_data.h"
 #include "mprpc/thread_pool.h"
@@ -46,8 +46,7 @@ public:
      * \param connector connector
      * \param config configuration
      */
-    client(std::shared_ptr<logging::logger> logger,
-        std::shared_ptr<thread_pool> threads,
+    client(logging::labeled_logger logger, std::shared_ptr<thread_pool> threads,
         std::shared_ptr<transport::connector> connector, client_config config)
         : logger_(std::move(logger)),
           threads_(std::move(threads)),
@@ -227,7 +226,7 @@ private:
     }
 
     //! logger
-    std::shared_ptr<logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! thread pool
     std::shared_ptr<thread_pool> threads_;
