@@ -57,8 +57,9 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
         std::ostringstream stream;
         auto spdlog_logger = spdlog::synchronous_factory::template create<
             spdlog::sinks::ostream_sink_mt>("test_spdlog_logger", stream);
-        const auto logger = std::make_shared<mprpc::logging::impl::spdlog_logger>(
-            spdlog_logger, mprpc::logging::log_level::info);
+        const auto logger =
+            std::make_shared<mprpc::logging::impl::spdlog_logger>(
+                spdlog_logger, mprpc::logging::log_level::info);
 
         test_mprpc_log(logger);
         auto log = remove_line_feed(stream.str());
@@ -73,7 +74,7 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
         REQUIRE_THAT(log,
             Catch::Matchers::Matches(
                 R"***(\[\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
-                R"***(\[error\] \(thread \d*\) message)***"));
+                R"***(\[error\] \(thread \d*\) message \(:\))***"));
     }
 
     SECTION("log level string") {
@@ -82,8 +83,9 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
         auto spdlog_logger = spdlog::synchronous_factory::template create<
             spdlog::sinks::ostream_sink_mt>(
             "test_spdlog_logger_log_level", stream);
-        const auto logger = std::make_shared<mprpc::logging::impl::spdlog_logger>(
-            spdlog_logger, log_level::trace);
+        const auto logger =
+            std::make_shared<mprpc::logging::impl::spdlog_logger>(
+                spdlog_logger, log_level::trace);
 
         stream.str("");
         logger->write(log_level::trace, "message");
