@@ -22,6 +22,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 
+#include "mprpc/logging/labeled_logger.h"
+
 namespace {
 
 // NOLINTNEXTLINE
@@ -84,7 +86,7 @@ TEST_CASE("logging macros in mpRPC") {
             test_func_name(), Catch::Matchers::Contains("test_func_name"));
     }
 
-    SECTION("macro to write log") {
+    SECTION("macro to write log with logger class") {
         using mprpc::logging::log_level;
         test_logger logger(log_level::trace);
 
@@ -119,5 +121,17 @@ TEST_CASE("logging macros in mpRPC") {
         MPRPC_FATAL(&logger, "test");
         REQUIRE(logger.level == log_level::fatal);
         REQUIRE(logger.message == "test");
+    }
+
+    SECTION("macro to write log with labeled_logger class") {
+        using mprpc::logging::log_level;
+        test_logger logger(log_level::trace);
+        const auto base_logger =
+            std::make_shared<test_logger>(log_level::trace);
+        mprpc::logging::labeled_logger labeled_logger{base_logger};
+        labeled_logger.add_level("mprpc_test");
+
+        MPRPC_INFO(labeled_logger, "test");
+        REQUIRE(base_logger->label == "mprpc_test");
     }
 }
