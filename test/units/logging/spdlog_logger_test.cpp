@@ -74,7 +74,7 @@ TEST_CASE("mprpc::logging::impl::spdlog_logger") {
         REQUIRE_THAT(log,
             Catch::Matchers::Matches(
                 R"***(\[\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\d\d\d\d\] )***"
-                R"***(\[error\] \(thread \d*\) message)***"));
+                R"***(\[error\] \(thread \d*\) message \(:\))***"));
     }
 
     SECTION("log level string") {

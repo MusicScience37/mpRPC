@@ -23,6 +23,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "mprpc/logging/logger.h"
+#include "spdlog/common.h"
 
 namespace mprpc {
 namespace logging {
@@ -131,7 +132,8 @@ public:
 
         auto formatter = std::make_unique<spdlog::pattern_formatter>();
         formatter->add_flag<impl::log_level_flag>('k');
-        formatter->set_pattern("[%Y-%m-%dT%H:%M:%S.%f] %^%k%$ (thread %t) %v");
+        formatter->set_pattern(
+            "[%Y-%m-%dT%H:%M:%S.%f] %^%k%$ (thread %t) %v (%s:%#)");
         spdlog_logger_->set_formatter(std::move(formatter));
     }
 
@@ -141,16 +143,16 @@ public:
      * \param label label
      * \param filename file name
      * \param line line number
+     * \param function function name
      * \param level log level
      * \param message log message
      */
     void write_impl(const char* label, const char* filename, std::uint32_t line,
-        const char* /*function*/, log_level level,
+        const char* function, log_level level,
         const char* message) noexcept final {
-        write_impl(level,
-            fmt::format(
-                FMT_STRING("[{}] {} ({}:{})"), label, message, filename, line)
-                .c_str());
+        spdlog_logger_->log(spdlog::source_loc(filename, line, function),
+            impl::convert_log_level_to_spdlog(level), "[{}] {}", label,
+            message);
     }
 
     /*!
@@ -158,15 +160,15 @@ public:
      *
      * \param filename file name
      * \param line line number
+     * \param function function name
      * \param level log level
      * \param message log message
      */
     void write_impl(const char* filename, std::uint32_t line,
-        const char* /*function*/, log_level level,
+        const char* function, log_level level,
         const char* message) noexcept final {
-        write_impl(level,
-            fmt::format(FMT_STRING("{} ({}:{})"), message, filename, line)
-                .c_str());
+        spdlog_logger_->log(spdlog::source_loc(filename, line, function),
+            impl::convert_log_level_to_spdlog(level), message);
     }
 
     /*!
