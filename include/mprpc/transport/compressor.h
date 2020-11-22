@@ -22,7 +22,7 @@
 #include <memory>
 
 #include "mprpc/exception.h"
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/message_data.h"
 #include "mprpc/shared_binary.h"
 
@@ -96,7 +96,7 @@ public:
      * \return compressor
      */
     virtual std::unique_ptr<compressor> create_compressor(
-        std::shared_ptr<logging::logger> logger) = 0;
+        logging::labeled_logger logger) = 0;
 
     /*!
      * \brief create a compressor with streaming
@@ -105,7 +105,7 @@ public:
      * \return compressor
      */
     virtual std::unique_ptr<streaming_compressor> create_streaming_compressor(
-        std::shared_ptr<logging::logger> logger) = 0;
+        logging::labeled_logger logger) = 0;
 
     //! construct
     compressor_factory() noexcept = default;

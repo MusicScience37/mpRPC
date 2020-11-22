@@ -24,11 +24,12 @@
 #include "mprpc/execution/simple_method_server.h"
 #include "mprpc/generate_string.h"
 #include "mprpc/logging/basic_loggers.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/transport/mock/mock_session.h"
 
 static void echo_exec(benchmark::State& state) {
-    static const auto logger =
-        mprpc::logging::create_stdout_logger(mprpc::logging::log_level::warn);
+    static auto logger = mprpc::logging::labeled_logger(
+        mprpc::logging::create_stdout_logger(mprpc::logging::log_level::warn));
 
     const auto size = static_cast<std::size_t>(state.range());
     const auto data = mprpc::generate_string(size);

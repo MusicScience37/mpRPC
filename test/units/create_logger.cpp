@@ -34,8 +34,7 @@ std::shared_ptr<mprpc::logging::logger> create_logger_impl() {
     return logger;
 }
 
-std::shared_ptr<mprpc::logging::logger> create_logger(
-    const std::string& test_name) {
+mprpc::logging::labeled_logger create_logger(const std::string& test_name) {
     static auto logger = create_logger_impl();
 
     constexpr auto info_level = mprpc::logging::log_level::info;
@@ -44,5 +43,5 @@ std::shared_ptr<mprpc::logging::logger> create_logger(
     logger->write(info_level, line);
     logger->write(info_level, "starting test {}", test_name);
 
-    return logger;
+    return mprpc::logging::labeled_logger(logger, "mprpc_test");
 }

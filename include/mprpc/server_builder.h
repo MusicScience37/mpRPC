@@ -27,6 +27,8 @@
 #include "mprpc/execution/function_method_executor.h"
 #include "mprpc/execution/simple_method_server.h"
 #include "mprpc/logging/basic_loggers.h"
+#include "mprpc/logging/labeled_logger.h"
+#include "mprpc/logging/logger.h"
 #include "mprpc/server.h"
 #include "mprpc/transport.h"
 #include "mprpc/transport/compression_config.h"
@@ -51,6 +53,14 @@ public:
      * \param logger logger
      */
     explicit server_builder(std::shared_ptr<mprpc::logging::logger> logger)
+        : logger_(std::move(logger)) {}
+
+    /*!
+     * \brief construct
+     *
+     * \param logger logger
+     */
+    explicit server_builder(logging::labeled_logger logger)
         : logger_(std::move(logger)) {}
 
     /*!
@@ -212,7 +222,7 @@ public:
 
 private:
     //! logger
-    std::shared_ptr<mprpc::logging::logger> logger_{
+    logging::labeled_logger logger_{
         logging::create_stdout_logger(mprpc::logging::log_level::info)};
 
     //! server configuration

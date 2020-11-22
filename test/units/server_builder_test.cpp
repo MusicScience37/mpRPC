@@ -29,7 +29,7 @@
 #include "mprpc/transport/tcp/tcp_connector_config.h"
 
 TEST_CASE("mprpc::server_builder") {
-    const auto logger = create_logger("mprpc::server_builder");
+    auto logger = create_logger("mprpc::server_builder");
 
     SECTION("create a server") {
         const auto host = std::string("127.0.0.1");

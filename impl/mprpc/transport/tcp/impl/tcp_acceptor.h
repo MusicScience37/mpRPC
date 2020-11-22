@@ -26,7 +26,7 @@
 
 #include "mprpc/error_info.h"
 #include "mprpc/exception.h"
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
@@ -55,7 +55,7 @@ public:
      * \param parser_factory_ptr factory of parsers
      * \param config configuration
      */
-    tcp_acceptor(std::shared_ptr<mprpc::logging::logger> logger,
+    tcp_acceptor(logging::labeled_logger logger,
         const asio::ip::tcp::endpoint& endpoint, asio::io_context& io_context,
         std::shared_ptr<compressor_factory> comp_factory,
         std::shared_ptr<parser_factory> parser_factory_ptr,
@@ -121,7 +121,7 @@ public:
 
 private:
     //! logger
-    std::shared_ptr<mprpc::logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! socket
     asio::ip::tcp::acceptor socket_;

@@ -44,7 +44,7 @@ constexpr std::uint16_t port = 3780;
 }  // namespace
 
 TEST_CASE("RPC on UDP using zstd compression") {
-    const auto logger = create_logger();
+    auto logger = create_logger();
 
     constexpr std::size_t line_length = 100;
     logger->write(
@@ -88,7 +88,7 @@ TEST_CASE("RPC on UDP using zstd compression") {
 }
 
 TEST_CASE("RPC on TCP using zstd compression") {
-    const auto logger = create_logger();
+    auto logger = create_logger();
 
     constexpr std::size_t line_length = 100;
     logger->write(

@@ -33,7 +33,7 @@
 #include "mprpc/transport/udp/udp_connector_config.h"
 
 TEST_CASE("mprpc::transport::udp") {
-    const auto logger = create_logger("mprpc::transport::udp");
+    auto logger = create_logger("mprpc::transport::udp");
 
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 2);
     threads->start();

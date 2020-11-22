@@ -29,7 +29,7 @@
 #include "mprpc/transport/mock/mock_acceptor.h"
 
 TEST_CASE("mprpc::server") {
-    const auto logger = create_logger("mprpc::server");
+    auto logger = create_logger("mprpc::server");
 
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 2);
     threads->start();

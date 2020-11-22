@@ -6,6 +6,7 @@
 #include "common.h"
 #include "mprpc/generate_binary_data.h"
 #include "mprpc/logging/basic_loggers.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/compressors/null_compressor.h"
@@ -100,8 +101,8 @@ private:
 };
 
 static void transport_binary_msgpack_tcp(benchmark::State& state) {
-    static const auto logger =
-        mprpc::logging::create_stdout_logger(mprpc::logging::log_level::error);
+    static auto logger = mprpc::logging::labeled_logger(
+        mprpc::logging::create_stdout_logger(mprpc::logging::log_level::error));
 
     constexpr std::size_t num_threads = 2;
     const auto threads =

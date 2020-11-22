@@ -59,14 +59,14 @@ TEST_CASE("mprpc::thread_pool") {
         threads->on_error(on_error);
         threads->start();
 
-        threads->post([logger] {
+        threads->post([&logger] {
             MPRPC_INFO(logger, "throws an exception with mprpc::exception");
             throw mprpc::exception(
                 mprpc::error_info(mprpc::error_code::parse_error,
                     "test of exception in threads"));
         });
 
-        threads->post([logger] {
+        threads->post([&logger] {
             MPRPC_INFO(logger, "throws an exception with std::runtime_error");
             throw std::runtime_error("test of exception in threads");
         });

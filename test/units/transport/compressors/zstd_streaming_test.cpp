@@ -25,7 +25,7 @@
 #include "mprpc/transport/parsers/zstd_parser.h"
 
 TEST_CASE("mprpc::transport::zstd with streaming") {
-    const auto logger = create_logger("mprpc::transport::zstd with streaming");
+    auto logger = create_logger("mprpc::transport::zstd with streaming");
 
     mprpc::transport::compression_config compressor_config;
     const auto compressor = std::make_shared<

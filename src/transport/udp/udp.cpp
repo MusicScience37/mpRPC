@@ -28,8 +28,8 @@ namespace mprpc {
 namespace transport {
 namespace udp {
 
-std::shared_ptr<acceptor> create_udp_acceptor(
-    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
+std::shared_ptr<acceptor> create_udp_acceptor(logging::labeled_logger logger,
+    thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const udp_acceptor_config& config) {
@@ -58,8 +58,8 @@ std::shared_ptr<acceptor> create_udp_acceptor(
     }
 }
 
-std::shared_ptr<connector> create_udp_connector(
-    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
+std::shared_ptr<connector> create_udp_connector(logging::labeled_logger logger,
+    thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const udp_connector_config& config) {

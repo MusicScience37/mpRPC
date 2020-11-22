@@ -25,7 +25,7 @@
 
 #include "mprpc/execution/method_executor.h"
 #include "mprpc/execution/method_server.h"
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/thread_pool.h"
 
@@ -44,7 +44,7 @@ public:
      * \param threads threads
      * \param methods methods
      */
-    simple_method_server(std::shared_ptr<mprpc::logging::logger> logger,
+    simple_method_server(logging::labeled_logger logger,
         mprpc::thread_pool& threads,
         const std::vector<std::shared_ptr<method_executor>>& methods)
         : logger_(std::move(logger)), threads_(threads) {
@@ -129,7 +129,7 @@ private:
     }
 
     //! logger
-    std::shared_ptr<mprpc::logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! thread pool
     mprpc::thread_pool& threads_;

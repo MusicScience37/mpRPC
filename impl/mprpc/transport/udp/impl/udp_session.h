@@ -43,7 +43,7 @@ public:
      * \param endpoint endpoint
      * \param data data
      */
-    udp_session(const std::shared_ptr<logging::logger>& logger,
+    udp_session(logging::labeled_logger& logger,
         std::shared_ptr<udp_common> helper, asio::ip::udp::endpoint endpoint,
         message_data data)
         : helper_(std::move(helper)),

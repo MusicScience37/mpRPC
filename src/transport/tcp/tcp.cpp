@@ -32,8 +32,8 @@ namespace mprpc {
 namespace transport {
 namespace tcp {
 
-std::shared_ptr<acceptor> create_tcp_acceptor(
-    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
+std::shared_ptr<acceptor> create_tcp_acceptor(logging::labeled_logger logger,
+    thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const tcp_acceptor_config& config) {
@@ -51,8 +51,8 @@ std::shared_ptr<acceptor> create_tcp_acceptor(
         threads.context(), comp_factory, parser_factory_ptr, config);
 }
 
-std::shared_ptr<connector> create_tcp_connector(
-    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
+std::shared_ptr<connector> create_tcp_connector(logging::labeled_logger logger,
+    thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const tcp_connector_config& config) {

@@ -33,7 +33,7 @@
 #include "mprpc/transport/tcp/tcp_connector_config.h"
 
 TEST_CASE("mprpc::transport::tcp") {
-    const auto logger = create_logger("mprpc::transport::tcp");
+    auto logger = create_logger("mprpc::transport::tcp");
 
     const auto threads = std::make_shared<mprpc::thread_pool>(logger, 2);
     threads->start();
