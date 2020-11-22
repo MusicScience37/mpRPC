@@ -81,6 +81,8 @@ TEST_CASE("mprpc::logging::labeled_logger") {
         REQUIRE(logger->level == mprpc::logging::log_level::info);
         REQUIRE(logger->message == "contents");
 
+        labeled_logger =
+            mprpc::logging::labeled_logger(labeled_logger, "mprpc");
         labeled_logger.write(
             "test.cpp", 1, "test", mprpc::logging::log_level::info, "contents");
         REQUIRE(logger->label == "mprpc");
