@@ -103,8 +103,16 @@ if(MPRPC_BUILD_DOC
     execute_process(
         COMMAND ${PIPENV_EXECUTABLE} --venv
         WORKING_DIRECTORY ${MPRPC_SOURCE_DIR}
-        OUTPUT_VARIABLE PIPENV_VENV_DIR)
-    string(REGEX REPLACE "\n$" "" PIPENV_VENV_DIR "${PIPENV_VENV_DIR}")
+        OUTPUT_VARIABLE PIPENV_VENV_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(NOT PIPENV_VENV_DIR)
+        # on Windows, this is required
+        execute_process(
+            COMMAND pipenv --venv
+            WORKING_DIRECTORY ${MPRPC_SOURCE_DIR}
+            OUTPUT_VARIABLE PIPENV_VENV_DIR
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
     message(STATUS "Virtualenv location: ${PIPENV_VENV_DIR}")
 endif()
 
@@ -185,9 +193,8 @@ endif()
 if(MPRPC_PYTHON_INTERFACE)
     find_program(
         PYTHON_EXECUTABLE
-        NAMES python3
-        PATHS ${PIPENV_VENV_DIR}/bin ${PIPENV_VENV_DIR}/Scripts
-        NO_DEFAULT_PATH)
+        NAMES python3 python
+        PATHS ${PIPENV_VENV_DIR}/bin ${PIPENV_VENV_DIR}/Scripts NO_DEFAULT_PATH)
     if(NOT PYTHON_EXECUTABLE)
         message(FATAL_ERROR "Python not found for Python interface")
     endif()
