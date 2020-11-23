@@ -88,8 +88,24 @@ add_subdirectory(extern/toml11)
 
 find_package(Threads REQUIRED)
 
-if(MPRPC_BUILD_DOC)
-    add_subdirectory(doc)
+if(MPRPC_BUILD_DOC
+   OR MPRPC_TESTING
+   OR MPRPC_ENABLE_BENCH
+   OR MPRPC_PYTHON_INTERFACE)
+    find_program(PIPENV_EXECUTABLE NAMES pipenv)
+    if(NOT PIPENV_EXECUTABLE)
+        message(
+            FATAL_ERROR
+                "pipenv is required for MPRPC_BUILD_DOC, MPRPC_TESTING, MPRPC_ENABLE_BENCH or MPRPC_PYTHON_INTERFACE"
+        )
+    endif()
+    message(STATUS "Found pipenv: ${PIPENV_EXECUTABLE}")
+    execute_process(
+        COMMAND ${PIPENV_EXECUTABLE} --venv
+        WORKING_DIRECTORY ${MPRPC_SOURCE_DIR}
+        OUTPUT_VARIABLE PIPENV_VENV_DIR)
+    string(REGEX REPLACE "\n$" "" PIPENV_VENV_DIR "${PIPENV_VENV_DIR}")
+    message(STATUS "Virtualenv location: ${PIPENV_VENV_DIR}")
 endif()
 
 add_library(mprpc_pch INTERFACE)
@@ -175,22 +191,6 @@ if(MPRPC_PYTHON_INTERFACE)
     add_subdirectory(python)
 endif()
 
-if(MPRPC_BUILD_DOC
-   OR MPRPC_TESTING
-   OR MPRPC_ENABLE_BENCH
-   OR MPRPC_PYTHON_INTERFACE)
-    find_program(PIPENV_EXECUTABLE NAMES pipenv)
-    if(NOT PIPENV_EXECUTABLE)
-        message(
-            FATAL_ERROR
-                "pipenv is required for MPRPC_BUILD_DOC, MPRPC_TESTING, MPRPC_ENABLE_BENCH or MPRPC_PYTHON_INTERFACE"
-        )
-    endif()
-    message(STATUS "Found pipenv: ${PIPENV_EXECUTABLE}")
-    execute_process(
-        COMMAND ${PIPENV_EXECUTABLE} --venv
-        WORKING_DIRECTORY ${MPRPC_SOURCE_DIR}
-        OUTPUT_VARIABLE PIPENV_VENV_DIR)
-    string(REGEX REPLACE "\n$" "" PIPENV_VENV_DIR "${PIPENV_VENV_DIR}")
-    message(STATUS "Virtualenv location: ${PIPENV_VENV_DIR}")
+if(MPRPC_BUILD_DOC)
+    add_subdirectory(doc)
 endif()
