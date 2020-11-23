@@ -61,7 +61,27 @@ static void add_logging(pybind11::module& module) {
         pybind11::arg("max_file_size") = mprpc::logging::default_max_file_size,
         pybind11::arg("max_files") = mprpc::logging::default_max_files,
         pybind11::arg("rotate_on_open") = false,
-        "create a logger writing to files");
+        R"doc(
+            create a logger writing to files
+
+            Parameters
+            ----------
+            base_filename : str
+              base file name
+            log_output_level : LogLevel
+              log output level
+            max_file_size : int
+              maximum size of a file
+            max_files : int
+              maximum number of files
+            rotate_on_open : bool
+              whether rotate file on opening this logger
+
+            Returns
+            -------
+            Logger
+              logger
+        )doc");
 
     using mprpc::logging::create_stdout_logger;
     module.def("create_stdout_logger", &create_stdout_logger,
