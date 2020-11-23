@@ -217,6 +217,7 @@ doc:
     - pipenv run
       cmake -S ./ -B build_doc
       -DMPRPC_BUILD_DOC:BOOL=ON
+      -DMPRPC_PYTHON_INTERFACE:BOOL=ON
     - cmake --build build_doc --target mprpc_doc
   artifacts:
     paths:
