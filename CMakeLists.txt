@@ -195,7 +195,8 @@ if(MPRPC_PYTHON_INTERFACE)
     find_program(
         PYTHON_EXECUTABLE
         NAMES python3 python
-        PATHS ${PIPENV_VENV_DIR}/bin ${PIPENV_VENV_DIR}/Scripts NO_DEFAULT_PATH)
+        PATHS ${PIPENV_VENV_DIR}/bin ${PIPENV_VENV_DIR}/Scripts
+        NO_DEFAULT_PATH)
     if(NOT PYTHON_EXECUTABLE)
         message(FATAL_ERROR "Python not found for Python interface")
     endif()
