@@ -60,14 +60,19 @@ static void add_logging(pybind11::module& module) {
         pybind11::arg("log_output_level") = log_level::warn,
         pybind11::arg("max_file_size") = mprpc::logging::default_max_file_size,
         pybind11::arg("max_files") = mprpc::logging::default_max_files,
-        pybind11::arg("rotate_on_open") = false);
+        pybind11::arg("rotate_on_open") = false,
+        "create a logger writing to files");
 
     using mprpc::logging::create_stdout_logger;
     module.def("StdoutLogger", &create_stdout_logger,
-        pybind11::arg("log_output_level") = log_level::warn);
+        pybind11::arg("log_output_level") = log_level::warn,
+        "create a logger writing to standard output");
 }
 
 PYBIND11_MODULE(_mprpc_cpp, module) {
+    pybind11::options options;
+    options.disable_function_signatures();
+
     module.doc() = "wrapper of mpRPC C++ library for Python";
 
     add_logging(module);
