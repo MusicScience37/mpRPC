@@ -4,15 +4,15 @@ from _mprpc_cpp import (
     LogLevel,
     Logger,
     PythonLoggerHelper,
-    FileLogger,
-    StdoutLogger,
+    create_file_logger,
+    create_stdout_logger,
 )
 
 for obj in (
     LogLevel,
     Logger,
     PythonLoggerHelper,
-    FileLogger,
-    StdoutLogger,
+    create_file_logger,
+    create_stdout_logger,
 ):
     obj.__module__ = "mprpc.mprpc_cpp"
