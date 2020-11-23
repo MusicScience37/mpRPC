@@ -1,12 +1,6 @@
 add_subdirectory(utils)
 
 option(MPRPC_WRITE_JUNIT "write JUnit XML files in tests" OFF)
-if(MPRPC_WRITE_JUNIT)
-    set(MPRPC_JUNIT_DIR
-        "${CMAKE_BINARY_DIR}/junit"
-        CACHE PATH "directory to which JUnit XML files are outputted" FORCE)
-    file(MAKE_DIRECTORY ${MPRPC_JUNIT_DIR})
-endif()
 
 set(MPRPC_TEMP_TEST_DIR
     "${CMAKE_BINARY_DIR}/temp_test"

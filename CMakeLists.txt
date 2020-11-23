@@ -160,6 +160,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.cmake
                ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
 include(CTest)
 
+set(MPRPC_JUNIT_DIR
+    "${CMAKE_BINARY_DIR}/junit"
+    CACHE PATH "directory to which JUnit XML files are outputted" FORCE)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/junit)
+
 if(MPRPC_TESTING OR MPRPC_ENABLE_BENCH)
     add_subdirectory(extern/Catch2)
     add_subdirectory(test)

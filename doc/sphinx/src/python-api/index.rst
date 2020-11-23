@@ -6,4 +6,4 @@ Python API Reference
     :caption: Contents:
 
     mprpc
-    mprpc.mprpc_cpp
+    mprpc.logging

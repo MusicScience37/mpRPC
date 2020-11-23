@@ -32,13 +32,13 @@ namespace python {
 void bind_logging(pybind11::module& module) {
     using mprpc::logging::log_level;
     pybind11::enum_<log_level>(module, "LogLevel", "enumeration of log levels")
-        .value("trace", log_level::trace, "trace")
-        .value("debug", log_level::debug, "debug")
-        .value("info", log_level::info, "information")
-        .value("warn", log_level::warn, "warning")
-        .value("error", log_level::error, "error")
-        .value("fatal", log_level::fatal, "fatal")
-        .value("none", log_level::none, "none (for log output level)")
+        .value("TRACE", log_level::trace, "trace")
+        .value("DEBUG", log_level::debug, "debug")
+        .value("INFO", log_level::info, "information")
+        .value("WARN", log_level::warn, "warning")
+        .value("ERROR", log_level::error, "error")
+        .value("FATAL", log_level::fatal, "fatal")
+        .value("NONE", log_level::none, "none (for log output level)")
         .export_values();
 
     using mprpc::logging::logger;
