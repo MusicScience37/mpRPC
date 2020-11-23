@@ -6,8 +6,19 @@ An implementation of MessagePack-RPC in C++
 [![coverage report](https://gitlab.com/MusicScience37/mprpc/badges/develop/coverage.svg)](https://gitlab.com/MusicScience37/mprpc/-/commits/develop)
 
 - RPC on TCP and UDP
+- optionally compressed message transport
 - synchronous / asynchronous calls
 - simple API for basic usage
+- Python interface (on development)
+
+## Documentation
+
+Documentation built on develop branch:
+
+- [Documentation built using Sphinx](https://musicscience37.gitlab.io/mprpc/sphinx/)
+  - API reference of C++ and Python
+- [Documentation built using Doxygen](https://musicscience37.gitlab.io/mprpc/doxygen/)
+  - API reference of C++
 
 ## Simple Example
 
@@ -104,10 +115,21 @@ Following compiler is tested by hand frequently:
 
 This project uses [CMake](https://cmake.org/) for building library and tests.
 
-### Python (Optional)
+### Doxygen (for documentation)
 
-This project uses Python in documentation and formatting of CMake scripts.
+This project uses [Doxygen](https://www.doxygen.nl/index.html) for building documentation.
+
+### Python with Pipenv (for Python interface and development of C++ library)
+
+This project uses Python in followings:
+
+- building documentation
+- tests (even for C++ library)
+- benchmarks (even for C++ library)
+- formatting of CMake scripts
+- Python interface of this library
 
 Python packages is managed using [Pipenv](https://pipenv.pypa.io/).
-To prepare environment after installing pipenv,
+To prepare environment for development,
+after installing Pipenv,
 execute command `pipenv install --dev` at this root directory.

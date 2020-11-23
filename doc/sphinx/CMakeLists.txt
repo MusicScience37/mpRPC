@@ -23,3 +23,6 @@ add_custom_target(
     WORKING_DIRECTORY ${MPRPC_SOURCE_DIR})
 
 add_dependencies(mprpc_doc mprpc_doc_sphinx_html)
+if(MPRPC_PYTHON_INTERFACE)
+    add_dependencies(mprpc_doc_sphinx_html mprpc_python_wrapper)
+endif()

@@ -1,0 +1,3 @@
+[MASTER]
+init-hook='import sys; sys.path.append("${CMAKE_CURRENT_SOURCE_DIR}"); sys.path.append("${CMAKE_BINARY_DIR}/bin")'
+extension-pkg-whitelist=_mprpc_cpp

@@ -29,6 +29,8 @@ author = 'MusicScience37'
 
 extensions = [
     'sphinx.ext.todo',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
 ]
 
 templates_path = ['_templates']

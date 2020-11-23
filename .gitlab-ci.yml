@@ -70,6 +70,7 @@ static analysis:
       -DMPRPC_BUILD_EXAMPLE:BOOL=ON
       -DMPRPC_ENABLE_CPP_WARNINGS:BOOL=ON
       -DMPRPC_USE_PCH:BOOL=OFF
+      -DMPRPC_PYTHON_INTERFACE:BOOL=ON
     - cmake --build build_static_analysis
       --target mprpc_clang_tidy
     - scripts/check_clang_tidy.sh build_static_analysis/clang_tidy
@@ -102,6 +103,7 @@ static analysis:
       -DMPRPC_ENABLE_BENCH:BOOL=ON
       -DMPRPC_BENCH_IN_TEST:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
+      -DMPRPC_PYTHON_INTERFACE:BOOL=ON
     - cd $BUILD_DIR
     - ctest -V -M Experimental -T Configure -T Build -T Test -T MemCheck
     - ctest -M Experimental -T Submit
@@ -125,6 +127,7 @@ static analysis:
       -DMPRPC_ENABLE_BENCH:BOOL=ON
       -DMPRPC_BENCH_IN_TEST:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
+      -DMPRPC_PYTHON_INTERFACE:BOOL=ON
     - cd $BUILD_DIR
     - ctest -V -M Experimental -T Configure -T Build -T Test -T MemCheck
     - ctest -M Experimental -T Submit
@@ -217,6 +220,7 @@ doc:
     - pipenv run
       cmake -S ./ -B build_doc
       -DMPRPC_BUILD_DOC:BOOL=ON
+      -DMPRPC_PYTHON_INTERFACE:BOOL=ON
     - cmake --build build_doc --target mprpc_doc
   artifacts:
     paths:
