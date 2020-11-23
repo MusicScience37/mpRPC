@@ -48,11 +48,10 @@ static void add_logging(pybind11::module& module) {
         std::shared_ptr<python_logger_helper>>(module, "PythonLoggerHelper",
         "class of loggers for implementation in Python")
         .def(pybind11::init<
-                 const std::function<void(const std::string&,
-                     const std::string&, std::uint32_t, const std::string&,
-                     log_level, const std::string&)>&,
-                 log_level>(),
-            "construct");
+            const std::function<void(const std::string&, const std::string&,
+                std::uint32_t, const std::string&, log_level,
+                const std::string&)>&,
+            log_level>());
 
     using mprpc::logging::create_file_logger;
     module.def("create_file_logger", &create_file_logger,
@@ -86,7 +85,19 @@ static void add_logging(pybind11::module& module) {
     using mprpc::logging::create_stdout_logger;
     module.def("create_stdout_logger", &create_stdout_logger,
         pybind11::arg("log_output_level") = log_level::warn,
-        "create a logger writing to standard output");
+        R"doc(
+            create a logger writing to standard output
+
+            Parameters
+            ----------
+            log_output_level : LogLevel
+              log output level
+
+            Returns
+            -------
+            Logger
+              logger
+        )doc");
 }
 
 PYBIND11_MODULE(_mprpc_cpp, module) {
