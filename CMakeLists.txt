@@ -107,6 +107,7 @@ if(MPRPC_BUILD_DOC
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(NOT PIPENV_VENV_DIR)
         # on Windows, this is required
+        set(PIPENV_EXECUTABLE pipenv)
         execute_process(
             COMMAND pipenv --venv
             WORKING_DIRECTORY ${MPRPC_SOURCE_DIR}
