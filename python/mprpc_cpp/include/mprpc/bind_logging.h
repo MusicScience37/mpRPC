@@ -15,16 +15,19 @@
  */
 /*!
  * \file
- * \brief implementation of the wrapper of mpRPC C++ library for Python
+ * \brief declaration of bind_logging function
  */
-#include <memory>
-
 #include <pybind11/pybind11.h>
 
-#include "mprpc/bind_logging.h"
+namespace mprpc {
+namespace python {
 
-PYBIND11_MODULE(_mprpc_cpp, module) {
-    module.doc() = "wrapper of mpRPC C++ library for Python";
+/*!
+ * \brief bind logging module
+ *
+ * \param module module
+ */
+void bind_logging(pybind11::module& module);
 
-    mprpc::python::bind_logging(module);
-}
+}  // namespace python
+}  // namespace mprpc
