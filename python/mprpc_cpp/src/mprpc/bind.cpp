@@ -41,7 +41,39 @@ static void add_logging(pybind11::module& module) {
     using mprpc::logging::logger;
     // NOLINTNEXTLINE: no member to export
     pybind11::class_<logger, std::shared_ptr<logger>>(
-        module, "Logger", "base class of loggers");
+        module, "Logger", "base class of loggers")
+        .def(
+            "write",
+            [](const std::shared_ptr<logger>& self, const std::string& label,
+                const std::string& filename, std::uint32_t line,
+                const std::string& function, log_level level,
+                const std::string& message) {
+                self->write(label.c_str(), filename.c_str(), line,
+                    function.c_str(), level, message.c_str());
+            },
+            R"doc(
+            write log
+
+            Parameters
+            ----------
+            label : str
+              label
+            filename : str
+              file name
+            line : int
+              line number
+            function : str
+              function name
+            log_level : LogLevel
+              log level
+            message : str
+              log message
+
+            Returns
+            -------
+            None
+              none
+            )doc");
 
     using mprpc::python::python_logger_helper;
     pybind11::class_<python_logger_helper, logger,
