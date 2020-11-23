@@ -10,6 +10,7 @@ option(MPRPC_BUILD_DOC "build documentation of mpRPC" OFF)
 option(MPRPC_TESTING "enable testing of mpRPC" OFF)
 option(MPRPC_ENABLE_BENCH "enable benchmarks of mpRPC" OFF)
 option(MPRPC_BUILD_EXAMPLE "build examples of mpRPC" OFF)
+option(MPRPC_PYTHON_INTERFACE "enable Python interface of mpRPC" OFF)
 
 set(CMAKE_CXX_STANDARD
     14
@@ -89,12 +90,13 @@ find_package(Threads REQUIRED)
 
 if(MPRPC_BUILD_DOC
    OR MPRPC_TESTING
-   OR MPRPC_ENABLE_BENCH)
+   OR MPRPC_ENABLE_BENCH
+   OR MPRPC_PYTHON_INTERFACE)
     find_program(PIPENV_EXECUTABLE NAMES pipenv)
     if(NOT PIPENV_EXECUTABLE)
         message(
             FATAL_ERROR
-                "pipenv is required for MPRPC_BUILD_DOC, MPRPC_TESTING or MPRPC_ENABLE_BENCH"
+                "pipenv is required for MPRPC_BUILD_DOC, MPRPC_TESTING, MPRPC_ENABLE_BENCH or MPRPC_PYTHON_INTERFACE"
         )
     endif()
     message(STATUS "Found pipenv: ${PIPENV_EXECUTABLE}")
@@ -102,6 +104,7 @@ if(MPRPC_BUILD_DOC
         COMMAND ${PIPENV_EXECUTABLE} --venv
         WORKING_DIRECTORY ${MPRPC_SOURCE_DIR}
         OUTPUT_VARIABLE PIPENV_VENV_DIR)
+    string(REGEX REPLACE "\n$" "" PIPENV_VENV_DIR "${PIPENV_VENV_DIR}")
     message(STATUS "Virtualenv location: ${PIPENV_VENV_DIR}")
 endif()
 
@@ -176,4 +179,18 @@ endif()
 
 if(MPRPC_BUILD_EXAMPLE)
     add_subdirectory(example)
+endif()
+
+if(MPRPC_PYTHON_INTERFACE)
+    find_program(
+        PYTHON_EXECUTABLE
+        NAMES python3
+        PATHS ${PIPENV_VENV_DIR}/bin ${PIPENV_VENV_DIR}/Scripts
+        NO_DEFAULT_PATH)
+    if(NOT PYTHON_EXECUTABLE)
+        message(FATAL_ERROR "Python not found for Python interface")
+    endif()
+    message(STATUS "Found Python: ${PYTHON_EXECUTABLE}")
+    add_subdirectory(extern/pybind11)
+    add_subdirectory(python)
 endif()
