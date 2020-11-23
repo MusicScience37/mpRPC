@@ -1,6 +1,6 @@
-mprpc.mprpc\_cpp module
+mprpc.\_mprpc\_cpp module
 ==============================
 
-.. automodule:: mprpc.mprpc_cpp
+.. automodule:: mprpc._mprpc_cpp
     :members:
     :inherited-members:

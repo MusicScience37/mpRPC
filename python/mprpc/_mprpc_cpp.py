@@ -15,4 +15,5 @@ for obj in (
     create_file_logger,
     create_stdout_logger,
 ):
-    obj.__module__ = "mprpc.mprpc_cpp"
+    obj.__module__ = "mprpc._mprpc_cpp"
+del obj
