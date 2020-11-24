@@ -75,6 +75,11 @@ public:
     std::string message{};
 };
 
+struct macro_test_class {
+    macro_test_class() : result(MPRPC_FUNCTION) {}
+    std::string result;
+};
+
 }  // namespace
 
 TEST_CASE("logging macros in mpRPC") {
@@ -84,6 +89,11 @@ TEST_CASE("logging macros in mpRPC") {
         REQUIRE(MPRPC_LINE == 4);
         REQUIRE_THAT(
             test_func_name(), Catch::Matchers::Contains("test_func_name"));
+    }
+
+    SECTION("function name of constructor") {
+        macro_test_class obj;
+        REQUIRE_THAT(obj.result, Catch::Matchers::Contains("macro_test_class"));
     }
 
     SECTION("macro to write log with logger class") {
