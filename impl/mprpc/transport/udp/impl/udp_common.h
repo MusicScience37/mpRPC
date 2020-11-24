@@ -29,6 +29,7 @@
 
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/asio_helper/basic_endpoint.h"
 #include "mprpc/transport/compressor.h"
@@ -71,8 +72,8 @@ public:
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
           strand_(asio::make_strand(io_context)),
-          compressor_(std::move(comp)),
-          parser_(std::move(parser_ptr)),
+          compressor_(MPRPC_REQUIRE_NONULL_MOVE(comp)),
+          parser_(MPRPC_REQUIRE_NONULL_MOVE(parser_ptr)),
           config_(config) {}
 
     /*!

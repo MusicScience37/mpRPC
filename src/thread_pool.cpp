@@ -31,6 +31,7 @@
 #include "mprpc/error_info.h"
 #include "mprpc/exception.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 
 namespace mprpc {
 
@@ -82,7 +83,7 @@ struct thread_pool::impl {
 thread_pool::thread_pool(
     std::shared_ptr<logging::logger> logger, std::size_t num_threads)
     // NOLINTNEXTLINE: required to export this class on MSVC
-    : impl_(new impl(std::move(logger), num_threads)) {}
+    : impl_(new impl(MPRPC_REQUIRE_NONULL_MOVE(logger), num_threads)) {}
 
 thread_pool::thread_pool(
     logging::labeled_logger logger, std::size_t num_threads)

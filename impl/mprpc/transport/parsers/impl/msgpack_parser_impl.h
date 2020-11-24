@@ -23,6 +23,7 @@
 
 #include "mprpc/buffer.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/transport/parser.h"
 
 namespace mprpc {
@@ -42,6 +43,7 @@ public:
 
     //! \copydoc mprpc::transport::parser::parse
     message_data parse(const char* data, std::size_t size) override {
+        MPRPC_REQUIRE_NONULL(data);
         return message_data(data, size);
     }
 

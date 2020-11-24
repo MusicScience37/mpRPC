@@ -1,5 +1,6 @@
 add_executable(
     mprpc_test_units
+    position_macros_test.cpp
     logging/log_data_traits_test.cpp
     logging/format_log_data_test.cpp
     logging/logger_test.cpp
@@ -13,6 +14,7 @@ add_executable(
     error_info_test.cpp
     exception_test.cpp
     format_message_test.cpp
+    require_nonull_test.cpp
     config/option_test.cpp
     config/toml_helper_test.cpp
     config/load_test.cpp

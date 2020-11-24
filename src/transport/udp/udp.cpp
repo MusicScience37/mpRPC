@@ -23,6 +23,7 @@
 #include "mprpc/exception.h"
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/transport/udp/impl/udp_acceptor.h"
 #include "mprpc/transport/udp/impl/udp_connector.h"
 
@@ -35,8 +36,12 @@ std::shared_ptr<acceptor> create_udp_acceptor(
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const udp_acceptor_config& config) {
+    MPRPC_REQUIRE_NONULL(comp_factory);
+    MPRPC_REQUIRE_NONULL(parser_factory_ptr);
+
     const auto& ip_address = config.host.value();
     const auto port = config.port.value();
+
     asio::error_code err;
     const auto ip_address_parsed = asio::ip::make_address(ip_address, err);
     if (err) {
@@ -67,8 +72,12 @@ std::shared_ptr<connector> create_udp_connector(
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const udp_connector_config& config) {
+    MPRPC_REQUIRE_NONULL(comp_factory);
+    MPRPC_REQUIRE_NONULL(parser_factory_ptr);
+
     const auto& host = config.host.value();
     const auto port = config.port.value();
+
     asio::ip::udp::resolver resolver(threads.context());
     asio::error_code err;
     MPRPC_DEBUG(logger, "resloving {}:{}", host, port);

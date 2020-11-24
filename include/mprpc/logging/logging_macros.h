@@ -21,31 +21,7 @@
 
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logger.h"
-
-/*!
- * \brief macro to get file name
- */
-#define MPRPC_FILENAME __FILE__  // NOLINT: use of macro is necessary
-
-/*!
- * \brief macro to get line number
- */
-#define MPRPC_LINE __LINE__  // NOLINT: use of macro is necessary
-
-#ifdef MPRPC_DOCUMENTATION
-/*!
- * \brief macro to get function name
- *
- * This macro will be expanded to implementation-defined macros or variables.
- */
-#define MPRPC_FUNCTION <implementation defined strings>
-#elif __GNUC__                              // GCC and Clang
-#define MPRPC_FUNCTION __PRETTY_FUNCTION__  // NOLINT: use of macro is necessary
-#elif _MSC_VER                              // MSVC
-#define MPRPC_FUNCTION __FUNCSIG__          // NOLINT: use of macro is necessary
-#else                                       // fallback (C++ standard)
-#define MPRPC_FUNCTION __func__             // NOLINT: use of macro is necessary
-#endif
+#include "mprpc/position_macros.h"
 
 namespace mprpc {
 namespace logging {
@@ -135,8 +111,8 @@ inline void write(const std::shared_ptr<logger>& l, const char* filename,
  * \param data data
  */
 template <typename Format, typename... Data>
-inline void write(const labeled_logger& l, const char* filename, std::uint32_t line,
-    const char* function, log_level level, Format&& format,
+inline void write(const labeled_logger& l, const char* filename,
+    std::uint32_t line, const char* function, log_level level, Format&& format,
     Data&&... data) noexcept {
     l.write(filename, line, function, level, std::forward<Format>(format),
         std::forward<Data>(data)...);

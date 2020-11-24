@@ -25,6 +25,7 @@
 
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/asio_helper/basic_endpoint.h"
 #include "mprpc/transport/asio_helper/stream_socket_helper.h"
@@ -57,9 +58,9 @@ public:
         asio::ip::tcp::socket socket, asio::io_context& io_context,
         std::shared_ptr<streaming_compressor> comp,
         std::shared_ptr<streaming_parser> parser, tcp_connector_config config)
-        : socket_helper_(
-              std::make_shared<socket_helper_type>(logger, std::move(socket),
-                  io_context, std::move(comp), std::move(parser), config_)),
+        : socket_helper_(std::make_shared<socket_helper_type>(logger,
+              std::move(socket), io_context, MPRPC_REQUIRE_NONULL_MOVE(comp),
+              MPRPC_REQUIRE_NONULL_MOVE(parser), config_)),
           logger_(logger),
           config_(std::move(config)) {
         MPRPC_INFO(logger_, "conencted {} to {}",

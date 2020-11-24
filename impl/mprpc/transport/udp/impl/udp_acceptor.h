@@ -23,6 +23,7 @@
 
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
 #include "mprpc/transport/asio_helper/basic_endpoint.h"
@@ -58,7 +59,8 @@ public:
         udp_acceptor_config config)
         : logger_(logger),
           helper_(std::make_shared<udp_common>(logger, std::move(socket),
-              io_context, std::move(comp), std::move(parser_ptr), config_)),
+              io_context, MPRPC_REQUIRE_NONULL_MOVE(comp),
+              MPRPC_REQUIRE_NONULL_MOVE(parser_ptr), config_)),
           config_(std::move(config)) {
         helper_->init();
     }

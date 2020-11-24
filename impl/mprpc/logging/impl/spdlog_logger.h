@@ -23,7 +23,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "mprpc/logging/logger.h"
-#include "spdlog/common.h"
+#include "mprpc/require_nonull.h"
 
 namespace mprpc {
 namespace logging {
@@ -126,7 +126,8 @@ public:
      */
     spdlog_logger(std::shared_ptr<spdlog::logger> spdlog_logger,
         mprpc::logging::log_level log_output_level) noexcept
-        : logger(log_output_level), spdlog_logger_(std::move(spdlog_logger)) {
+        : logger(log_output_level),
+          spdlog_logger_(MPRPC_REQUIRE_NONULL_MOVE(spdlog_logger)) {
         spdlog_logger_->set_level(spdlog::level::trace);
         spdlog_logger_->flush_on(spdlog::level::trace);
 

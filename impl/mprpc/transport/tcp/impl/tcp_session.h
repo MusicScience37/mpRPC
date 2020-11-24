@@ -25,6 +25,7 @@
 
 #include "mprpc/logging/logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/asio_helper/basic_endpoint.h"
 #include "mprpc/transport/asio_helper/stream_socket_helper.h"
@@ -58,9 +59,9 @@ public:
         std::shared_ptr<streaming_compressor> comp,
         std::shared_ptr<streaming_parser> parser,
         const tcp_acceptor_config& config)
-        : socket_helper_(
-              std::make_shared<socket_helper_type>(logger, std::move(socket),
-                  io_context, std::move(comp), std::move(parser), config)),
+        : socket_helper_(std::make_shared<socket_helper_type>(logger,
+              std::move(socket), io_context, MPRPC_REQUIRE_NONULL_MOVE(comp),
+              MPRPC_REQUIRE_NONULL_MOVE(parser), config)),
           logger_(logger) {
         MPRPC_INFO(logger_, "accepted connection from {} at {}",
             socket_helper_->socket().remote_endpoint(),

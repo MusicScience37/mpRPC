@@ -27,6 +27,7 @@
 #include "mprpc/execution/method_server.h"
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 
 namespace mprpc {
@@ -49,6 +50,7 @@ public:
         const std::vector<std::shared_ptr<method_executor>>& methods)
         : logger_(std::move(logger), "method_server"), threads_(threads) {
         for (const auto& method : methods) {
+            MPRPC_REQUIRE_NONULL(method);
             methods_.emplace(method->name(), method);
         }
     }
@@ -57,6 +59,7 @@ public:
     void async_process_message(
         const std::shared_ptr<transport::session>& session, const message& msg,
         on_message_processed_handler handler) override {
+        MPRPC_REQUIRE_NONULL(session);
         threads_.post([this, session, msg, moved_handler = std::move(handler)] {
             this->do_process_message(session, msg, moved_handler);
         });
