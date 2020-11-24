@@ -37,8 +37,9 @@ namespace error_code {
  * \brief enumeration of common error codes
  */
 enum common_errors : error_code_t {
-    success = 0,      //!< success (no error)
-    unexpected_error  //!< unexpected error
+    success = 0,        //!< success (no error)
+    unexpected_error,   //!< unexpected error
+    unexpected_nullptr  //!< unexpected null pointer
 };
 
 /*!
