@@ -92,7 +92,7 @@ Pointer copy_ptr(const Pointer& origin) {
 }
 
 template <typename Pointer>
-Pointer&& move_ptr(Pointer origin) {
+Pointer move_ptr(Pointer origin) {
     return MPRPC_REQUIRE_NONULL_MOVE(origin);
 }
 
