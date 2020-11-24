@@ -1,5 +1,6 @@
 add_executable(
     mprpc_test_units
+    position_macros_test.cpp
     logging/log_data_traits_test.cpp
     logging/format_log_data_test.cpp
     logging/logger_test.cpp

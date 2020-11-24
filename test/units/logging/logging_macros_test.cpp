@@ -26,9 +26,6 @@
 
 namespace {
 
-// NOLINTNEXTLINE
-std::string test_func_name() { return std::string(MPRPC_FUNCTION); }
-
 void test_mprpc_log(mprpc::logging::logger* logger_ptr) {
     constexpr int value = 37;
 #line 5 "test.cpp"
@@ -75,27 +72,9 @@ public:
     std::string message{};
 };
 
-struct macro_test_class {
-    macro_test_class() : result(MPRPC_FUNCTION) {}
-    std::string result;
-};
-
 }  // namespace
 
 TEST_CASE("logging macros in mpRPC") {
-    SECTION("macros to get source information") {
-#line 3 "test.cpp"
-        REQUIRE(std::string(MPRPC_FILENAME) == "test.cpp");
-        REQUIRE(MPRPC_LINE == 4);
-        REQUIRE_THAT(
-            test_func_name(), Catch::Matchers::Contains("test_func_name"));
-    }
-
-    SECTION("function name of constructor") {
-        macro_test_class obj;
-        REQUIRE_THAT(obj.result, Catch::Matchers::Contains("macro_test_class"));
-    }
-
     SECTION("macro to write log with logger class") {
         using mprpc::logging::log_level;
         test_logger logger(log_level::trace);
