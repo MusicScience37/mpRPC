@@ -28,6 +28,7 @@
 #include "mprpc/exception.h"
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
 #include "mprpc/transport/parser.h"
@@ -63,8 +64,8 @@ public:
         : logger_(std::move(logger), fmt::format("tcp({})", endpoint.port())),
           socket_(io_context),
           io_context_(io_context),
-          compressor_factory_(std::move(comp_factory)),
-          parser_factory_(std::move(parser_factory_ptr)),
+          compressor_factory_(MPRPC_REQUIRE_NONULL_MOVE(comp_factory)),
+          parser_factory_(MPRPC_REQUIRE_NONULL_MOVE(parser_factory_ptr)),
           config_(std::move(config)) {
         try {
             socket_ = asio::ip::tcp::acceptor(io_context, endpoint);

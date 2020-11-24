@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include <iterator>
 #include <string>
 
 #include "mprpc/error_code.h"
@@ -34,7 +35,7 @@ namespace mprpc {
  * \param ptr pointer
  * \param name name
  * \param where position in source codes
- * \return
+ * \return pointer
  */
 template <typename Pointer>
 Pointer require_nonull(
@@ -55,13 +56,53 @@ Pointer require_nonull(
     return ptr;
 }
 
+/*!
+ * \brief check ptr is not null, and throw exception if not
+ *
+ * \tparam Pointer pointer type
+ * \param ptr pointer
+ * \param name name
+ * \param where position in source codes
+ * \return pointer
+ */
+template <typename Pointer>
+Pointer&& require_nonull_move(
+    Pointer&& ptr, const char* name, const char* where) {
+    if (name == nullptr) {
+        throw exception(error_info(error_code::unexpected_nullptr,
+            "unexpected null pointer for name at mprpc::require_nonull"));
+    }
+    if (where == nullptr) {
+        throw exception(error_info(error_code::unexpected_nullptr,
+            "unexpected null pointer for where at mprpc::require_nonull"));
+    }
+    if (ptr == nullptr) {
+        throw exception(error_info(error_code::unexpected_nullptr,
+            std::string() + "unexpected null pointer for " + name + " at " +
+                where));
+    }
+    return std::forward<Pointer>(ptr);
+}
+
 }  // namespace mprpc
 
 /*!
  * \brief check POINTER is not null, and throw exception if not
  *
  * \param POINTER pointer
+ * \return pointer
  */
 #define MPRPC_REQUIRE_NONULL(POINTER)                                    \
     ::mprpc::require_nonull(POINTER, static_cast<const char*>(#POINTER), \
+        static_cast<const char*>(MPRPC_FUNCTION))
+
+/*!
+ * \brief check POINTER is not null, and throw exception if not
+ *
+ * \param POINTER pointer
+ * \return pointer
+ */
+#define MPRPC_REQUIRE_NONULL_MOVE(POINTER)           \
+    ::mprpc::require_nonull_move(std::move(POINTER), \
+        static_cast<const char*>(#POINTER),          \
         static_cast<const char*>(MPRPC_FUNCTION))

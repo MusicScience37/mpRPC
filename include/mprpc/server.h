@@ -27,6 +27,7 @@
 #include "mprpc/execution/method_server.h"
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/server_config.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
@@ -53,10 +54,14 @@ public:
         std::shared_ptr<execution::method_server> method_server,
         server_config config)
         : logger_(std::move(logger)),
-          threads_(std::move(threads)),
+          threads_(MPRPC_REQUIRE_NONULL_MOVE(threads)),
           acceptors_(std::move(acceptors)),
-          method_server_(std::move(method_server)),
-          config_(std::move(config)) {}
+          method_server_(MPRPC_REQUIRE_NONULL_MOVE(method_server)),
+          config_(std::move(config)) {
+        for (const auto& acceptor : acceptors_) {
+            MPRPC_REQUIRE_NONULL(acceptor);
+        }
+    }
 
     /*!
      * \brief start process

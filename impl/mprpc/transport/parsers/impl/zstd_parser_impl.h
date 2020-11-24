@@ -24,6 +24,7 @@
 #include "mprpc/buffer.h"
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/transport/parser.h"
 #include "mprpc/transport/parsers/impl/msgpack_parser_impl.h"
 
@@ -49,6 +50,8 @@ public:
 
     //! \copydoc mprpc::transport::parser::parse
     message_data parse(const char* data, std::size_t size) override {
+        MPRPC_REQUIRE_NONULL(data);
+
         buffer_.resize(ZSTD_getDecompressedSize(data, size));
 
         MPRPC_TRACE(logger_, "decompressing a message using zstd library");

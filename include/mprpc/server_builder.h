@@ -29,6 +29,7 @@
 #include "mprpc/logging/basic_loggers.h"
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logger.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/server.h"
 #include "mprpc/transport.h"
 #include "mprpc/transport/compression_config.h"
@@ -53,7 +54,7 @@ public:
      * \param logger logger
      */
     explicit server_builder(std::shared_ptr<mprpc::logging::logger> logger)
-        : logger_(std::move(logger), "mprpc.server") {}
+        : logger_(MPRPC_REQUIRE_NONULL_MOVE(logger), "mprpc.server") {}
 
     /*!
      * \brief construct
@@ -159,7 +160,7 @@ public:
      */
     server_builder& method(
         std::shared_ptr<execution::method_executor> method_executor) {
-        methods_.push_back(std::move(method_executor));
+        methods_.push_back(MPRPC_REQUIRE_NONULL_MOVE(method_executor));
         return *this;
     }
 

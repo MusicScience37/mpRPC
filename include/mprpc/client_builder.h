@@ -26,6 +26,7 @@
 #include "mprpc/client_config.h"
 #include "mprpc/logging/basic_loggers.h"
 #include "mprpc/logging/labeled_logger.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/transport.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/connector.h"
@@ -50,7 +51,7 @@ public:
      * \param logger logger
      */
     explicit client_builder(std::shared_ptr<mprpc::logging::logger> logger)
-        : logger_(std::move(logger), "mprpc.client") {}
+        : logger_(MPRPC_REQUIRE_NONULL_MOVE(logger), "mprpc.client") {}
 
     /*!
      * \brief construct

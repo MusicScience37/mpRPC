@@ -23,6 +23,7 @@
 #include <utility>
 
 #include "mprpc/logging/logger.h"
+#include "mprpc/require_nonull.h"
 
 namespace mprpc {
 namespace logging {
@@ -40,7 +41,8 @@ public:
      */
     explicit labeled_logger(
         std::shared_ptr<logger> logger, std::string label = std::string())
-        : logger_(std::move(logger)), label_(std::move(label)) {}
+        : logger_(MPRPC_REQUIRE_NONULL_MOVE(logger)),
+          label_(std::move(label)) {}
 
     /*!
      * \brief construct
