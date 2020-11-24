@@ -11,6 +11,7 @@ This project uses the following external libraries in source codes:
 - `cpp-stl-ext <https://gitlab.com/MusicScience37/cpp-stl-ext>`_
 - `zstd <https://github.com/facebook/zstd>`_
 - `toml11 <https://github.com/ToruNiina/toml11>`_
+- `pybind11 <https://github.com/pybind/pybind11>`_
 
 This project uses the following external libraries in tests:
 
