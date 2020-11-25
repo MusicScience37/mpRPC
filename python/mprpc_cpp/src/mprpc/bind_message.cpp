@@ -44,13 +44,25 @@ void bind_message(pybind11::module& module) {
     static const std::string module_name = "mprpc.message";
 
     std::string class_full_name = module_name + ".MessageData";
-    pybind11::class_<message_data>(module, "MessageData")
+    pybind11::class_<message_data>(
+        module, "MessageData", "class of message data")
         .def(pybind11::init<>())
         .def(pybind11::init([](const pybind11::bytes& data) {
             const auto data_as_str = static_cast<std::string>(data);
             return message_data(data_as_str.data(), data_as_str.size());
         }))
-        .def("data", &message_data_to_bytes)
+        .def("data", &message_data_to_bytes,
+            R"doc(
+            get data
+
+            Parameters
+            ----------
+
+            Returns
+            -------
+            bytes
+              data
+            )doc")
         .def("__bytes__", &message_data_to_bytes)
         .def("__str__",
             [class_full_name](const message_data& self) {
