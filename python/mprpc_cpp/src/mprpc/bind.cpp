@@ -22,9 +22,11 @@
 #include <pybind11/pybind11.h>
 
 #include "mprpc/bind_logging.h"
+#include "mprpc/bind_message.h"
 
 PYBIND11_MODULE(_mprpc_cpp, module) {
     module.doc() = "wrapper of mpRPC C++ library for Python";
 
     mprpc::python::bind_logging(module);
+    mprpc::python::bind_message(module);
 }

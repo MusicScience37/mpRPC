@@ -15,7 +15,7 @@
  */
 /*!
  * \file
- * \brief declaration of bind_logging function
+ * \brief declaration of bind_message function
  */
 #include <pybind11/pybind11.h>
 
@@ -23,11 +23,11 @@ namespace mprpc {
 namespace python {
 
 /*!
- * \brief bind logging functions, classes, and enumerations
+ * \brief bind message-related functions, classes, and enumerations
  *
  * \param module module
  */
-void bind_logging(pybind11::module& module);
+void bind_message(pybind11::module& module);
 
 }  // namespace python
 }  // namespace mprpc
