@@ -15,21 +15,28 @@
  */
 /*!
  * \file
- * \brief declaration of bind_message function
+ * \brief declaration of bind_logging function
  */
-#pragma once
+#include "mprpc/format_bytes.h"
 
-#include <pybind11/pybind11.h>
+#include <fmt/core.h>
+
+#include "mprpc/require_nonull.h"
 
 namespace mprpc {
 namespace python {
 
-/*!
- * \brief bind message-related functions, classes, and enumerations
- *
- * \param module module
- */
-void bind_message(pybind11::module& module);
+std::string format_bytes(const char* data, std::size_t size) {
+    MPRPC_REQUIRE_NONULL(data);
+    std::string result;
+    result += 'b';
+    result += '\'';
+    for (std::size_t i = 0; i < size; ++i) {
+        result += fmt::format("\\x{:02x}", static_cast<unsigned char>(data[i]));
+    }
+    result += '\'';
+    return result;
+}
 
 }  // namespace python
 }  // namespace mprpc

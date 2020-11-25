@@ -19,26 +19,53 @@
  */
 #include "mprpc/bind_message.h"
 
+#include <fmt/format.h>
 #include <pybind11/pybind11.h>
 
+#include "mprpc/format_bytes.h"
+#include "mprpc/format_message.h"
 #include "mprpc/message_data.h"
 
 namespace mprpc {
 namespace python {
 
+pybind11::bytes message_data_to_bytes(const message_data& self) {
+    if (!self.has_data()) {
+        throw pybind11::value_error(
+            "mprpc.message.MessageData.data called to empty data");
+    }
+    return pybind11::bytes(self.data(), self.size());
+}
+
 void bind_message(pybind11::module& module) {
     using mprpc::message_data;
+
+    // module name in Python
+    static const std::string module_name = "mprpc.message";
+
+    std::string class_full_name = module_name + ".MessageData";
     pybind11::class_<message_data>(module, "MessageData")
+        .def(pybind11::init<>())
         .def(pybind11::init([](const pybind11::bytes& data) {
             const auto data_as_str = static_cast<std::string>(data);
             return message_data(data_as_str.data(), data_as_str.size());
         }))
-        .def("data", [](const message_data& self) {
+        .def("data", &message_data_to_bytes)
+        .def("__bytes__", &message_data_to_bytes)
+        .def("__str__",
+            [class_full_name](const message_data& self) {
+                if (!self.has_data()) {
+                    return class_full_name + "()";
+                }
+                return fmt::format(
+                    "<{}: {}>", class_full_name, mprpc::format_message(self));
+            })
+        .def("__repr__", [class_full_name](const message_data& self) {
             if (!self.has_data()) {
-                throw pybind11::value_error(
-                    "mprpc.message.MessageData.data called to empty data");
+                return class_full_name + "()";
             }
-            return pybind11::bytes(self.data(), self.size());
+            return fmt::format("{}({})", class_full_name,
+                format_bytes(self.data(), self.size()));
         });
 }
 

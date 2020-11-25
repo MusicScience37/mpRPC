@@ -15,21 +15,23 @@
  */
 /*!
  * \file
- * \brief declaration of bind_message function
+ * \brief declaration of bind_logging function
  */
 #pragma once
 
-#include <pybind11/pybind11.h>
+#include <string>
 
 namespace mprpc {
 namespace python {
 
 /*!
- * \brief bind message-related functions, classes, and enumerations
+ * \brief format bytes as `bytes.__repr__()` in Python
  *
- * \param module module
+ * \param data data
+ * \param size data size
+ * \return formated string (with ASCII characters)
  */
-void bind_message(pybind11::module& module);
+std::string format_bytes(const char* data, std::size_t size);
 
 }  // namespace python
 }  // namespace mprpc

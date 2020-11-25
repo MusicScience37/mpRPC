@@ -17,6 +17,8 @@
  * \file
  * \brief declaration of bind_logging function
  */
+#pragma once
+
 #include <pybind11/pybind11.h>
 
 namespace mprpc {
