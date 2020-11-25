@@ -21,3 +21,6 @@ def test_message_data():
 
     # pylint: disable=eval-used
     assert eval(repr(data)).data() == origin
+
+    assert MessageData(origin) == MessageData(origin)
+    assert MessageData(origin) != MessageData(b'\x93\x01\x02\x04')

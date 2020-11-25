@@ -72,12 +72,20 @@ void bind_message(pybind11::module& module) {
                 return fmt::format(
                     "<{}: {}>", class_full_name, mprpc::format_message(self));
             })
-        .def("__repr__", [class_full_name](const message_data& self) {
-            if (!self.has_data()) {
-                return class_full_name + "()";
-            }
-            return fmt::format("{}({})", class_full_name,
-                format_bytes(self.data(), self.size()));
+        .def("__repr__",
+            [class_full_name](const message_data& self) {
+                if (!self.has_data()) {
+                    return class_full_name + "()";
+                }
+                return fmt::format("{}({})", class_full_name,
+                    format_bytes(self.data(), self.size()));
+            })
+        .def("__eq__",
+            [](const message_data& self, const message_data& other) {
+                return self == other;
+            })
+        .def("__ne__", [](const message_data& self, const message_data& other) {
+            return self != other;
         });
 }
 
