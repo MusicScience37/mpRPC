@@ -11,4 +11,5 @@ from _mprpc_cpp import (  # pylint: disable=unused-import
     MessageData,
     # error
     ErrorInfo,
+    MPRPCException,
 )

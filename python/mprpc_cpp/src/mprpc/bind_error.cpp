@@ -20,6 +20,7 @@
 #include "mprpc/bind_error.h"
 
 #include "mprpc/error_info.h"
+#include "mprpc/exception.h"
 #include "mprpc/repr_from_cpp.h"
 
 namespace mprpc {
@@ -127,6 +128,19 @@ void bind_error(pybind11::module& module) {
                 class_full_name, self.code(), repr_from_cpp(self.message()),
                 repr_from_cpp(self.data()));
         });
+
+    static pybind11::exception<mprpc::exception> mprpc_exception(
+        module, "MPRPCException");
+    pybind11::register_exception_translator([](const std::exception_ptr& ptr) {
+        try {
+            if (ptr) {
+                std::rethrow_exception(ptr);
+            }
+        } catch (const mprpc::exception& except) {
+            PyErr_SetObject(
+                mprpc_exception.ptr(), pybind11::cast(except.info()).ptr());
+        }
+    });
 }
 
 }  // namespace python
