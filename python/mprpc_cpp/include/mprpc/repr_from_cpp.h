@@ -21,6 +21,9 @@
 
 #include <pybind11/pybind11.h>
 
+namespace mprpc {
+namespace python {
+
 /*!
  * \brief call Python's repr function for C++ object
  *
@@ -44,3 +47,6 @@ template <typename T>
 inline std::string str_from_cpp(const T& obj) {
     return static_cast<std::string>(pybind11::str(pybind11::cast(obj)));
 }
+
+}  // namespace python
+}  // namespace mprpc
