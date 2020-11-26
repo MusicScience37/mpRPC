@@ -22,7 +22,6 @@
 #include <fmt/format.h>
 #include <pybind11/pybind11.h>
 
-#include "mprpc/format_bytes.h"
 #include "mprpc/format_message.h"
 #include "mprpc/message_data.h"
 
@@ -78,7 +77,8 @@ void bind_message(pybind11::module& module) {
                     return class_full_name + "()";
                 }
                 return fmt::format("{}({})", class_full_name,
-                    format_bytes(self.data(), self.size()));
+                    static_cast<std::string>(pybind11::repr(
+                        pybind11::bytes(self.data(), self.size()))));
             })
         .def("__eq__",
             [](const message_data& self, const message_data& other) {
