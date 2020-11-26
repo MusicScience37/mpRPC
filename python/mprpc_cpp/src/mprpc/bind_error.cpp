@@ -131,7 +131,8 @@ void bind_error(pybind11::module& module) {
 
     static pybind11::exception<mprpc::exception> mprpc_exception(
         module, "MPRPCException");
-    pybind11::register_exception_translator([](const std::exception_ptr& ptr) {
+    // NOLINTNEXTLINE: requirements of external library
+    pybind11::register_exception_translator([](std::exception_ptr ptr) {
         try {
             if (ptr) {
                 std::rethrow_exception(ptr);
