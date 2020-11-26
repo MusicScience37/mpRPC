@@ -15,20 +15,21 @@
  */
 /*!
  * \file
- * \brief implementation of the wrapper of mpRPC C++ library for Python
+ * \brief declaration of bind_error function
  */
-#include <memory>
+#pragma once
 
 #include <pybind11/pybind11.h>
 
-#include "mprpc/bind_error.h"
-#include "mprpc/bind_logging.h"
-#include "mprpc/bind_message.h"
+namespace mprpc {
+namespace python {
 
-PYBIND11_MODULE(_mprpc_cpp, module) {
-    module.doc() = "wrapper of mpRPC C++ library for Python";
+/*!
+ * \brief bind error-related functions, classes, and enumerations
+ *
+ * \param module module
+ */
+void bind_error(pybind11::module& module);
 
-    mprpc::python::bind_logging(module);
-    mprpc::python::bind_message(module);
-    mprpc::python::bind_error(module);
-}
+}  // namespace python
+}  // namespace mprpc

@@ -29,13 +29,22 @@ author = 'MusicScience37'
 
 extensions = [
     'sphinx.ext.todo',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
 ]
 
 templates_path = ['_templates']
 
 exclude_patterns = []
+
+# -- Options for autodoc -----------------------------------------------------
+
+extensions += ['sphinx.ext.autodoc', 'sphinx.ext.napoleon']
+
+autodoc_default_options = {
+    'members': None,
+    'member-order': 'bysource',
+    'inherited-members': None,
+    'special-members': None,
+}
 
 # -- Options for breathe -----------------------------------------------------
 

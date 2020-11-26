@@ -15,20 +15,32 @@
  */
 /*!
  * \file
- * \brief implementation of the wrapper of mpRPC C++ library for Python
+ * \brief declaration and implementation of repr_from_cpp function
  */
-#include <memory>
+#pragma once
 
 #include <pybind11/pybind11.h>
 
-#include "mprpc/bind_error.h"
-#include "mprpc/bind_logging.h"
-#include "mprpc/bind_message.h"
+/*!
+ * \brief call Python's repr function for C++ object
+ *
+ * \tparam T object type
+ * \param obj object
+ * \return result string
+ */
+template <typename T>
+inline std::string repr_from_cpp(const T& obj) {
+    return static_cast<std::string>(pybind11::repr(pybind11::cast(obj)));
+}
 
-PYBIND11_MODULE(_mprpc_cpp, module) {
-    module.doc() = "wrapper of mpRPC C++ library for Python";
-
-    mprpc::python::bind_logging(module);
-    mprpc::python::bind_message(module);
-    mprpc::python::bind_error(module);
+/*!
+ * \brief call Python's str function for C++ object
+ *
+ * \tparam T object type
+ * \param obj object
+ * \return result string
+ */
+template <typename T>
+inline std::string str_from_cpp(const T& obj) {
+    return static_cast<std::string>(pybind11::str(pybind11::cast(obj)));
 }
