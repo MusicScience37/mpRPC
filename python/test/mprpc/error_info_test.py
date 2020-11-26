@@ -45,7 +45,3 @@ def test_error_info():
     assert str(err) == expected_str
     # pylint: disable=eval-used
     assert str(eval(repr(err))) == expected_str
-
-    from _mprpc_cpp import throw_error
-
-    throw_error()
