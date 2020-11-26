@@ -16,6 +16,7 @@ def test_error_info():
     assert err.code == 0
     assert err.message == ""
     assert err.data == MessageData()
+    assert not err
 
     expected_str = "mprpc.ErrorInfo()"
     assert str(err) == expected_str
@@ -28,6 +29,7 @@ def test_error_info():
     assert err.code == code
     assert err.message == message
     assert err.data == MessageData()
+    assert err
 
     expected_str = "mprpc.ErrorInfo(code=37, message='test message')"
     assert str(err) == expected_str
@@ -39,6 +41,7 @@ def test_error_info():
     assert err.code == code
     assert err.message == message
     assert err.data == data
+    assert err
 
     expected_str = "mprpc.ErrorInfo(code=37, message='test message', " + \
         "data=<mprpc.message.MessageData: [1,2,3]>)"
