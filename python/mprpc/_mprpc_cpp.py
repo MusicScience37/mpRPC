@@ -9,6 +9,14 @@ from _mprpc_cpp import (  # pylint: disable=unused-import
     create_stdout_logger,
     # message
     MessageData,
+    # error codes
+    CommonErrors,
+    MessageErrors,
+    NetworkErrors,
+    ExecutionErrors,
+    FutureErrors,
+    ConfigErrors,
+    ClientErrors,
     # error
     ErrorInfo,
     MPRPCException,
