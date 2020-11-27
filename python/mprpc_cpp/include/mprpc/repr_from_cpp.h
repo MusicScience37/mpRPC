@@ -15,7 +15,7 @@
  */
 /*!
  * \file
- * \brief declaration of bind_logging function
+ * \brief declaration and implementation of repr_from_cpp function
  */
 #pragma once
 
@@ -25,11 +25,28 @@ namespace mprpc {
 namespace python {
 
 /*!
- * \brief bind logging functions, classes, and enumerations
+ * \brief call Python's repr function for C++ object
  *
- * \param module module
+ * \tparam T object type
+ * \param obj object
+ * \return result string
  */
-void bind_logging(pybind11::module& module);
+template <typename T>
+inline std::string repr_from_cpp(const T& obj) {
+    return static_cast<std::string>(pybind11::repr(pybind11::cast(obj)));
+}
+
+/*!
+ * \brief call Python's str function for C++ object
+ *
+ * \tparam T object type
+ * \param obj object
+ * \return result string
+ */
+template <typename T>
+inline std::string str_from_cpp(const T& obj) {
+    return static_cast<std::string>(pybind11::str(pybind11::cast(obj)));
+}
 
 }  // namespace python
 }  // namespace mprpc
