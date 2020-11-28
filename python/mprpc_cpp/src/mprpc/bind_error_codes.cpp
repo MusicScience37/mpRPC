@@ -33,71 +33,45 @@ namespace mprpc {
 namespace python {
 
 void bind_error_codes(pybind11::module& module) {
-    using mprpc::error_code::common_errors;
-    pybind11::enum_<common_errors>(module, "CommonErrors",
-        "enumeration of common error codes", pybind11::arithmetic())
-        .value("SUCCESS", common_errors::success, "success (no error)")
-        .value("UNEXPECTED_ERROR", common_errors::unexpected_error,
-            "unexpected error")
-        .value("UNEXPECTED_NULLPTR", common_errors::unexpected_nullptr,
-            "unexpected null pointer")
-        .export_values();
+    static const auto code_list =
+        std::vector<std::tuple<mprpc::error_code_t, std::string, std::string>>{
+            {mprpc::error_code::success, "SUCCESS", "success (no error)"},
+            {mprpc::error_code::unexpected_error, "UNEXPECTED_ERROR",
+                "unexpected error"},
+            {mprpc::error_code::unexpected_nullptr, "UNEXPECTED_NULLPTR",
+                "unexpected null pointer"},
+            {mprpc::error_code::parse_error, "PARSE_ERROR", "parse error"},
+            {mprpc::error_code::invalid_message, "INVALID_MESSAGE",
+                "invalid message"},
+            {mprpc::error_code::eof, "EOF", "end of file"},
+            {mprpc::error_code::failed_to_listen, "FAILED_TO_LISTEN",
+                "failed to listen to an address"},
+            {mprpc::error_code::failed_to_accept, "FAILED_TO_ACCEPT",
+                "failed to accept a connection"},
+            {mprpc::error_code::failed_to_resolve, "FAILED_TO_RESOLVE",
+                "failed to resolve a server"},
+            {mprpc::error_code::failed_to_connect, "FAILED_TO_CONNECT",
+                "failed to connect to a server"},
+            {mprpc::error_code::failed_to_read, "FAILED_TO_READ",
+                "failed to read data"},
+            {mprpc::error_code::failed_to_write, "FAILED_TO_WRITE",
+                "failed to write data"},
+            {mprpc::error_code::method_not_found, "METHOD_NOT_FOUND",
+                "method not found"},
+            {mprpc::error_code::invalid_future_use, "INVALID_FUTURE_USE",
+                "use of invalid future"},
+            {mprpc::error_code::invalid_config_value, "INVALID_CONFIG_VALUE",
+                "invalid configuration value"},
+            {mprpc::error_code::config_parse_error, "CONFIG_PARSE_ERROR",
+                "parse error of configuration files"},
+            {mprpc::error_code::timeout, "TIMEOUT", "timeout"}};
 
-    using mprpc::error_code::message_errors;
-    pybind11::enum_<message_errors>(module, "MessageErrors",
-        "enumeration of message-related error codes", pybind11::arithmetic())
-        .value("PARSE_ERROR", message_errors::parse_error, "parse error")
-        .value("INVALID_MESSAGE", message_errors::invalid_message,
-            "invalid message")
-        .export_values();
-
-    using mprpc::error_code::network_errors;
-    pybind11::enum_<network_errors>(module, "NetworkErrors",
-        "enumeration of network-related error codes", pybind11::arithmetic())
-        .value("EOF", network_errors::eof, "end of file")
-        .value("FAILED_TO_LISTEN", network_errors::failed_to_listen,
-            "failed to listen to an address")
-        .value("FAILED_TO_ACCEPT", network_errors::failed_to_accept,
-            "failed to accept a connection")
-        .value("FAILED_TO_RESOLVE", network_errors::failed_to_resolve,
-            "failed to resolve a server")
-        .value("FAILED_TO_CONNECT", network_errors::failed_to_connect,
-            "failed to connect to a server")
-        .value("FAILED_TO_READ", network_errors::failed_to_read,
-            "failed to read data")
-        .value("FAILED_TO_WRITE", network_errors::failed_to_write,
-            "failed to write data")
-        .export_values();
-
-    using mprpc::error_code::execution_errors;
-    pybind11::enum_<execution_errors>(module, "ExecutionErrors",
-        "enumeration of execution-related error codes", pybind11::arithmetic())
-        .value("METHOD_NOT_FOUND", execution_errors::method_not_found,
-            "method not found")
-        .export_values();
-
-    using mprpc::error_code::future_errors;
-    pybind11::enum_<future_errors>(module, "FutureErrors",
-        "enumeration of future-related error codes", pybind11::arithmetic())
-        .value("INVALID_FUTURE_USE", future_errors::invalid_future_use,
-            "use of invalid future")
-        .export_values();
-
-    using mprpc::error_code::config_errors;
-    pybind11::enum_<config_errors>(module, "ConfigErrors",
-        "enumeration of configuration-related error codes",
-        pybind11::arithmetic())
-        .value("INVALID_CONFIG_VALUE", config_errors::invalid_config_value,
-            "invalid configuration value")
-        .value("CONFIG_PARSE_ERROR", config_errors::config_parse_error,
-            "parse error of configuration files")
-        .export_values();
-
-    using mprpc::error_code::client_errors;
-    pybind11::enum_<client_errors>(module, "ClientErrors",
-        "enumeration of client-specific error codes", pybind11::arithmetic())
-        .value("TIMEOUT", client_errors::timeout, "timeout")
-        .export_values();
+    pybind11::class_<unused> codes{
+        module, "ErrorCode", "definition of error codes"};
+    for (const auto& tuple : code_list) {
+        codes.def_readonly_static(std::get<1>(tuple).c_str(),
+            &std::get<0>(tuple), std::get<2>(tuple).c_str());
+    }
 }
 
 }  // namespace python

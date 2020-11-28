@@ -6,7 +6,10 @@ from ._mprpc_cpp import (
     MPRPCException,
 )
 
+from ._error_code import ErrorCode
+
 for obj in (
+    ErrorCode,
     ErrorInfo,
     MPRPCException,
 ):
