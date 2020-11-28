@@ -27,6 +27,9 @@
 #include "mprpc/bind_message.h"
 
 PYBIND11_MODULE(_mprpc_cpp, module) {
+    pybind11::options options;
+    options.disable_function_signatures();
+
     module.doc() = "wrapper of mpRPC C++ library for Python";
 
     mprpc::python::bind_logging(module);

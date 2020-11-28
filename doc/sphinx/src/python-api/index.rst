@@ -6,6 +6,5 @@ Python API Reference
     :caption: Contents:
 
     mprpc
-    mprpc.error_code
     mprpc.logging
     mprpc.message

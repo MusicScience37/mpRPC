@@ -2,8 +2,7 @@
 """
 
 import logging
-from mprpc.logging import LogLevel
-from mprpc.logging.log_level_convertion import to_mprpc_log_level, to_python_log_level
+from mprpc.logging import LogLevel, to_mprpc_log_level, to_python_log_level
 
 
 def test_to_mprpc_log_level():
