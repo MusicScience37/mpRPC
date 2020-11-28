@@ -34,8 +34,38 @@ void bind_error(pybind11::module& module) {
     using mprpc::error_info;
     using mprpc::message_data;
     std::string class_full_name = module_name + ".ErrorInfo";
-    pybind11::class_<error_info>(
-        module, "ErrorInfo", "class of error information")
+    pybind11::class_<error_info>(module, "ErrorInfo",
+        R"doc(
+            class of error information
+
+            Parameters
+            ----------
+            code : int, optional
+                error code.
+                Zero for this parameter means no error, so other arguments are ignores.
+            message : str, optional
+                error message
+            data : mprpc.message.MessageData, optional
+                data related to this error
+
+            Attributes
+            ----------
+            code : int
+                error code (read only)
+            message : str
+                error message (read only)
+            data : mprpc.message.MessageData
+                data related to this error (read only)
+
+            Methods
+            -------
+            __bool__(self) -> bool
+                get whether this has an error
+            __str__(self) -> str
+                get string representation for debugging
+            __repr__(self) -> str
+                get string representation usable with eval()
+        )doc")
         .def(pybind11::init([](error_code_t code, const std::string& message,
                                 const message_data& data) {
             if (code == mprpc::error_code::success) {
@@ -49,22 +79,10 @@ void bind_error(pybind11::module& module) {
             pybind11::arg("code") =
                 static_cast<mprpc::error_code_t>(mprpc::error_code::success),
             pybind11::arg("message") = std::string(),
-            pybind11::arg("data") = message_data(),
-            R"doc(
-            initialize
-
-            Parameters
-            ----------
-            code : int
-              error code.
-              Zero for this parameter means no error, so other arguments are ignores.
-            message : str
-              error message
-            data : mprpc.message.MessageData
-              data related to this error
-            )doc")
+            pybind11::arg("data") = message_data())
         .def("has_error", &error_info::has_error,
-            R"doc(
+            R"doc(has_error(self) -> bool
+
             get whether this has an error
 
             Returns
@@ -72,20 +90,10 @@ void bind_error(pybind11::module& module) {
             bool
               whether this has an error
             )doc")
-        .def("__bool__", &error_info::has_error,
-            R"doc(
-            get whether this has an error
-
-            Parameters
-            ----------
-
-            Returns
-            -------
-            bool
-              whether this has an error
-            )doc")
+        .def("__bool__", &error_info::has_error)
         .def("has_data", &error_info::has_data,
-            R"doc(
+            R"doc(has_data(self) -> bool
+
             get whether this has data related to this error
 
             Parameters
@@ -96,12 +104,9 @@ void bind_error(pybind11::module& module) {
             bool
               whether this has data related to this error
             )doc")
-        .def_property_readonly(
-            "code", &error_info::code, "error code (readonly)")
-        .def_property_readonly(
-            "message", &error_info::message, "error message (readonly)")
-        .def_property_readonly(
-            "data", &error_info::data, "data related to this error (readonly)")
+        .def_property_readonly("code", &error_info::code)
+        .def_property_readonly("message", &error_info::message)
+        .def_property_readonly("data", &error_info::data)
         .def("__str__",
             [class_full_name](const error_info& self) {
                 if (!self.has_error()) {

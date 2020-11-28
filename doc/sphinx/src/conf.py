@@ -43,7 +43,6 @@ autodoc_default_options = {
     'members': None,
     'member-order': 'bysource',
     'inherited-members': None,
-    'special-members': None,
 }
 
 # -- Options for breathe -----------------------------------------------------

@@ -43,25 +43,37 @@ void bind_message(pybind11::module& module) {
     static const std::string module_name = "mprpc.message";
 
     std::string class_full_name = module_name + ".MessageData";
-    pybind11::class_<message_data>(
-        module, "MessageData", "class of message data")
+    pybind11::class_<message_data>(module, "MessageData",
+        R"doc(
+            class of message data
+
+            Parameters
+            ----------
+            data : bytes, optional
+                data, omitting this parameter will create an empty object.
+
+            Attributes
+            ----------
+            data : bytes
+                data (read only)
+
+            Methods
+            -------
+            __bytes__(self) -> bytes
+                get data
+            __str__(self) -> str
+                get string representation for debugging
+            __repr__(self) -> str
+                get string representation usable with eval()
+            __eq__(self, other) -> bool
+            __ne__(self, other) -> bool
+        )doc")
         .def(pybind11::init<>())
         .def(pybind11::init([](const pybind11::bytes& data) {
             const auto data_as_str = static_cast<std::string>(data);
             return message_data(data_as_str.data(), data_as_str.size());
         }))
-        .def("data", &message_data_to_bytes,
-            R"doc(
-            get data
-
-            Parameters
-            ----------
-
-            Returns
-            -------
-            bytes
-              data
-            )doc")
+        .def_property_readonly("data", &message_data_to_bytes)
         .def("__bytes__", &message_data_to_bytes)
         .def("__str__",
             [class_full_name](const message_data& self) {
