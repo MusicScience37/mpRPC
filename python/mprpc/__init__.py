@@ -1,4 +1,9 @@
 """An implementation of MessagePack-RPC
+
+Submodules
+----------
+- :py:mod:`mprpc.logging`
+- :py:mod:`mprpc.message`
 """
 
 from ._mprpc_cpp import (
