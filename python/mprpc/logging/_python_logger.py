@@ -3,17 +3,20 @@
 
 import logging
 
-from .log_level_convertion import to_python_log_level
+from ._log_level_convertion import to_python_log_level
 from .._mprpc_cpp import PythonLoggerHelper, LogLevel
 
 
-class PythonLogger(PythonLoggerHelper):
+class PythonLogger(PythonLoggerHelper):  # pylint: disable=too-few-public-methods
     """class to write logs using Python's logging module
+
+    Parameters
+    ----------
+    log_output_level : mprpc.logging.LogLevel
+        log output level (default to LogLevel.WARN)
     """
 
     def __init__(self, log_output_level: LogLevel = LogLevel.WARN):
-        """construct
-        """
 
         super().__init__(self.__write_impl, log_output_level)
         self.logger = logging.getLogger("mprpc")
@@ -26,22 +29,22 @@ class PythonLogger(PythonLoggerHelper):
         Parameters
         ----------
         label : str
-          label
+            label
         filename : str
-          file name
+            file name
         line : int
-          line number
+            line number
         function : str
-          function name
+            function name
         log_level : LogLevel
-          log level
+            log level
         message : str
-          log message
+            log message
 
         Returns
         -------
         None
-          none
+            none
         """
 
         log = logging.LogRecord(label, to_python_log_level(

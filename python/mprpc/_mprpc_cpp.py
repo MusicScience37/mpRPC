@@ -1,6 +1,7 @@
 """package to import Python wrapper of mpRPC C++ library
 """
-from _mprpc_cpp import (  # pylint: disable=unused-import
+# pylint: disable=unused-import
+from _mprpc_cpp import (
     # logging
     LogLevel,
     Logger,

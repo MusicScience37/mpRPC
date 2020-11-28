@@ -20,12 +20,12 @@ def to_mprpc_log_level(level: int) -> LogLevel:
     Parameters
     ----------
     level : int
-      log level in Python's logging module
+        log level in Python's logging module
 
     Returns
     -------
     mprpc.logging.LogLevel
-      converted log level
+        converted log level
     """
 
     return PYTHON_TO_MPRPC_DICT[level]
@@ -47,12 +47,12 @@ def to_python_log_level(level: LogLevel) -> int:
     Parameters
     ----------
     mprpc.logging.LogLevel
-      log level in mpRPC
+        log level in mpRPC
 
     Returns
     -------
     int
-      converted log level in Python's logging
+        converted log level in Python's logging
     """
 
     return MPRPC_TO_PYTHON_DICT[level]
