@@ -1,4 +1,4 @@
-"""message definition
+"""definition of MsgType class
 """
 
 from enum import IntEnum

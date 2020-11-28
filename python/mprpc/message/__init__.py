@@ -4,7 +4,7 @@
 from .._mprpc_cpp import (
     MessageData,
 )
-from .msgtype import MsgType
+from ._msgtype import MsgType
 
 for obj in (
     MessageData,
