@@ -35,7 +35,8 @@ void bind_error(pybind11::module& module) {
     using mprpc::message_data;
     std::string class_full_name = module_name + ".ErrorInfo";
     pybind11::class_<error_info>(module, "ErrorInfo",
-        R"doc(
+        R"doc(ErrorInfo(code: int = 0, message: str = '', data: MessageData = MessageData())
+
             class of error information
 
             Parameters

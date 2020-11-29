@@ -44,7 +44,8 @@ void bind_message(pybind11::module& module) {
 
     std::string class_full_name = module_name + ".MessageData";
     pybind11::class_<message_data>(module, "MessageData",
-        R"doc(
+        R"doc(MessageData(data: bytes)
+
             class of message data
 
             Parameters

@@ -10,6 +10,7 @@ An implementation of MessagePack-RPC in C++
 - synchronous / asynchronous calls
 - simple API for basic usage
 - Python interface (on development)
+  - validation of data using [marshmallow package](https://marshmallow.readthedocs.io/).
 
 ## Documentation
 
