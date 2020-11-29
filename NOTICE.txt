@@ -32,3 +32,6 @@ This project includes toml11 library, which is available under a
 
 This project includes pybind11 library, which is available under a 
 "BSD License." For details, see extern/pybind11.
+
+This project depends on marshmallow package, which is available under a 
+"MIT License." For details, see https://marshmallow.readthedocs.io/.
