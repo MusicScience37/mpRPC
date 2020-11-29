@@ -20,23 +20,12 @@ class Request(NamedTuple):
         method name
     params : List[Any]
         parameters
-
-    Attributes
-    ----------
-    msgtype : mprpc.messages.MsgType
-        message type
-    msgid : int
-        message ID
-    method : str
-        method name
-    params : List[Any]
-        parameters
     """
 
-    msgtype: MsgType
-    msgid: int
-    method: str
-    params: List[Any]
+    msgtype: MsgType  # message type
+    msgid: int  # message ID
+    method: str  # method name
+    params: List[Any]  # parameters
 
 
 class Response(NamedTuple):
@@ -52,23 +41,12 @@ class Response(NamedTuple):
         error
     result : Any
         result
-
-    Attributes
-    ----------
-    msgtype : mprpc.messages.MsgType
-        message type
-    msgid : int
-        message ID
-    error : Any
-        error
-    result : Any
-        result
     """
 
-    msgtype: MsgType
-    msgid: int
-    error: Any
-    result: Any
+    msgtype: MsgType  # message type
+    msgid: int  # message ID
+    error: Any  # error
+    result: Any  # result
 
 
 class Notification(NamedTuple):
@@ -82,17 +60,8 @@ class Notification(NamedTuple):
         method name
     params : List[Any]
         parameters
-
-    Attributes
-    ----------
-    msgtype : mprpc.messages.MsgType
-        message type
-    method : str
-        method name
-    params : List[Any]
-        parameters
     """
 
-    msgtype: MsgType
-    method: str
-    params: List[Any]
+    msgtype: MsgType  # message type
+    method: str  # method name
+    params: List[Any]  # parameters
