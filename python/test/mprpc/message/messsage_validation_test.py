@@ -1,11 +1,11 @@
-"""test of functions to parse messages
+"""test of functions to validate messages
 """
 
-import pytest
 from typing import Any
+import pytest
 
 from mprpc.message import (
-    Request, Response, Notification, parse_message, MsgType
+    Request, Response, Notification, validate_message, MsgType
 )
 from mprpc import MPRPCException, ErrorInfo, ErrorCode
 
@@ -20,7 +20,7 @@ def _check_parse_error(data: Any):
     """
 
     with pytest.raises(MPRPCException) as err:
-        parse_message(data)
+        validate_message(data)
     assert isinstance(err.value.args[0], ErrorInfo)
     assert err.value.args[0].code == int(ErrorCode.PARSE_ERROR)
 
@@ -35,7 +35,7 @@ def test_parse_request():
     params = [1, 'test', 3.14]
     data = [msgtype, msgid, method, params]
 
-    req = parse_message(data)
+    req = validate_message(data)
     assert isinstance(req, Request)
     assert req.msgtype == MsgType.REQUEST
     assert req.msgid == msgid
@@ -71,7 +71,7 @@ def test_parse_response():
     result = 'result text'
     data = [msgtype, msgid, error, result]
 
-    res = parse_message(data)
+    res = validate_message(data)
     assert isinstance(res, Response)
     assert res.msgtype == int(MsgType.RESPONSE)
     assert res.msgid == msgid
@@ -100,7 +100,7 @@ def test_parse_notification():
     params = [1, 'test', 3.14]
     data = [msgtype, method, params]
 
-    notification = parse_message(data)
+    notification = validate_message(data)
     assert isinstance(notification, Notification)
     assert notification.msgtype == MsgType.NOTIFICATION
     assert notification.method == method
@@ -119,7 +119,7 @@ def test_parse_notification():
     _check_parse_error(data)
 
 
-def test_parse_message():
+def test_validate_message():
     """test of parsing other messages
     """
 

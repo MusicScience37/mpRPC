@@ -6,7 +6,8 @@ from .._mprpc_cpp import (
 )
 from ._msgtype import MsgType
 from ._msgid import MAX_MSGID, is_valid_msgid
-from ._message import Request, Response, Notification, parse_message
+from ._message import Request, Response, Notification
+from ._message_validation import validate_message
 
 for obj in (
     MessageData,
@@ -14,7 +15,7 @@ for obj in (
     Request,
     Response,
     Notification,
-    parse_message,
+    validate_message,
     is_valid_msgid,
 ):
     obj.__module__ = "mprpc.message"
