@@ -13,6 +13,7 @@ This project uses the following external libraries in source codes:
 - `toml11 <https://github.com/ToruNiina/toml11>`_
 - `pybind11 <https://github.com/pybind/pybind11>`_
 - `marshmallow <https://marshmallow.readthedocs.io/>`_
+- `msgpack-python <https://github.com/msgpack/msgpack-python>`_
 
 This project uses the following external libraries in tests:
 

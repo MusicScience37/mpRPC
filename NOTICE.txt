@@ -35,3 +35,6 @@ This project includes pybind11 library, which is available under a
 
 This project depends on marshmallow package, which is available under a 
 "MIT License." For details, see https://marshmallow.readthedocs.io/.
+
+This project depends on msgpack package, which is available under a 
+"Apache License, Version 2.0." For details, see https://github.com/msgpack/msgpack-python.
