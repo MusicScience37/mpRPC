@@ -1,10 +1,13 @@
 """definition of messages and implementation of their parsing functions
 """
 
-from collections import namedtuple
+from typing import NamedTuple, Any, List
+
+from ._msgtype import MsgType
 
 
-class Request(namedtuple('Request', ['msgtype', 'msgid', 'method', 'params'])):
+# pylint: disable=too-few-public-methods
+class Request(NamedTuple):
     """class of request messages
 
     Parameters
@@ -30,8 +33,13 @@ class Request(namedtuple('Request', ['msgtype', 'msgid', 'method', 'params'])):
         parameters
     """
 
+    msgtype: MsgType
+    msgid: int
+    method: str
+    params: List[Any]
 
-class Response(namedtuple('Response', ['msgtype', 'msgid', 'error', 'result'])):
+
+class Response(NamedTuple):
     """class of response messages
 
     Parameters
@@ -57,8 +65,13 @@ class Response(namedtuple('Response', ['msgtype', 'msgid', 'error', 'result'])):
         result
     """
 
+    msgtype: MsgType
+    msgid: int
+    error: Any
+    result: Any
 
-class Notification(namedtuple('Notification', ['msgtype', 'method', 'params'])):
+
+class Notification(NamedTuple):
     """class of notification messages
 
     Parameters
@@ -79,3 +92,7 @@ class Notification(namedtuple('Notification', ['msgtype', 'method', 'params'])):
     params : List[Any]
         parameters
     """
+
+    msgtype: MsgType
+    method: str
+    params: List[Any]
