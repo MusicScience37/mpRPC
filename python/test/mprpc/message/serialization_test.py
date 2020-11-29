@@ -3,7 +3,14 @@
 
 import pytest
 
-from mprpc.message import pack_object, unpack_object, MessageData
+from mprpc.message import (
+    pack_object, unpack_object,
+    pack_request, pack_response, pack_notification,
+    MessageData,
+    validate_message,
+    Request, Response, Notification,
+    MsgType,
+)
 from mprpc import MPRPCException, ErrorInfo, ErrorCode
 
 
@@ -37,3 +44,51 @@ def test_pack_object():
         pack_object(origin)
     assert isinstance(err.value.args[0], ErrorInfo)
     assert err.value.args[0].code == int(ErrorCode.UNEXPECTED_ERROR)
+
+
+def test_pack_request():
+    """test of pack_request function
+    """
+
+    msgid = 37
+    method = 'abc'
+    params = [1, 'param']
+
+    data = pack_request(msgid=msgid, method=method, params=params)
+    req = validate_message(unpack_object(data))
+    assert req == Request(MsgType.REQUEST, msgid, method, params)
+
+
+def test_pack_response():
+    """test of pack_response function
+    """
+
+    msgid = 37
+
+    data = pack_response(msgid=msgid)
+    res = validate_message(unpack_object(data))
+    assert res == Response(MsgType.RESPONSE, msgid, None, None)
+
+    result = 'abc'
+
+    data = pack_response(msgid=msgid, result=result)
+    res = validate_message(unpack_object(data))
+    assert res == Response(MsgType.RESPONSE, msgid, None, result)
+
+    error = 123
+
+    data = pack_response(msgid=msgid, error=error)
+    res = validate_message(unpack_object(data))
+    assert res == Response(MsgType.RESPONSE, msgid, error, None)
+
+
+def test_pack_notification():
+    """test of pack_notification function
+    """
+
+    method = 'abc'
+    params = [1, 'param']
+
+    data = pack_notification(method=method, params=params)
+    notification = validate_message(unpack_object(data))
+    assert notification == Notification(MsgType.NOTIFICATION, method, params)
