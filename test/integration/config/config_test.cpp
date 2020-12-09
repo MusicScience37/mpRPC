@@ -48,7 +48,7 @@ TEST_CASE("load configuration for RPC") {
             mprpc::client_builder(logger).client_config(config.client).create();
 
         auto echo_client =
-            mprpc::method_client<std::string(std::string)>(*client, "echo");
+            mprpc::method_client<std::string(std::string)>(client, "echo");
 
         const auto str = std::string("abc");
         REQUIRE(echo_client(str) == str);

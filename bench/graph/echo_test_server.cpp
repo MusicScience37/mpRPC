@@ -38,7 +38,7 @@ std::shared_ptr<mprpc::logging::logger> get_logger() {
 std::string echo(std::string str) { return str; }
 
 void create_server(const std::string& host, const std::string& type) {
-    static std::unique_ptr<mprpc::server> echo_server;
+    static std::shared_ptr<mprpc::server> echo_server;
     static const auto logger = get_logger();
 
     echo_server.reset();
