@@ -11,6 +11,8 @@ from mprpc.config import (
     UDPAcceptorConfig,
     UDPConnectorConfig,
     ServerConfig,
+    TransportType,
+    ClientConfig,
 )
 from mprpc import MPRPCException
 
@@ -91,3 +93,16 @@ def test_server_config():
 
     with pytest.raises(MPRPCException):
         config.num_threads = 0
+
+
+def test_client_config():
+    """test of ClientConfig class
+    """
+
+    config = ClientConfig()
+
+    config.num_threads = 1
+    config.sync_request_timeout_ms = 10000
+    config.connector_type = TransportType.UDP
+    config.tcp_connector.compression.type = CompressionType.ZSTD
+    config.udp_connector.compression.type = CompressionType.ZSTD

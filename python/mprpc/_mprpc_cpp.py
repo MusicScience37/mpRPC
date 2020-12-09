@@ -22,4 +22,6 @@ from _mprpc_cpp import (
     UDPAcceptorConfig,
     UDPConnectorConfig,
     ServerConfig,
+    TransportType,
+    ClientConfig,
 )

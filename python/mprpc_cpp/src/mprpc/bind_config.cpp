@@ -21,6 +21,7 @@
 
 #include <pybind11/stl.h>
 
+#include "mprpc/client_config.h"
 #include "mprpc/server_config.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/tcp/tcp_acceptor_config.h"
@@ -179,9 +180,9 @@ void bind_config(pybind11::module& module) {
             ----------
             num_threads : int
                 number of threads
-            tcp_acceptors : List[TCPAcceptorConfig]
+            tcp_acceptors : List[mprpc.config.TCPAcceptorConfig]
                 TCP acceptors
-            udp_acceptors : List[UDPAcceptorConfig]
+            udp_acceptors : List[mprpc.config.UDPAcceptorConfig]
                 UDP acceptors
         )doc");
     server_config_class.def(pybind11::init<>());
@@ -190,6 +191,40 @@ void bind_config(pybind11::module& module) {
         "tcp_acceptors", &server_config::tcp_acceptors);
     server_config_class.def_readwrite(
         "udp_acceptors", &server_config::udp_acceptors);
+
+    using mprpc::transport_type;
+    pybind11::enum_<transport_type>(
+        module, "TransportType", "enumeration of transport types")
+        .value("TCP", transport_type::tcp, "TCP")
+        .value("UDP", transport_type::udp, "UDP");
+
+    using mprpc::client_config;
+    auto client_config_class = pybind11::class_<client_config>(
+        module, "ClientConfig", R"doc(ClientConfig()
+
+            configuration of clients
+
+            Attributes
+            ----------
+            num_threads : int
+                number of threads
+            sync_request_timeout_ms : int
+                timeout of synchronous requests [ms]
+            connector_type : mprpc.config.TransportType
+                connector type (TCP, UDP)
+            tcp_connector : mprpc.config.TCPConnectorConfig
+                TCP connector configuration
+            udp_connector : mprpc.config.UDPConnectorConfig
+                UDP connector configuration
+        )doc");
+    client_config_class.def(pybind11::init<>());
+    bind_value(client_config_class, &client_config::num_threads);
+    bind_value(client_config_class, &client_config::sync_request_timeout_ms);
+    bind_value(client_config_class, &client_config::connector_type);
+    client_config_class.def_readwrite(
+        "tcp_connector", &client_config::tcp_connector);
+    client_config_class.def_readwrite(
+        "udp_connector", &client_config::udp_connector);
 }
 
 }  // namespace python
