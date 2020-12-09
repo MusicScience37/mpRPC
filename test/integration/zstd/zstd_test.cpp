@@ -68,7 +68,7 @@ TEST_CASE("RPC on UDP using zstd compression") {
             .create();
 
     auto echo_client =
-        mprpc::method_client<std::string(std::string)>(*client, "echo");
+        mprpc::method_client<std::string(std::string)>(client, "echo");
 
     SECTION("request echo") {
         const auto str = std::string("abc");
@@ -112,7 +112,7 @@ TEST_CASE("RPC on TCP using zstd compression") {
             .create();
 
     auto echo_client =
-        mprpc::method_client<std::string(std::string)>(*client, "echo");
+        mprpc::method_client<std::string(std::string)>(client, "echo");
 
     SECTION("request echo") {
         const auto str = std::string("abc");

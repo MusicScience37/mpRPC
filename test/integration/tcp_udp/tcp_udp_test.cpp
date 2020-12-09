@@ -47,7 +47,7 @@ TEST_CASE("RPC on TCP") {
             mprpc::client_builder(logger).num_threads(2).connect_tcp().create();
 
         auto echo_client =
-            mprpc::method_client<std::string(std::string)>(*client, "echo");
+            mprpc::method_client<std::string(std::string)>(client, "echo");
 
         const auto timeout = std::chrono::seconds(3);
 
@@ -62,7 +62,7 @@ TEST_CASE("RPC on TCP") {
             mprpc::client_builder(logger).num_threads(2).connect_udp().create();
 
         auto echo_client =
-            mprpc::method_client<std::string(std::string)>(*client, "echo");
+            mprpc::method_client<std::string(std::string)>(client, "echo");
 
         const auto timeout = std::chrono::seconds(3);
         const auto str = std::string("abc");

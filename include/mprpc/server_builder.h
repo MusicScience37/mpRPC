@@ -185,7 +185,7 @@ public:
      *
      * \return server
      */
-    std::unique_ptr<server> create() {
+    std::shared_ptr<server> create() {
         const auto threads = std::make_shared<thread_pool>(
             logger_, server_config_.num_threads.value());
 
@@ -214,7 +214,7 @@ public:
                 transport::create_parser_factory(config.compression), config));
         }
 
-        auto srv = std::make_unique<server>(logger_, threads,
+        auto srv = std::make_shared<server>(logger_, threads,
             std::move(acceptors), std::move(method_server), server_config_);
         srv->start();
 

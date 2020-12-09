@@ -72,7 +72,7 @@ client->async_request<std::string>("echo", "abc").then(callback_function);
 ```cpp
 // wrapper for a method in the server
 auto echo =
-    mprpc::method_client<std::string(std::string)>(*client, "echo");
+    mprpc::method_client<std::string(std::string)>(client, "echo");
 
 // call like a function
 std::string result = echo("abc");

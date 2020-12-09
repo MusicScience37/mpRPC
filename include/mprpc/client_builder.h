@@ -154,7 +154,7 @@ public:
      *
      * \return client
      */
-    std::unique_ptr<client> create() {
+    std::shared_ptr<client> create() {
         const auto threads = std::make_shared<thread_pool>(
             logger_, client_config_.num_threads.value());
 
@@ -178,7 +178,7 @@ public:
             break;
         }
 
-        auto res = std::make_unique<client>(
+        auto res = std::make_shared<client>(
             logger_, threads, std::move(connector), client_config_);
         res->start();
 

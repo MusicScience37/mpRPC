@@ -48,8 +48,8 @@ TEST_CASE("RPC on UDP") {
         mprpc::client_builder(logger).num_threads(2).connect_udp().create();
 
     auto echo_client =
-        mprpc::method_client<std::string(std::string)>(*client, "echo");
-    auto count_client = mprpc::method_client<void()>(*client, "count");
+        mprpc::method_client<std::string(std::string)>(client, "echo");
+    auto count_client = mprpc::method_client<void()>(client, "count");
 
     const auto timeout = std::chrono::seconds(3);
 
