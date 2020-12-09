@@ -8,3 +8,4 @@ Python API Reference
     mprpc
     mprpc.logging
     mprpc.message
+    mprpc.config

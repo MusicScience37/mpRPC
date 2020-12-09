@@ -14,4 +14,9 @@ from _mprpc_cpp import (
     ErrorCode,
     ErrorInfo,
     MPRPCException,
+    # config
+    CompressionType,
+    CompressionConfig,
+    TCPAcceptorConfig,
+    TCPConnectorConfig,
 )
