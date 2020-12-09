@@ -22,6 +22,8 @@
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/tcp/tcp_acceptor_config.h"
 #include "mprpc/transport/tcp/tcp_connector_config.h"
+#include "mprpc/transport/udp/udp_acceptor_config.h"
+#include "mprpc/transport/udp/udp_connector_config.h"
 
 namespace {
 
@@ -113,6 +115,56 @@ void bind_config(pybind11::module& module) {
     bind_value(tcp_connector_config_class, &tcp_connector_config::port);
     bind_value(tcp_connector_config_class,
         &tcp_connector_config::streaming_min_buf_size);
+
+    using mprpc::transport::udp::udp_acceptor_config;
+    auto udp_acceptor_config_class = pybind11::class_<udp_acceptor_config>(
+        module, "UDPAcceptorConfig", R"doc(UDPAcceptorConfig()
+
+            configuration for UDP acceptors
+
+            Attributes
+            ----------
+            compression : mprpc.config.CompressionConfig
+                configuration of compression
+            host : str
+                host address (IP address for server, common names for clients)
+            port : int
+                port number
+            datagram_buf_size : int
+                buffer size in datagrams
+        )doc");
+    udp_acceptor_config_class.def(pybind11::init<>());
+    udp_acceptor_config_class.def_readwrite(
+        "compression", &udp_acceptor_config::compression);
+    bind_value(udp_acceptor_config_class, &udp_acceptor_config::host);
+    bind_value(udp_acceptor_config_class, &udp_acceptor_config::port);
+    bind_value(
+        udp_acceptor_config_class, &udp_acceptor_config::datagram_buf_size);
+
+    using mprpc::transport::udp::udp_connector_config;
+    auto udp_connector_config_class = pybind11::class_<udp_connector_config>(
+        module, "UDPConnectorConfig", R"doc(UDPConnectorConfig()
+
+            configuration for UDP acceptors
+
+            Attributes
+            ----------
+            compression : mprpc.config.CompressionConfig
+                configuration of compression
+            host : str
+                host address (IP address for server, common names for clients)
+            port : int
+                port number
+            datagram_buf_size : int
+                buffer size in datagrams
+        )doc");
+    udp_connector_config_class.def(pybind11::init<>());
+    udp_connector_config_class.def_readwrite(
+        "compression", &udp_connector_config::compression);
+    bind_value(udp_connector_config_class, &udp_connector_config::host);
+    bind_value(udp_connector_config_class, &udp_connector_config::port);
+    bind_value(
+        udp_connector_config_class, &udp_connector_config::datagram_buf_size);
 }
 
 }  // namespace python

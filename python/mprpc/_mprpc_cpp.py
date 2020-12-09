@@ -19,4 +19,6 @@ from _mprpc_cpp import (
     CompressionConfig,
     TCPAcceptorConfig,
     TCPConnectorConfig,
+    UDPAcceptorConfig,
+    UDPConnectorConfig,
 )
