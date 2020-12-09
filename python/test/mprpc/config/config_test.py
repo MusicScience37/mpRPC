@@ -1,6 +1,9 @@
 """test of configuration
 """
 
+import os
+import pathlib
+
 import pytest
 
 from mprpc.config import (
@@ -14,6 +17,7 @@ from mprpc.config import (
     TransportType,
     ClientConfig,
     MPRPCConfig,
+    load,
 )
 from mprpc import MPRPCException
 
@@ -108,6 +112,7 @@ def test_client_config():
     config.tcp_connector.compression.type = CompressionType.ZSTD
     config.udp_connector.compression.type = CompressionType.ZSTD
 
+
 def test_mprpc_config():
     """test of MPRPCConfig class
     """
@@ -116,3 +121,23 @@ def test_mprpc_config():
 
     config.client.num_threads = 1
     config.server.num_threads = 1
+
+
+def test_load():
+    """test of load function
+    """
+
+    input_path = pathlib.Path(__file__).absolute().parent / 'config_test.toml'
+    assert input_path.is_file()
+
+    config = load(str(input_path))
+
+    assert config.client.num_threads == 3
+    assert config.client.tcp_connector.compression.type == CompressionType.ZSTD
+    assert config.client.tcp_connector.host == 'localhost'
+    assert config.client.tcp_connector.port == 12345
+
+    assert len(config.server.tcp_acceptors) == 1
+    assert config.server.tcp_acceptors[0].compression.type == CompressionType.ZSTD
+    assert config.server.tcp_acceptors[0].host == '0.0.0.0'
+    assert config.server.tcp_acceptors[0].port == 12345

@@ -25,4 +25,5 @@ from _mprpc_cpp import (
     TransportType,
     ClientConfig,
     MPRPCConfig,
+    load,
 )

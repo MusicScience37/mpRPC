@@ -22,6 +22,7 @@
 #include <pybind11/stl.h>
 
 #include "mprpc/client_config.h"
+#include "mprpc/config/load.h"
 #include "mprpc/mprpc_config.h"
 #include "mprpc/server_config.h"
 #include "mprpc/transport/compression_config.h"
@@ -242,6 +243,23 @@ void bind_config(pybind11::module& module) {
         .def(pybind11::init<>())
         .def_readwrite("client", &mprpc_config::client)
         .def_readwrite("server", &mprpc_config::server);
+
+    using mprpc::config::load;
+    module.def("load", &load,
+        R"doc(load(config_filepath : str) -> mprpc.config.MPRPCConfig
+
+            load configuration file
+
+            Parameters
+            ----------
+            config_filepath : str
+                configuration file path
+
+            Returns
+            -------
+            mprpc.config.MPRPCConfig
+                configuration
+        )doc");
 }
 
 }  // namespace python
