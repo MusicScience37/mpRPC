@@ -13,6 +13,7 @@ from mprpc.config import (
     ServerConfig,
     TransportType,
     ClientConfig,
+    MPRPCConfig,
 )
 from mprpc import MPRPCException
 
@@ -106,3 +107,12 @@ def test_client_config():
     config.connector_type = TransportType.UDP
     config.tcp_connector.compression.type = CompressionType.ZSTD
     config.udp_connector.compression.type = CompressionType.ZSTD
+
+def test_mprpc_config():
+    """test of MPRPCConfig class
+    """
+
+    config = MPRPCConfig()
+
+    config.client.num_threads = 1
+    config.server.num_threads = 1

@@ -22,6 +22,7 @@
 #include <pybind11/stl.h>
 
 #include "mprpc/client_config.h"
+#include "mprpc/mprpc_config.h"
 #include "mprpc/server_config.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/tcp/tcp_acceptor_config.h"
@@ -225,6 +226,22 @@ void bind_config(pybind11::module& module) {
         "tcp_connector", &client_config::tcp_connector);
     client_config_class.def_readwrite(
         "udp_connector", &client_config::udp_connector);
+
+    using mprpc::mprpc_config;
+    pybind11::class_<mprpc_config>(module, "MPRPCConfig", R"doc(MPRPCConfig()
+
+            configuration of this library
+
+            Attributes
+            ----------
+            client : mprpc.config.ClientConfig
+                configuration of clients
+            server : mprpc.config.ServerConfig
+                configuration of servers
+        )doc")
+        .def(pybind11::init<>())
+        .def_readwrite("client", &mprpc_config::client)
+        .def_readwrite("server", &mprpc_config::server);
 }
 
 }  // namespace python

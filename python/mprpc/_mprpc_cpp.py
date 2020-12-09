@@ -24,4 +24,5 @@ from _mprpc_cpp import (
     ServerConfig,
     TransportType,
     ClientConfig,
+    MPRPCConfig,
 )

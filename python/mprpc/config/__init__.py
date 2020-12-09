@@ -11,6 +11,7 @@ from .._mprpc_cpp import (
     ServerConfig,
     TransportType,
     ClientConfig,
+    MPRPCConfig,
 )
 
 for obj in (
@@ -23,6 +24,7 @@ for obj in (
     ServerConfig,
     TransportType,
     ClientConfig,
+    MPRPCConfig,
 ):
     obj.__module__ = "mprpc.config"
 del obj
