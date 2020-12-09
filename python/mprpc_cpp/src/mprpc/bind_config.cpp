@@ -19,6 +19,9 @@
  */
 #include "mprpc/bind_config.h"
 
+#include <pybind11/stl.h>
+
+#include "mprpc/server_config.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/tcp/tcp_acceptor_config.h"
 #include "mprpc/transport/tcp/tcp_connector_config.h"
@@ -165,6 +168,28 @@ void bind_config(pybind11::module& module) {
     bind_value(udp_connector_config_class, &udp_connector_config::port);
     bind_value(
         udp_connector_config_class, &udp_connector_config::datagram_buf_size);
+
+    using mprpc::server_config;
+    auto server_config_class = pybind11::class_<server_config>(
+        module, "ServerConfig", R"doc(ServerConfig()
+
+            configuration of servers
+
+            Attributes
+            ----------
+            num_threads : int
+                number of threads
+            tcp_acceptors : List[TCPAcceptorConfig]
+                TCP acceptors
+            udp_acceptors : List[UDPAcceptorConfig]
+                UDP acceptors
+        )doc");
+    server_config_class.def(pybind11::init<>());
+    bind_value(server_config_class, &server_config::num_threads);
+    server_config_class.def_readwrite(
+        "tcp_acceptors", &server_config::tcp_acceptors);
+    server_config_class.def_readwrite(
+        "udp_acceptors", &server_config::udp_acceptors);
 }
 
 }  // namespace python

@@ -8,6 +8,7 @@ from .._mprpc_cpp import (
     TCPConnectorConfig,
     UDPAcceptorConfig,
     UDPConnectorConfig,
+    ServerConfig,
 )
 
 for obj in (
@@ -17,6 +18,7 @@ for obj in (
     TCPConnectorConfig,
     UDPAcceptorConfig,
     UDPConnectorConfig,
+    ServerConfig,
 ):
     obj.__module__ = "mprpc.config"
 del obj

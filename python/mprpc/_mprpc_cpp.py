@@ -21,4 +21,5 @@ from _mprpc_cpp import (
     TCPConnectorConfig,
     UDPAcceptorConfig,
     UDPConnectorConfig,
+    ServerConfig,
 )

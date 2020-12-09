@@ -10,6 +10,7 @@ from mprpc.config import (
     TCPConnectorConfig,
     UDPAcceptorConfig,
     UDPConnectorConfig,
+    ServerConfig,
 )
 from mprpc import MPRPCException
 
@@ -72,3 +73,21 @@ def test_udp_connector_config():
     config.host = '127.0.0.1'
     config.port = 12345
     config.datagram_buf_size = 1000
+
+
+def test_server_config():
+    """test of ServerConfig class
+    """
+
+    config = ServerConfig()
+
+    config.num_threads = 1
+
+    tcp = TCPAcceptorConfig()
+    config.tcp_acceptors = [tcp]
+
+    udp = UDPAcceptorConfig()
+    config.udp_acceptors = [udp]
+
+    with pytest.raises(MPRPCException):
+        config.num_threads = 0
