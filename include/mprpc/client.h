@@ -24,6 +24,7 @@
 #include <unordered_map>
 
 #include "mprpc/client_config.h"
+#include "mprpc/client_fwd.h"
 #include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
 #include "mprpc/pack_data.h"
