@@ -26,6 +26,7 @@
 #include "mprpc/bind_error_codes.h"
 #include "mprpc/bind_logging.h"
 #include "mprpc/bind_message.h"
+#include "mprpc/bind_transport.h"
 
 PYBIND11_MODULE(_mprpc_cpp, module) {
     pybind11::options options;
@@ -38,4 +39,5 @@ PYBIND11_MODULE(_mprpc_cpp, module) {
     mprpc::python::bind_error_codes(module);
     mprpc::python::bind_error(module);
     mprpc::python::bind_config(module);
+    mprpc::python::bind_transport(module);
 }

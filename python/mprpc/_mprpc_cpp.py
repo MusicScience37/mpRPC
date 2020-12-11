@@ -26,4 +26,7 @@ from _mprpc_cpp import (
     ClientConfig,
     MPRPCConfig,
     load,
+    # transport
+    Address,
+    Session,
 )
