@@ -29,4 +29,6 @@ from _mprpc_cpp import (
     # transport
     Address,
     Session,
+    # server
+    PythonServerHelper,
 )

@@ -19,25 +19,15 @@
  */
 #pragma once
 
-#include <mutex>
-#include <unordered_set>
-#include <vector>
-
-#include "mprpc/error_info.h"
-#include "mprpc/execution/method_server.h"
-#include "mprpc/logging/labeled_logger.h"
-#include "mprpc/logging/logging_macros.h"
-#include "mprpc/require_nonull.h"
-#include "mprpc/server_config.h"
-#include "mprpc/thread_pool.h"
-#include "mprpc/transport/acceptor.h"
+#include "mprpc/impl/server_base.h"
+#include "mprpc/server_fwd.h"
 
 namespace mprpc {
 
 /*!
  * \brief class of servers
  */
-class server {
+class server final : public impl::server_base {
 public:
     /*!
      * \brief construct
@@ -48,46 +38,15 @@ public:
      * \param method_server method server
      * \param config configuration
      */
-    server(logging::labeled_logger logger,
+    server(const logging::labeled_logger& logger,
         std::shared_ptr<mprpc::thread_pool> threads,
         std::vector<std::shared_ptr<transport::acceptor>> acceptors,
         std::shared_ptr<execution::method_server> method_server,
         server_config config)
-        : logger_(std::move(logger)),
-          threads_(MPRPC_REQUIRE_NONULL_MOVE(threads)),
-          acceptors_(std::move(acceptors)),
-          method_server_(MPRPC_REQUIRE_NONULL_MOVE(method_server)),
-          config_(std::move(config)) {
-        for (const auto& acceptor : acceptors_) {
-            MPRPC_REQUIRE_NONULL(acceptor);
-        }
-    }
-
-    /*!
-     * \brief start process
-     */
-    void start() {
-        MPRPC_INFO(logger_, "server starting");
-        threads_->start();
-        for (const auto& acceptor : acceptors_) {
-            do_accept(acceptor);
-        }
-        MPRPC_INFO(logger_, "server started");
-    }
-
-    /*!
-     * \brief stop process
-     */
-    void stop() {
-        MPRPC_INFO(logger_, "server stopping");
-        std::unique_lock<std::mutex> lock(*mutex_);
-        for (const auto& session : sessions_) {
-            session->shutdown();
-        }
-        lock.unlock();
-        threads_->stop();
-        MPRPC_INFO(logger_, "server stopped");
-    }
+        : impl::server_base(logger, std::move(threads), std::move(acceptors),
+              std::move(config)),
+          logger_(logger),
+          method_server_(MPRPC_REQUIRE_NONULL_MOVE(method_server)) {}
 
     server(const server&) = delete;
     server& operator=(const server&) = delete;
@@ -97,142 +56,29 @@ public:
     //! destruct
     ~server() { stop(); }
 
-private:
-    /*!
-     * \brief accept a session
-     *
-     * \param acceptor acceptor
-     */
-    void do_accept(const std::shared_ptr<transport::acceptor>& acceptor) {
-        acceptor->async_accept(
-            [this,
-                weak_acceptor = std::weak_ptr<transport::acceptor>(acceptor)](
-                const error_info& error,
-                const std::shared_ptr<transport::session>& session) {
-                auto acceptor = weak_acceptor.lock();
-                if (acceptor) {
-                    this->on_accept(acceptor, error, session);
-                }
-            });
-    }
-
-    /*!
-     * \brief process on session accepted
-     *
-     * \param acceptor acceptor
-     * \param error error
-     * \param session session
-     */
-    void on_accept(const std::shared_ptr<transport::acceptor>& acceptor,
-        const error_info& error,
-        const std::shared_ptr<transport::session>& session) {
-        if (!error) {
-            std::unique_lock<std::mutex> lock(*mutex_);
-            sessions_.insert(session);
-            lock.unlock();
-            do_read(session);
-        }
-        do_accept(acceptor);
-    }
-
-    /*!
-     * \brief read a message
-     *
-     * \param session session
-     */
-    void do_read(const std::shared_ptr<transport::session>& session) {
-        session->async_read(
-            [this, weak_session = std::weak_ptr<transport::session>(session)](
-                const error_info& error, const message_data& data) {
-                auto session = weak_session.lock();
-                if (session) {
-                    this->on_read(session, error, data);
-                }
-            });
-    }
-
-    /*!
-     * \brief process on message read
-     *
-     * \param session session
-     * \param error error
-     * \param data message data
-     */
-    void on_read(const std::shared_ptr<transport::session>& session,
-        const error_info& error, const message_data& data) {
-        if (error) {
-            async_remove_session(session);
-            return;
-        }
+protected:
+    //! \copydoc mprpc::impl::server_base::async_process_message
+    void async_process_message(
+        const std::shared_ptr<transport::session>& session,
+        const message_data& data,
+        const execution::method_server::on_message_processed_handler& handler)
+        override {
         try {
             const auto msg = message(data);
-            method_server_->async_process_message(session, msg,
-                [session](const error_info& error, bool response_exists,
-                    const message_data& response) {
-                    on_execution(session, error, response_exists, response);
-                });
+            method_server_->async_process_message(session, msg, handler);
         } catch (const exception& e) {
             MPRPC_ERROR(logger_, "{}", e.info());
             async_remove_session(session);
             return;
         }
-        do_read(session);
     }
 
-    /*!
-     * \brief process on execution of methods
-     *
-     * \param session session
-     * \param error error
-     * \param response_exists whether response exists
-     * \param response response
-     */
-    static void on_execution(const std::shared_ptr<transport::session>& session,
-        const error_info& error, bool response_exists,
-        const message_data& response) {
-        if (error) {
-            return;
-        }
-        if (!response_exists) {
-            return;
-        }
-        session->async_write(response, [](const error_info& /*error*/) {});
-    }
-
-    /*!
-     * \brief asynchronously remove a session
-     *
-     * \param session session
-     */
-    void async_remove_session(
-        const std::shared_ptr<transport::session>& session) {
-        threads_->post([this, session] {
-            std::unique_lock<std::mutex> lock(*mutex_);
-            session->shutdown();
-            sessions_.erase(session);
-        });
-    }
-
+private:
     //! logger
     logging::labeled_logger logger_;
 
-    //! thread pool
-    std::shared_ptr<mprpc::thread_pool> threads_;
-
-    //! acceptors
-    std::vector<std::shared_ptr<transport::acceptor>> acceptors_;
-
-    //! session
-    std::unordered_set<std::shared_ptr<transport::session>> sessions_{};
-
-    //! mutex for session
-    std::unique_ptr<std::mutex> mutex_{std::make_unique<std::mutex>()};
-
     //! method server
     std::shared_ptr<execution::method_server> method_server_;
-
-    //! server configuration
-    const server_config config_;
 };
 
 }  // namespace mprpc
