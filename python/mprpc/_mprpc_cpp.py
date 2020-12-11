@@ -31,4 +31,6 @@ from _mprpc_cpp import (
     Session,
     # server
     PythonServerHelper,
+    # client
+    PythonClientHelper,
 )

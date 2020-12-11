@@ -10,3 +10,4 @@ Python API Reference
     mprpc.message
     mprpc.config
     mprpc.server
+    mprpc.client

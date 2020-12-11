@@ -4,6 +4,9 @@ Submodules
 ----------
 - :py:mod:`mprpc.logging`
 - :py:mod:`mprpc.message`
+- :py:mod:`mprpc.config`
+- :py:mod:`mprpc.server`
+- :py:mod:`mprpc.client`
 """
 
 from ._mprpc_cpp import (

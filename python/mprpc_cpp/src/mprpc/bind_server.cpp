@@ -39,7 +39,9 @@ void bind_server(pybind11::module& module) {
             config : mprpc.config.ServerConfig
                 server configuration
             message_processor: Callable[[mprpc.transport.Session, mprpc.message.MessageData], mprpc.message.MessageData]
-                function to process messages
+                function to process messages.
+                Parameters are session and message data.
+                Return value is a message data for response (empty for no response).
         )doc")
         .def(pybind11::init(&python_server_helper::create))
         .def("start", &python_server_helper::start, R"doc(start()

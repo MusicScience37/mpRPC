@@ -21,6 +21,7 @@
 
 #include <pybind11/pybind11.h>
 
+#include "mprpc/bind_client.h"
 #include "mprpc/bind_config.h"
 #include "mprpc/bind_error.h"
 #include "mprpc/bind_error_codes.h"
@@ -42,4 +43,5 @@ PYBIND11_MODULE(_mprpc_cpp, module) {
     mprpc::python::bind_config(module);
     mprpc::python::bind_transport(module);
     mprpc::python::bind_server(module);
+    mprpc::python::bind_client(module);
 }
