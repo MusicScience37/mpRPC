@@ -19,7 +19,10 @@
  */
 #include "mprpc/bind_server.h"
 
+#include <pybind11/functional.h>
+
 #include "mprpc/python_server_helper.h"
+#include "mprpc/shared_function_caster.h"
 
 namespace mprpc {
 namespace python {
@@ -28,7 +31,7 @@ void bind_server(pybind11::module& module) {
     using mprpc::python::python_server_helper;
     pybind11::class_<python_server_helper,
         std::shared_ptr<python_server_helper>>(module, "PythonServerHelper",
-        R"doc(PythonServerHelper(logger: mprpc.logging.Logger, config: mprpc.config.ServerConfig, message_processor: Callable[[mprpc.transport.Session, mprpc.message.MessageData], mprpc.message.MessageData])
+        R"doc(PythonServerHelper(logger: mprpc.logging.Logger, config: mprpc.config.ServerConfig, message_processor: Callable[[mprpc.transport.Session, mprpc.message.MessageData, Callable[[mprpc.ErrorInfo, bool, mprpc.message.MessageData], Any]], Any])
 
             class for implementation of servers in Python
 
@@ -38,10 +41,10 @@ void bind_server(pybind11::module& module) {
                 logger
             config : mprpc.config.ServerConfig
                 server configuration
-            message_processor: Callable[[mprpc.transport.Session, mprpc.message.MessageData], mprpc.message.MessageData]
+            message_processor: Callable[[mprpc.transport.Session, mprpc.message.MessageData, Callable[[mprpc.ErrorInfo, bool, mprpc.message.MessageData], Any]], Any]
                 function to process messages.
-                Parameters are session and message data.
-                Return value is a message data for response (empty for no response).
+                Parameters are session, message data, and handler on message processed.
+                The handler's parameters are error, flag whether a response exists, and response data (if exists).
         )doc")
         .def(pybind11::init(&python_server_helper::create))
         .def("start", &python_server_helper::start, R"doc(start()

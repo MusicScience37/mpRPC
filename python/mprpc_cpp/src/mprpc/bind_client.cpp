@@ -19,7 +19,10 @@
  */
 #include "mprpc/bind_client.h"
 
+#include <pybind11/functional.h>
+
 #include "mprpc/python_client_helper.h"
+#include "mprpc/shared_function_caster.h"
 
 namespace mprpc {
 namespace python {
@@ -42,6 +45,7 @@ void bind_client(pybind11::module& module) {
                 function to process messages.
                 Parameters are error and message data.
             )doc")
+        .def(pybind11::init(&python_client_helper::create))
         .def("start", &python_client_helper::start, R"doc(start()
 
             start process

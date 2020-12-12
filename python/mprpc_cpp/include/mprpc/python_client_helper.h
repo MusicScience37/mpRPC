@@ -22,6 +22,8 @@
 #include <functional>
 #include <memory>
 
+#include <pybind11/pybind11.h>
+
 #include "mprpc/client_config.h"
 #include "mprpc/exception.h"
 #include "mprpc/logging/labeled_logger.h"
@@ -62,7 +64,7 @@ public:
         std::shared_ptr<thread_pool> threads,
         std::shared_ptr<transport::connector> connector, client_config config,
         message_processor_t message_processor)
-        : labeled_logger(std::move(logger)),
+        : labeled_logger_(std::move(logger)),
           threads_(std::move(threads)),
           connector_(std::move(connector)),
           config_(std::move(config)),
@@ -72,20 +74,22 @@ public:
      * \brief start process
      */
     void start() {
-        MPRPC_INFO(labeled_logger, "client starting");
+        pybind11::gil_scoped_release gil_released;
+        MPRPC_INFO(labeled_logger_, "client starting");
         threads_->start();
         do_read();
-        MPRPC_INFO(labeled_logger, "client started");
+        MPRPC_INFO(labeled_logger_, "client started");
     }
 
     /*!
      * \brief stop process
      */
     void stop() {
-        MPRPC_INFO(labeled_logger, "client stopping");
+        pybind11::gil_scoped_release gil_released;
+        MPRPC_INFO(labeled_logger_, "client stopping");
         connector_->shutdown();
         threads_->stop();
-        MPRPC_INFO(labeled_logger, "client stopped");
+        MPRPC_INFO(labeled_logger_, "client stopped");
     }
 
     /*!
@@ -111,6 +115,7 @@ public:
         const std::shared_ptr<logging::logger>& logger,
         const client_config& config,
         const message_processor_t& message_processor) {
+        pybind11::gil_scoped_release gil_released;
         const auto labeled_logger =
             logging::labeled_logger(logger, "mprpc.client");
 
@@ -143,6 +148,14 @@ public:
             std::move(connector), config, message_processor);
     }
 
+    python_client_helper(const python_client_helper&) = delete;
+    python_client_helper& operator=(const python_client_helper&) = delete;
+    python_client_helper(python_client_helper&&) = delete;
+    python_client_helper& operator=(python_client_helper&&) = delete;
+
+    //! destruct
+    ~python_client_helper() { stop(); }
+
 private:
     /*!
      * \brief read a message
@@ -155,7 +168,7 @@ private:
     }
 
     //! logger
-    logging::labeled_logger labeled_logger;
+    logging::labeled_logger labeled_logger_;
 
     //! thread pool
     std::shared_ptr<thread_pool> threads_;

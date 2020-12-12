@@ -64,7 +64,7 @@ public:
     static handle cast(const stl_ext::shared_function<Result(Args...)>& src,
         return_value_policy policy, handle parent) {
         return type_caster<std::function<Result(Args...)>>::cast(
-            src, policy, parent);
+            std::function<Result(Args...)>(src), policy, parent);
     }
 
 private:

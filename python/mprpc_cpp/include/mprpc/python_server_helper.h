@@ -21,6 +21,8 @@
 
 #include <functional>
 
+#include <pybind11/pybind11.h>
+
 #include "mprpc/exception.h"
 #include "mprpc/impl/server_base.h"
 
@@ -33,6 +35,12 @@ namespace python {
 class python_server_helper final : public impl::server_base {
 public:
     /*!
+     * \brief type of handlers on message processed
+     */
+    using on_message_processed_handler =
+        execution::method_server::on_message_processed_handler;
+
+    /*!
      * \brief type of function to process messages
      *
      * Parameters:
@@ -42,8 +50,9 @@ public:
      *
      * Return value: message data for response (empty for no response)
      */
-    using message_processor_t = std::function<message_data(
-        const std::shared_ptr<transport::session>&, const message_data&)>;
+    using message_processor_t =
+        std::function<void(const std::shared_ptr<transport::session>&,
+            const message_data&, const on_message_processed_handler&)>;
 
     /*!
      * \brief construct
@@ -57,11 +66,28 @@ public:
     python_server_helper(const logging::labeled_logger& logger,
         const std::shared_ptr<mprpc::thread_pool>& threads,
         std::vector<std::shared_ptr<transport::acceptor>> acceptors,
-        server_config config, const message_processor_t& message_processor)
+        server_config config, message_processor_t message_processor)
         : impl::server_base(
               logger, threads, std::move(acceptors), std::move(config)),
           logger_(logger),
-          threads_(threads) {}
+          threads_(threads),
+          message_processor_(std::move(message_processor)) {}
+
+    /*!
+     * \brief start process
+     */
+    void start() {
+        pybind11::gil_scoped_release gil_released;
+        impl::server_base::start();
+    }
+
+    /*!
+     * \brief stop process
+     */
+    void stop() {
+        pybind11::gil_scoped_release gil_released;
+        impl::server_base::stop();
+    }
 
     /*!
      * \brief asynchronously process message
@@ -77,11 +103,12 @@ public:
         override {
         threads_->post([this, session, data, handler]() {
             try {
-                const auto response = message_processor_(session, data);
-                handler(error_info(), response.has_data(), response);
+                message_processor_(session, data, handler);
             } catch (const exception& e) {
+                MPRPC_ERROR(logger_, e.what());
                 handler(e.info(), false, message_data());
             } catch (const std::exception& e) {
+                MPRPC_ERROR(logger_, e.what());
                 handler(error_info(error_code::unexpected_error, e.what()),
                     false, message_data());
             }
@@ -100,6 +127,7 @@ public:
         const std::shared_ptr<mprpc::logging::logger>& logger,
         const server_config& config,
         const message_processor_t& message_processor) {
+        pybind11::gil_scoped_release gil_released;
         const auto labeled_logger =
             logging::labeled_logger(logger, "mprpc.server");
         const auto threads = std::make_shared<thread_pool>(
