@@ -20,7 +20,7 @@ sync pipenv:
   image: musicscience37/clang-ci:clang10-v3.0
   script:
     - mkdir -p .venv
-    - pipenv install --dev
+    - pipenv install --dev --python 3.8.6
   artifacts:
     paths:
       - .venv
