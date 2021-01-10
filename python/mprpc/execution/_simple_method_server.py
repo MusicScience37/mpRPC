@@ -2,12 +2,14 @@
 """
 
 
-from typing import Union, Callable, Any, List
+from typing import Callable, Any, List
 from concurrent.futures import ThreadPoolExecutor, Future
 
 from mprpc.logging import Logger, LabeledLogger
 from mprpc.transport import Session
-from mprpc.message import Request, Notification, MessageData, pack_response
+from mprpc.message import (
+    Request, Notification, MessageData, pack_response, unpack_object, validate_message
+)
 from mprpc import ErrorInfo, ErrorCode, MPRPCException
 
 from ._method_server import MethodServer
@@ -35,7 +37,7 @@ class SimpleMethodServer(MethodServer):
         }
         self.__threads = ThreadPoolExecutor(1)
 
-    def async_process_message(self, session: Session, msg: Union[Request, Notification],
+    def async_process_message(self, session: Session, msg: MessageData,
                               handler: Callable[[ErrorInfo, bool, MessageData], Any]):
         """asynchronously process message
 
@@ -43,7 +45,7 @@ class SimpleMethodServer(MethodServer):
         ----------
         session : Session
             session
-        msg : Union[Request, Notification]
+        msg : MessageData
             message
         handler : Callable[[ErrorInfo, bool, MessageData], Any]
             handler on message processed
@@ -78,15 +80,14 @@ class SimpleMethodServer(MethodServer):
         self.__threads.submit(self.process_message, session,
                               msg).add_done_callback(done_callback)
 
-    def process_message(self, session: Session,
-                        msg: Union[Request, Notification]) -> MessageData:
+    def process_message(self, session: Session, data: MessageData) -> MessageData:
         """process a message
 
         Parameters
         ----------
         session : Session
             session
-        msg : Union[Request, Notification]
+        data : MessageData
             message
 
         Returns
@@ -96,6 +97,8 @@ class SimpleMethodServer(MethodServer):
         """
 
         try:
+            msg = validate_message(unpack_object(data))
+
             if isinstance(msg, Request):
                 if msg.method not in self.__methods:
                     self.__logger.error('method %s not found', msg.method)

@@ -2,10 +2,10 @@
 """
 
 from abc import ABC, abstractmethod
-from typing import Union, Callable, Any
+from typing import Callable, Any
 
 from mprpc.transport import Session
-from mprpc.message import Request, Notification, MessageData
+from mprpc.message import MessageData
 from mprpc import ErrorInfo
 
 # This file ignores too-few-public-methods warning to define interface
@@ -16,7 +16,7 @@ class MethodServer(ABC):  # pylint: disable=too-few-public-methods
     """
 
     @abstractmethod
-    def async_process_message(self, session: Session, msg: Union[Request, Notification],
+    def async_process_message(self, session: Session, msg: MessageData,
                               handler: Callable[[ErrorInfo, bool, MessageData], Any]):
         """asynchronously process message
 
@@ -24,7 +24,7 @@ class MethodServer(ABC):  # pylint: disable=too-few-public-methods
         ----------
         session : Session
             session
-        msg : Union[Request, Notification]
+        msg : MessageData
             message
         handler : Callable[[ErrorInfo, bool, MessageData], Any]
             handler on message processed

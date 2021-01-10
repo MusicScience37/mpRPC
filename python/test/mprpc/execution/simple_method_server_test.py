@@ -6,7 +6,8 @@ from threading import Event
 from mprpc_cpp_test import MockSession
 from mprpc.logging import PythonLogger
 from mprpc.message import (
-    MsgType, Request, Notification, validate_message, unpack_object, MessageData,
+    MsgType, validate_message, unpack_object, MessageData,
+    pack_request, pack_notification,
 )
 from mprpc.execution import SimpleMethodServer, FunctionMethodExecutor
 from mprpc import ErrorInfo
@@ -31,7 +32,7 @@ def test_simple_method_server_request():
 
     msgid = 37
     params = [2, 3]
-    request = Request(MsgType.REQUEST, msgid, name, params)
+    request = pack_request(msgid, name, params)
 
     err = None
     has_response = None
@@ -84,7 +85,7 @@ def test_simple_method_server_request_invalid_method():
     msgid = 37
     name = 'invalid_method'
     params = [2, 3]
-    request = Request(MsgType.REQUEST, msgid, name, params)
+    request = pack_request(msgid, name, params)
 
     err = None
     has_response = None
@@ -122,6 +123,7 @@ def test_simple_method_server_request_invalid_method():
     assert response.msgid == msgid
     assert response.error is not None
 
+
 def test_simple_method_server_notification():
     """test of notifications to SimpleMethodServer class
     """
@@ -133,7 +135,7 @@ def test_simple_method_server_notification():
     session = MockSession()
 
     params = [2, 3]
-    notification = Notification(MsgType.NOTIFICATION, name, params)
+    notification = pack_notification(name, params)
 
     err = None
     has_response = None
