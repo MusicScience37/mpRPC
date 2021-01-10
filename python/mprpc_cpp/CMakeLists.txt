@@ -9,6 +9,9 @@ pybind11_add_module(
     src/mprpc/bind_error_codes.cpp
     src/mprpc/bind_error.cpp
     src/mprpc/bind_config.cpp
+    src/mprpc/bind_transport.cpp
+    src/mprpc/bind_server.cpp
+    src/mprpc/bind_client.cpp
     src/mprpc/bind.cpp)
 target_include_directories(mprpc_python_wrapper
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)

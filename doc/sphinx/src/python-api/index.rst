@@ -9,3 +9,6 @@ Python API Reference
     mprpc.logging
     mprpc.message
     mprpc.config
+    mprpc.execution
+    mprpc.server
+    mprpc.client
