@@ -35,6 +35,17 @@ templates_path = ['_templates']
 
 exclude_patterns = []
 
+# -- Options for autodoc -----------------------------------------------------
+
+extensions += ['sphinx.ext.autodoc', 'sphinx.ext.napoleon']
+
+autodoc_default_options = {
+    'members': None,
+    'member-order': 'bysource',
+    'inherited-members': None,
+    'show-inheritance': None,
+}
+
 # -- Options for breathe -----------------------------------------------------
 
 extensions += ['breathe']

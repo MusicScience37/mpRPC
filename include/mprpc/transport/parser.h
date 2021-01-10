@@ -22,7 +22,7 @@
 #include <memory>
 
 #include "mprpc/exception.h"
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/message_data.h"
 
 namespace mprpc {
@@ -123,7 +123,7 @@ public:
      * \return parser
      */
     virtual std::unique_ptr<parser> create_parser(
-        std::shared_ptr<logging::logger> logger) = 0;
+        logging::labeled_logger logger) = 0;
 
     /*!
      * \brief create a parser with streaming
@@ -132,7 +132,7 @@ public:
      * \return parser
      */
     virtual std::unique_ptr<streaming_parser> create_streaming_parser(
-        std::shared_ptr<logging::logger> logger) = 0;
+        logging::labeled_logger logger) = 0;
 
     //! construct
     parser_factory() noexcept = default;

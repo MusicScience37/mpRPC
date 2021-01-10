@@ -25,6 +25,8 @@
 #include "mprpc/client.h"
 #include "mprpc/client_config.h"
 #include "mprpc/logging/basic_loggers.h"
+#include "mprpc/logging/labeled_logger.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/transport.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/connector.h"
@@ -41,7 +43,7 @@ namespace mprpc {
 class client_builder {
 public:
     //! construct
-    client_builder() = default;
+    client_builder() : client_builder(logging::create_stdout_logger()) {}
 
     /*!
      * \brief construct
@@ -49,7 +51,15 @@ public:
      * \param logger logger
      */
     explicit client_builder(std::shared_ptr<mprpc::logging::logger> logger)
-        : logger_(std::move(logger)) {}
+        : logger_(MPRPC_REQUIRE_NONULL_MOVE(logger), "mprpc.client") {}
+
+    /*!
+     * \brief construct
+     *
+     * \param logger logger
+     */
+    explicit client_builder(logging::labeled_logger logger)
+        : logger_(std::move(logger), "client") {}
 
     /*!
      * \brief set number of threads
@@ -144,7 +154,7 @@ public:
      *
      * \return client
      */
-    std::unique_ptr<client> create() {
+    std::shared_ptr<client> create() {
         const auto threads = std::make_shared<thread_pool>(
             logger_, client_config_.num_threads.value());
 
@@ -168,7 +178,7 @@ public:
             break;
         }
 
-        auto res = std::make_unique<client>(
+        auto res = std::make_shared<client>(
             logger_, threads, std::move(connector), client_config_);
         res->start();
 
@@ -177,8 +187,7 @@ public:
 
 private:
     //! logger
-    std::shared_ptr<mprpc::logging::logger> logger_{
-        logging::create_stdout_logger(mprpc::logging::log_level::warn)};
+    logging::labeled_logger logger_;
 
     //! client configuration
     mprpc::client_config client_config_{};

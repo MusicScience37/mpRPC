@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include "mprpc/require_nonull.h"
 #include "mprpc/transport/session.h"
 #include "mprpc/transport/udp/impl/udp_address.h"
 #include "mprpc/transport/udp/impl/udp_common.h"
@@ -43,10 +44,10 @@ public:
      * \param endpoint endpoint
      * \param data data
      */
-    udp_session(const std::shared_ptr<logging::logger>& logger,
+    udp_session(const logging::labeled_logger& logger,
         std::shared_ptr<udp_common> helper, asio::ip::udp::endpoint endpoint,
         message_data data)
-        : helper_(std::move(helper)),
+        : helper_(MPRPC_REQUIRE_NONULL_MOVE(helper)),
           endpoint_(std::move(endpoint)),
           data_(std::move(data)) {
         MPRPC_INFO(logger, "accepted connection from {} at {}", endpoint,

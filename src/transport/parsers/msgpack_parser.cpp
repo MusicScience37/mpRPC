@@ -26,13 +26,12 @@ namespace transport {
 namespace parsers {
 
 std::unique_ptr<parser> create_msgpack_parser(
-    std::shared_ptr<logging::logger> /*logger*/) {  // NOLINT: for compatible
-                                                    // API
+    const logging::labeled_logger& /*logger*/) {
     return std::make_unique<impl::msgpack_parser>();
 }
 
 std::unique_ptr<streaming_parser> create_msgpack_streaming_parser(
-    std::shared_ptr<logging::logger> logger) {
+    logging::labeled_logger logger) {
     return std::make_unique<impl::msgpack_streaming_parser>(std::move(logger));
 }
 

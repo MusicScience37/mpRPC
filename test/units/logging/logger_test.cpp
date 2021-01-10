@@ -28,6 +28,17 @@ public:
     explicit test_logger(mprpc::logging::log_level log_output_level)
         : mprpc::logging::logger(log_output_level) {}
 
+    void write_impl(const char* label, const char* filename, std::uint32_t line,
+        const char* function, mprpc::logging::log_level level,
+        const char* message) noexcept override {
+        this->label = label;
+        this->filename = filename;
+        this->line = line;
+        this->function = function;
+        this->level = level;
+        this->message = message;
+    }
+
     void write_impl(const char* filename, std::uint32_t line,
         const char* function, mprpc::logging::log_level level,
         const char* message) noexcept override {
@@ -44,6 +55,7 @@ public:
         this->message = message;
     }
 
+    std::string label{};
     std::string filename{};
     std::uint32_t line{0};
     std::string function{};

@@ -23,6 +23,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "mprpc/logging/logger.h"
+#include "mprpc/require_nonull.h"
 
 namespace mprpc {
 namespace logging {
@@ -125,14 +126,34 @@ public:
      */
     spdlog_logger(std::shared_ptr<spdlog::logger> spdlog_logger,
         mprpc::logging::log_level log_output_level) noexcept
-        : logger(log_output_level), spdlog_logger_(std::move(spdlog_logger)) {
+        : logger(log_output_level),
+          spdlog_logger_(MPRPC_REQUIRE_NONULL_MOVE(spdlog_logger)) {
         spdlog_logger_->set_level(spdlog::level::trace);
         spdlog_logger_->flush_on(spdlog::level::trace);
 
         auto formatter = std::make_unique<spdlog::pattern_formatter>();
         formatter->add_flag<impl::log_level_flag>('k');
-        formatter->set_pattern("[%Y-%m-%dT%H:%M:%S.%f] %^%k%$ (thread %t) %v");
+        formatter->set_pattern(
+            "[%Y-%m-%dT%H:%M:%S.%f] %^%k%$ (thread %t) %v (%s:%#)");
         spdlog_logger_->set_formatter(std::move(formatter));
+    }
+
+    /*!
+     * \brief write log
+     *
+     * \param label label
+     * \param filename file name
+     * \param line line number
+     * \param function function name
+     * \param level log level
+     * \param message log message
+     */
+    void write_impl(const char* label, const char* filename, std::uint32_t line,
+        const char* function, log_level level,
+        const char* message) noexcept final {
+        spdlog_logger_->log(spdlog::source_loc(filename, line, function),
+            impl::convert_log_level_to_spdlog(level), "[{}] {}", label,
+            message);
     }
 
     /*!
@@ -140,15 +161,15 @@ public:
      *
      * \param filename file name
      * \param line line number
+     * \param function function name
      * \param level log level
      * \param message log message
      */
     void write_impl(const char* filename, std::uint32_t line,
-        const char* /*function*/, log_level level,
+        const char* function, log_level level,
         const char* message) noexcept final {
-        write_impl(level,
-            fmt::format(FMT_STRING("{} ({}:{})"), message, filename, line)
-                .c_str());
+        spdlog_logger_->log(spdlog::source_loc(filename, line, function),
+            impl::convert_log_level_to_spdlog(level), message);
     }
 
     /*!

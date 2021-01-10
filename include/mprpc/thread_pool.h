@@ -25,6 +25,7 @@
 #include <stl_ext/shared_function.h>
 
 #include "mprpc/error_info.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logger.h"
 #include "mprpc/mprpc_export.h"
 
@@ -50,6 +51,15 @@ public:
      */
     explicit thread_pool(
         std::shared_ptr<logging::logger> logger, std::size_t num_threads = 1);
+
+    /*!
+     * \brief construct
+     *
+     * \param logger logger
+     * \param num_threads number of threads
+     */
+    explicit thread_pool(
+        logging::labeled_logger logger, std::size_t num_threads = 1);
 
     /*!
      * \brief set handler called when errors happen

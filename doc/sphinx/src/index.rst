@@ -9,5 +9,6 @@ An implementation of MessagePack-RPC in C++
 
     overview
     cpp-api/index
+    python-api/index
     license
     acknowledgement

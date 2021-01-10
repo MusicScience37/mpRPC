@@ -19,7 +19,7 @@
  */
 #pragma once
 
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/mprpc_export.h"
 #include "mprpc/transport/parser.h"
 
@@ -34,7 +34,7 @@ namespace parsers {
  * \return parser
  */
 MPRPC_EXPORT std::unique_ptr<parser> create_msgpack_parser(
-    std::shared_ptr<logging::logger> logger);
+    const logging::labeled_logger& logger);
 
 /*!
  * \brief create streaming parser of messages with msgpack only
@@ -43,7 +43,7 @@ MPRPC_EXPORT std::unique_ptr<parser> create_msgpack_parser(
  * \return parser
  */
 MPRPC_EXPORT std::unique_ptr<streaming_parser> create_msgpack_streaming_parser(
-    std::shared_ptr<logging::logger> logger);
+    logging::labeled_logger logger);
 
 /*!
  * \brief class of factories of parsers using msgpack
@@ -52,13 +52,13 @@ class msgpack_parser_factory final : public parser_factory {
 public:
     //! \copydoc mprpc::transport::parser_factory::create_parser
     std::unique_ptr<parser> create_parser(
-        std::shared_ptr<logging::logger> logger) override {
-        return create_msgpack_parser(std::move(logger));
+        logging::labeled_logger logger) override {
+        return create_msgpack_parser(logger);
     }
 
     //! \copydoc mprpc::transport::parser_factory::create_streaming_parser
     std::unique_ptr<streaming_parser> create_streaming_parser(
-        std::shared_ptr<logging::logger> logger) override {
+        logging::labeled_logger logger) override {
         return create_msgpack_streaming_parser(std::move(logger));
     }
 

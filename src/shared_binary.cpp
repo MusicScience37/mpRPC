@@ -25,6 +25,8 @@
 #include <utility>
 #include <vector>
 
+#include "mprpc/require_nonull.h"
+
 namespace mprpc {
 
 //! struct for internal data
@@ -47,6 +49,7 @@ struct shared_binary::impl {
 shared_binary::shared_binary() noexcept = default;
 
 shared_binary::shared_binary(const char* data, std::size_t size) {
+    MPRPC_REQUIRE_NONULL(data);
     auto temp_impl =
         std::make_unique<impl>(std::vector<char>(data, data + size));
     impl_ = temp_impl.release();

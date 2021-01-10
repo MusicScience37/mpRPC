@@ -1,6 +1,7 @@
 image: ubuntu:focal
 
 stages:
+  - Prepare
   - Check
   - Test with Clang
   - Test with GCC
@@ -11,6 +12,20 @@ stages:
   retry:
     max: 2
     when: runner_system_failure
+
+sync pipenv:
+  extends: .retry setting
+  stage: Prepare
+  dependencies: []
+  image: musicscience37/clang-ci:clang10-v3.0
+  script:
+    - mkdir -p .venv
+    - pipenv install --dev --python 3.8.6
+  artifacts:
+    paths:
+      - .venv
+      - Pipfile.lock
+    expire_in: "3 mos"
 
 line count:
   extends: .retry setting
@@ -35,7 +50,10 @@ line count:
 static analysis:
   extends: .retry setting
   stage: Check
-  dependencies: []
+  needs:
+    - sync pipenv
+  dependencies:
+    - sync pipenv
   image: musicscience37/clang-ci:clang10-v3.0
   before_script:
     - pip3 install junit2html
@@ -52,6 +70,7 @@ static analysis:
       -DMPRPC_BUILD_EXAMPLE:BOOL=ON
       -DMPRPC_ENABLE_CPP_WARNINGS:BOOL=ON
       -DMPRPC_USE_PCH:BOOL=OFF
+      -DMPRPC_PYTHON_INTERFACE:BOOL=ON
     - cmake --build build_static_analysis
       --target mprpc_clang_tidy
     - scripts/check_clang_tidy.sh build_static_analysis/clang_tidy
@@ -68,20 +87,13 @@ static analysis:
         - build_static_analysis/clang_tidy/clang_tidy_junit.xml
     when: always
     expire_in: "3 mos"
-  cache:
-    paths:
-      - .venv
-      - Pipfile.lock
-    key:
-      files:
-        - Pipfile
 
 .release-test-base:
   extends: .retry setting
-  needs: ["line count"]
-  dependencies: []
-  before_script:
-    - pipenv install --dev
+  needs:
+    - sync pipenv
+  dependencies:
+    - sync pipenv
   script:
     - mkdir $BUILD_DIR
     - pipenv run
@@ -91,6 +103,7 @@ static analysis:
       -DMPRPC_ENABLE_BENCH:BOOL=ON
       -DMPRPC_BENCH_IN_TEST:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
+      -DMPRPC_PYTHON_INTERFACE:BOOL=ON
     - cd $BUILD_DIR
     - ctest -V -M Experimental -T Configure -T Build -T Test -T MemCheck
     - ctest -M Experimental -T Submit
@@ -99,17 +112,9 @@ static analysis:
       - $BUILD_DIR
     reports:
       junit:
-        - $BUILD_DIR/junit/mprpc_test_*.xml
+        - $BUILD_DIR/junit/*.xml
     when: always
     expire_in: "3 mos"
-  cache:
-    paths:
-      - .venv
-      - Pipfile.lock
-    key:
-      files:
-        - Pipfile
-
 
 .debug-test-base:
   extends: .release-test-base
@@ -122,6 +127,7 @@ static analysis:
       -DMPRPC_ENABLE_BENCH:BOOL=ON
       -DMPRPC_BENCH_IN_TEST:BOOL=ON
       -DMPRPC_WRITE_JUNIT:BOOL=ON
+      -DMPRPC_PYTHON_INTERFACE:BOOL=ON
     - cd $BUILD_DIR
     - ctest -V -M Experimental -T Configure -T Build -T Test -T MemCheck
     - ctest -M Experimental -T Submit
@@ -204,29 +210,23 @@ clang-10-debug:
 doc:
   extends: .retry setting
   stage: Build Documentation
-  needs: ["line count"]
-  dependencies: []
+  needs:
+    - sync pipenv
+  dependencies:
+    - sync pipenv
   image: musicscience37/sphinx-doxygen:v-3.0
-  before_script:
-    - pipenv install --dev
   script:
     - mkdir build_doc
     - pipenv run
       cmake -S ./ -B build_doc
       -DMPRPC_BUILD_DOC:BOOL=ON
+      -DMPRPC_PYTHON_INTERFACE:BOOL=ON
     - cmake --build build_doc --target mprpc_doc
   artifacts:
     paths:
       - build_doc
     when: always
     expire_in: "3 mos"
-  cache:
-    paths:
-      - .venv
-      - Pipfile.lock
-    key:
-      files:
-        - Pipfile
 
 pages:
   extends: .retry setting

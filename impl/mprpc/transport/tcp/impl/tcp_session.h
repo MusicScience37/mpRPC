@@ -25,6 +25,7 @@
 
 #include "mprpc/logging/logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/asio_helper/basic_endpoint.h"
 #include "mprpc/transport/asio_helper/stream_socket_helper.h"
@@ -53,16 +54,16 @@ public:
      * \param parser parser
      * \param config configuration
      */
-    tcp_session(const std::shared_ptr<logging::logger>& logger,
+    tcp_session(const logging::labeled_logger& logger,
         asio::ip::tcp::socket socket, asio::io_context& io_context,
         std::shared_ptr<streaming_compressor> comp,
         std::shared_ptr<streaming_parser> parser,
         const tcp_acceptor_config& config)
-        : socket_helper_(
-              std::make_shared<socket_helper_type>(logger, std::move(socket),
-                  io_context, std::move(comp), std::move(parser), config)),
+        : socket_helper_(std::make_shared<socket_helper_type>(logger,
+              std::move(socket), io_context, MPRPC_REQUIRE_NONULL_MOVE(comp),
+              MPRPC_REQUIRE_NONULL_MOVE(parser), config)),
           logger_(logger) {
-        MPRPC_INFO(logger, "accepted connection from {} at {}",
+        MPRPC_INFO(logger_, "accepted connection from {} at {}",
             socket_helper_->socket().remote_endpoint(),
             socket_helper_->socket().local_endpoint());
     }
@@ -82,14 +83,14 @@ public:
     void shutdown() override {
         std::promise<void> promise;
         auto future = promise.get_future();
-        socket_helper_->post(
-            [&promise, logger = logger_](asio::ip::tcp::socket& socket) {
-                MPRPC_INFO(logger, "gracefully shutting down a session with {}",
-                    socket.remote_endpoint());
-                promise.set_value();
-                socket.shutdown(asio::ip::tcp::socket::shutdown_both);
-                socket.close();
-            });
+        socket_helper_->post([&promise, logger = logger_](
+                                 asio::ip::tcp::socket& socket) mutable {
+            MPRPC_INFO(logger, "gracefully shutting down a session with {}",
+                socket.remote_endpoint());
+            promise.set_value();
+            socket.shutdown(asio::ip::tcp::socket::shutdown_both);
+            socket.close();
+        });
         const auto timeout = std::chrono::milliseconds(100);
         future.wait_for(timeout);
     }
@@ -109,7 +110,7 @@ private:
     std::shared_ptr<socket_helper_type> socket_helper_;
 
     //! logger
-    std::shared_ptr<logging::logger> logger_;
+    logging::labeled_logger logger_;
 };
 
 }  // namespace impl

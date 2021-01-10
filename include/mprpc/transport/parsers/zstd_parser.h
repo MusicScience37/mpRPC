@@ -34,7 +34,7 @@ namespace parsers {
  * \return parser
  */
 MPRPC_EXPORT std::unique_ptr<parser> create_zstd_parser(
-    std::shared_ptr<logging::logger> logger);
+    logging::labeled_logger logger);
 
 /*!
  * \brief create parser of messages using zstd library with streaming
@@ -43,7 +43,7 @@ MPRPC_EXPORT std::unique_ptr<parser> create_zstd_parser(
  * \return parser
  */
 MPRPC_EXPORT std::unique_ptr<streaming_parser> create_zstd_streaming_parser(
-    const std::shared_ptr<logging::logger>& logger);
+    const logging::labeled_logger& logger);
 
 /*!
  * \brief class of factories of parsers using zstd library
@@ -52,13 +52,13 @@ class zstd_parser_factory final : public parser_factory {
 public:
     //! \copydoc mprpc::transport::parser_factory::create_parser
     std::unique_ptr<parser> create_parser(
-        std::shared_ptr<logging::logger> logger) override {
+        logging::labeled_logger logger) override {
         return create_zstd_parser(std::move(logger));
     }
 
     //! \copydoc mprpc::transport::parser_factory::create_streaming_parser
     std::unique_ptr<streaming_parser> create_streaming_parser(
-        std::shared_ptr<logging::logger> logger) override {
+        logging::labeled_logger logger) override {
         return create_zstd_streaming_parser(logger);
     }
 

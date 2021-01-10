@@ -25,8 +25,9 @@
 
 #include "mprpc/execution/method_executor.h"
 #include "mprpc/execution/method_server.h"
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 
 namespace mprpc {
@@ -44,11 +45,12 @@ public:
      * \param threads threads
      * \param methods methods
      */
-    simple_method_server(std::shared_ptr<mprpc::logging::logger> logger,
+    simple_method_server(logging::labeled_logger logger,
         mprpc::thread_pool& threads,
         const std::vector<std::shared_ptr<method_executor>>& methods)
-        : logger_(std::move(logger)), threads_(threads) {
+        : logger_(std::move(logger), "method_server"), threads_(threads) {
         for (const auto& method : methods) {
+            MPRPC_REQUIRE_NONULL(method);
             methods_.emplace(method->name(), method);
         }
     }
@@ -57,6 +59,7 @@ public:
     void async_process_message(
         const std::shared_ptr<transport::session>& session, const message& msg,
         on_message_processed_handler handler) override {
+        MPRPC_REQUIRE_NONULL(session);
         threads_.post([this, session, msg, moved_handler = std::move(handler)] {
             this->do_process_message(session, msg, moved_handler);
         });
@@ -129,7 +132,7 @@ private:
     }
 
     //! logger
-    std::shared_ptr<mprpc::logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! thread pool
     mprpc::thread_pool& threads_;

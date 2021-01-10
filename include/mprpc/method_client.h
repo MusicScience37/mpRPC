@@ -19,6 +19,8 @@
  */
 #pragma once
 
+#include <memory>
+
 #include "mprpc/client.h"
 
 namespace mprpc {
@@ -46,8 +48,8 @@ public:
      * \param client client
      * \param method method name
      */
-    method_client(client& client, std::string method)
-        : client_(client), method_(std::move(method)) {}
+    method_client(std::shared_ptr<client> client, std::string method)
+        : client_(std::move(client)), method_(std::move(method)) {}
 
     /*!
      * \brief asynchronously request
@@ -57,7 +59,7 @@ public:
      */
     typed_response_future<ResultType> async_request(
         const ParamsType&... params) {
-        return client_.async_request<ResultType>(method_, params...);
+        return client_->async_request<ResultType>(method_, params...);
     }
 
     /*!
@@ -67,7 +69,7 @@ public:
      * \return result
      */
     ResultType request(const ParamsType&... params) {
-        return client_.request<ResultType>(method_, params...);
+        return client_->request<ResultType>(method_, params...);
     }
 
     /*!
@@ -86,12 +88,12 @@ public:
      * \param params parameters
      */
     void notify(const ParamsType&... params) {
-        client_.notify(method_, params...);
+        client_->notify(method_, params...);
     }
 
 private:
     //! client
-    client& client_;
+    std::shared_ptr<client> client_;
 
     //! method name
     std::string method_;
