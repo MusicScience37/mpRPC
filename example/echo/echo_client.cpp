@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
             mprpc::client_builder(logger).connect_tcp(host, port).create();
 
         auto echo =
-            mprpc::method_client<std::string(std::string)>(*client, "echo");
+            mprpc::method_client<std::string(std::string)>(client, "echo");
 
         MPRPC_INFO(logger, "send {}", data);
         const auto response = echo(data);

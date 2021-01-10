@@ -26,8 +26,9 @@
 
 #include "mprpc/error_info.h"
 #include "mprpc/exception.h"
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
 #include "mprpc/transport/parser.h"
@@ -55,16 +56,16 @@ public:
      * \param parser_factory_ptr factory of parsers
      * \param config configuration
      */
-    tcp_acceptor(std::shared_ptr<mprpc::logging::logger> logger,
+    tcp_acceptor(logging::labeled_logger logger,
         const asio::ip::tcp::endpoint& endpoint, asio::io_context& io_context,
         std::shared_ptr<compressor_factory> comp_factory,
         std::shared_ptr<parser_factory> parser_factory_ptr,
         tcp_acceptor_config config)
-        : logger_(std::move(logger)),
+        : logger_(std::move(logger), fmt::format("tcp({})", endpoint.port())),
           socket_(io_context),
           io_context_(io_context),
-          compressor_factory_(std::move(comp_factory)),
-          parser_factory_(std::move(parser_factory_ptr)),
+          compressor_factory_(MPRPC_REQUIRE_NONULL_MOVE(comp_factory)),
+          parser_factory_(MPRPC_REQUIRE_NONULL_MOVE(parser_factory_ptr)),
           config_(std::move(config)) {
         try {
             socket_ = asio::ip::tcp::acceptor(io_context, endpoint);
@@ -105,13 +106,17 @@ public:
             return;
         }
 
-        MPRPC_TRACE(
-            logger_, "accepted a connection from {}", socket.remote_endpoint());
+        const auto remote_endpoint = socket.remote_endpoint();
+        MPRPC_TRACE(logger_, "accepted a connection from {}", remote_endpoint);
+        const auto session_logger = logging::labeled_logger(
+            logger_, fmt::format("session({})", remote_endpoint.port()));
         handler(error_info(),
-            std::make_shared<tcp_session>(logger_, std::move(socket),
+            std::make_shared<tcp_session>(session_logger, std::move(socket),
                 io_context_,
-                compressor_factory_->create_streaming_compressor(logger_),
-                parser_factory_->create_streaming_parser(logger_), config_));
+                compressor_factory_->create_streaming_compressor(
+                    session_logger),
+                parser_factory_->create_streaming_parser(session_logger),
+                config_));
     }
 
     //! \copydoc mprpc::transport::acceptor::local_address
@@ -121,7 +126,7 @@ public:
 
 private:
     //! logger
-    std::shared_ptr<mprpc::logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! socket
     asio::ip::tcp::acceptor socket_;

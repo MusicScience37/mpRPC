@@ -43,9 +43,8 @@ public:
      * \param logger logger
      * \param config configuration
      */
-    zstd_compressor(
-        std::shared_ptr<logging::logger> logger, compression_config config)
-        : logger_(std::move(logger)), config_(config) {
+    zstd_compressor(logging::labeled_logger logger, compression_config config)
+        : logger_(std::move(logger), "zstd_compressor"), config_(config) {
         context_ = ZSTD_createCCtx();
         ZSTD_CCtx_setParameter(context_, ZSTD_c_compressionLevel,
             config_.zstd_compression_level.value());
@@ -84,7 +83,7 @@ public:
 
 private:
     //! logger
-    std::shared_ptr<logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! buffer
     mprpc::buffer buffer_{};
@@ -108,8 +107,9 @@ public:
      * \param config configuration
      */
     zstd_streaming_compressor(
-        std::shared_ptr<logging::logger> logger, compression_config config)
-        : logger_(std::move(logger)), config_(config) {
+        logging::labeled_logger logger, compression_config config)
+        : logger_(std::move(logger), "zstd_streaming_compressor"),
+          config_(config) {
         context_ = ZSTD_createCCtx();
         ZSTD_CCtx_setParameter(context_, ZSTD_c_compressionLevel,
             config_.zstd_compression_level.value());
@@ -162,7 +162,7 @@ public:
 
 private:
     //! logger
-    std::shared_ptr<logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! buffer
     mprpc::buffer buffer_{};

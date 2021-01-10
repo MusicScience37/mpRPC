@@ -24,6 +24,8 @@
 #include <limits>
 #include <new>
 
+#include "mprpc/require_nonull.h"
+
 namespace mprpc {
 
 /*!
@@ -55,6 +57,7 @@ public:
      * \param size data size
      */
     buffer(const char* data, std::size_t size) : buffer(size) {
+        MPRPC_REQUIRE_NONULL(data);
         std::memcpy(data_, data, size);
     }
 

@@ -25,13 +25,12 @@ namespace mprpc {
 namespace transport {
 namespace parsers {
 
-std::unique_ptr<parser> create_zstd_parser(
-    std::shared_ptr<logging::logger> logger) {
+std::unique_ptr<parser> create_zstd_parser(logging::labeled_logger logger) {
     return std::make_unique<impl::zstd_parser>(std::move(logger));
 }
 
 std::unique_ptr<streaming_parser> create_zstd_streaming_parser(
-    const std::shared_ptr<logging::logger>& logger) {
+    const logging::labeled_logger& logger) {
     return std::make_unique<impl::zstd_streaming_parser>(logger);
 }
 

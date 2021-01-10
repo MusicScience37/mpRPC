@@ -21,6 +21,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "../../create_logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/transport/compression_config.h"
 #include "mprpc/transport/compressors/zstd_compressor.h"
 #include "mprpc/transport/parsers/zstd_parser.h"

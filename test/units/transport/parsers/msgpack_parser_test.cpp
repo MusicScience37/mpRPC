@@ -26,7 +26,7 @@
 #include "../../create_logger.h"
 
 TEST_CASE("mprpc::transport::parsers::msgpack_parser") {
-    auto logger = create_logger("mprpc::transport::parsers::msgpack_parser");
+    const auto logger = create_logger("mprpc::transport::parsers::msgpack_parser");
 
     const auto parser_ptr =
         mprpc::transport::parsers::create_msgpack_parser(logger);
@@ -43,7 +43,7 @@ TEST_CASE("mprpc::transport::parsers::msgpack_parser") {
 }
 
 TEST_CASE("mprpc::transport::parsers::msgpack_streaming_parser") {
-    auto logger =
+    const auto logger =
         create_logger("mprpc::transport::parsers::msgpack_streaming_parser");
 
     const auto parser_ptr =

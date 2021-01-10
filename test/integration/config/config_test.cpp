@@ -28,9 +28,9 @@
 TEST_CASE("load configuration for RPC") {
     static constexpr std::size_t max_file_size = 1024 * 1024;
     static constexpr std::size_t max_files = 5;
-    static const auto logger = mprpc::logging::create_file_logger(
-        "mprpc_test_integ_config", "mprpc_test_integ_config.log",
-        mprpc::logging::log_level::trace, max_file_size, max_files, true);
+    static const auto logger =
+        mprpc::logging::create_file_logger("mprpc_test_integ_config.log",
+            mprpc::logging::log_level::trace, max_file_size, max_files, true);
 
     SECTION("load configuration and perform RPC") {
         const auto config = mprpc::config::load("mprpc_test_integ_config.toml");
@@ -48,7 +48,7 @@ TEST_CASE("load configuration for RPC") {
             mprpc::client_builder(logger).client_config(config.client).create();
 
         auto echo_client =
-            mprpc::method_client<std::string(std::string)>(*client, "echo");
+            mprpc::method_client<std::string(std::string)>(client, "echo");
 
         const auto str = std::string("abc");
         REQUIRE(echo_client(str) == str);

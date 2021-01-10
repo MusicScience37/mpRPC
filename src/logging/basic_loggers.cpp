@@ -29,11 +29,11 @@
 namespace mprpc {
 namespace logging {
 
-std::shared_ptr<logger> create_file_logger(const std::string& logger_name,
-    const std::string& base_filename, log_level log_output_level,
-    std::size_t max_file_size, std::size_t max_files, bool rotate_on_open) {
+std::shared_ptr<logger> create_file_logger(const std::string& base_filename,
+    log_level log_output_level, std::size_t max_file_size,
+    std::size_t max_files, bool rotate_on_open) {
     return std::make_shared<impl::spdlog_logger>(
-        spdlog::rotating_logger_mt(logger_name, base_filename, max_file_size,
+        spdlog::rotating_logger_mt(base_filename, base_filename, max_file_size,
             max_files, rotate_on_open),
         log_output_level);
 }

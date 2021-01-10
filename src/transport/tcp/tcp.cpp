@@ -23,7 +23,9 @@
 #include <asio/ip/tcp.hpp>
 
 #include "mprpc/exception.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/transport/asio_helper/basic_endpoint.h"
 #include "mprpc/transport/tcp/impl/tcp_acceptor.h"
 #include "mprpc/transport/tcp/impl/tcp_connector.h"
@@ -33,12 +35,16 @@ namespace transport {
 namespace tcp {
 
 std::shared_ptr<acceptor> create_tcp_acceptor(
-    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
+    const logging::labeled_logger& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const tcp_acceptor_config& config) {
+    MPRPC_REQUIRE_NONULL(comp_factory);
+    MPRPC_REQUIRE_NONULL(parser_factory_ptr);
+
     const auto& ip_address = config.host.value();
     const auto port = config.port.value();
+
     asio::error_code err;
     const auto ip_address_parsed = asio::ip::make_address(ip_address, err);
     if (err) {
@@ -52,12 +58,16 @@ std::shared_ptr<acceptor> create_tcp_acceptor(
 }
 
 std::shared_ptr<connector> create_tcp_connector(
-    const std::shared_ptr<mprpc::logging::logger>& logger, thread_pool& threads,
+    const logging::labeled_logger& logger, thread_pool& threads,
     const std::shared_ptr<compressor_factory>& comp_factory,
     const std::shared_ptr<parser_factory>& parser_factory_ptr,
     const tcp_connector_config& config) {
+    MPRPC_REQUIRE_NONULL(comp_factory);
+    MPRPC_REQUIRE_NONULL(parser_factory_ptr);
+
     const auto& host = config.host.value();
     const auto port = config.port.value();
+
     asio::ip::tcp::resolver resolver{threads.context()};
     asio::error_code err;
     MPRPC_DEBUG(logger, "resloving {}:{}", host, port);
@@ -78,10 +88,14 @@ std::shared_ptr<connector> create_tcp_connector(
             logger, "trying to connect to endpoint: {}", entry.endpoint());
         connector_socket.connect(entry.endpoint(), err);
         if (!err) {
-            return std::make_unique<impl::tcp_connector>(logger,
+            const auto connector_logger = logging::labeled_logger(logger,
+                fmt::format(
+                    "tcp({})", connector_socket.local_endpoint().port()));
+            return std::make_unique<impl::tcp_connector>(connector_logger,
                 std::move(connector_socket), threads.context(),
-                comp_factory->create_streaming_compressor(logger),
-                parser_factory_ptr->create_streaming_parser(logger), config);
+                comp_factory->create_streaming_compressor(connector_logger),
+                parser_factory_ptr->create_streaming_parser(connector_logger),
+                config);
         }
 
         MPRPC_DEBUG(logger, "failed to connect to {}: {}", entry.endpoint(),

@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
                 mprpc::logging::log_level::trace);
         } else {
             logger = mprpc::logging::create_file_logger(
-                "test_logger", filename, mprpc::logging::log_level::trace);
+                filename, mprpc::logging::log_level::trace);
         }
 
         MPRPC_TRACE(logger, "test");

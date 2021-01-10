@@ -61,7 +61,7 @@ public:
      * \return compressor
      */
     std::unique_ptr<compressor> create_compressor(
-        std::shared_ptr<logging::logger> /*logger*/) override {
+        logging::labeled_logger /*logger*/) override {
         return std::make_unique<null_compressor>();
     }
 
@@ -71,7 +71,7 @@ public:
      * \return compressor
      */
     std::unique_ptr<streaming_compressor> create_streaming_compressor(
-        std::shared_ptr<logging::logger> /*logger*/) override {
+        logging::labeled_logger /*logger*/) override {
         return std::make_unique<null_streaming_compressor>();
     }
 };

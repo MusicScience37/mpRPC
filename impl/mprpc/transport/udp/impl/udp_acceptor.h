@@ -21,8 +21,9 @@
 
 #include <memory>
 
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/acceptor.h"
 #include "mprpc/transport/asio_helper/basic_endpoint.h"
@@ -52,13 +53,14 @@ public:
      * \param parser_ptr parser
      * \param config configuration
      */
-    udp_acceptor(const std::shared_ptr<mprpc::logging::logger>& logger,
+    udp_acceptor(const logging::labeled_logger& logger,
         asio::ip::udp::socket socket, asio::io_context& io_context,
         std::shared_ptr<compressor> comp, std::shared_ptr<parser> parser_ptr,
         udp_acceptor_config config)
         : logger_(logger),
           helper_(std::make_shared<udp_common>(logger, std::move(socket),
-              io_context, std::move(comp), std::move(parser_ptr), config_)),
+              io_context, MPRPC_REQUIRE_NONULL_MOVE(comp),
+              MPRPC_REQUIRE_NONULL_MOVE(parser_ptr), config_)),
           config_(std::move(config)) {
         helper_->init();
     }
@@ -104,7 +106,7 @@ private:
     }
 
     //! logger
-    std::shared_ptr<mprpc::logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! socket helper
     std::shared_ptr<udp_common> helper_;

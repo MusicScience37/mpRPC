@@ -29,8 +29,9 @@
 #include <stl_ext/shared_function.h>
 
 #include "mprpc/exception.h"
-#include "mprpc/logging/logger.h"
+#include "mprpc/logging/labeled_logger.h"
 #include "mprpc/logging/logging_macros.h"
+#include "mprpc/require_nonull.h"
 #include "mprpc/thread_pool.h"
 #include "mprpc/transport/asio_helper/stream_socket_config.h"
 #include "mprpc/transport/compressor.h"
@@ -70,16 +71,16 @@ public:
      * \param parser parser
      * \param config configuration
      */
-    stream_socket_helper(std::shared_ptr<logging::logger> logger,
-        socket_type socket, asio::io_context& io_context,
+    stream_socket_helper(logging::labeled_logger logger, socket_type socket,
+        asio::io_context& io_context,
         std::shared_ptr<streaming_compressor> comp,
         std::shared_ptr<streaming_parser> parser,
         const stream_socket_config& config)
         : logger_(std::move(logger)),
           socket_(std::move(socket)),
           strand_(asio::make_strand(io_context)),
-          compressor_(std::move(comp)),
-          parser_(std::move(parser)),
+          compressor_(MPRPC_REQUIRE_NONULL_MOVE(comp)),
+          parser_(MPRPC_REQUIRE_NONULL_MOVE(parser)),
           config_(config) {
         compressor_->init();
     }
@@ -321,7 +322,7 @@ private:
     }
 
     //! logger
-    std::shared_ptr<logging::logger> logger_;
+    logging::labeled_logger logger_;
 
     //! socket
     socket_type socket_;

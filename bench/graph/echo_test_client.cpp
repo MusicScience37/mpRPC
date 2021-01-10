@@ -54,7 +54,7 @@ void test(std::size_t num_repetitions, std::size_t data_size,
     }
     const auto client = builder.create();
 
-    auto echo = mprpc::method_client<std::string(std::string)>(*client, "echo");
+    auto echo = mprpc::method_client<std::string(std::string)>(client, "echo");
 
     for (std::size_t i = 0; i < num_repetitions; ++i) {
         watch.start();
@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
                                  .connect_tcp(host, inst_server_port)
                                  .create();
     auto create_server =
-        mprpc::method_client<void(std::string)>(*inst_client, "create_server");
+        mprpc::method_client<void(std::string)>(inst_client, "create_server");
 
     for (const auto& type : benchmarks) {
         for (const auto data_size : data_sizes) {

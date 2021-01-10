@@ -35,7 +35,7 @@ namespace compressors {
  * \return compressor
  */
 MPRPC_EXPORT std::unique_ptr<compressor> create_zstd_compressor(
-    std::shared_ptr<logging::logger> logger, compression_config config);
+    logging::labeled_logger logger, compression_config config);
 
 /*!
  * \brief create a compressor using zstd library with streaming
@@ -46,7 +46,7 @@ MPRPC_EXPORT std::unique_ptr<compressor> create_zstd_compressor(
  */
 MPRPC_EXPORT std::unique_ptr<streaming_compressor>
 create_zstd_streaming_compressor(
-    std::shared_ptr<logging::logger> logger, compression_config config);
+    logging::labeled_logger logger, compression_config config);
 
 /*!
  * \brief class of factories of compressors using zstd library
@@ -63,13 +63,13 @@ public:
 
     //! \copydoc mprpc::transport::compressor_factory::create_compressor
     std::unique_ptr<compressor> create_compressor(
-        std::shared_ptr<logging::logger> logger) override {
+        logging::labeled_logger logger) override {
         return create_zstd_compressor(logger, config_);
     }
 
     //! \copydoc transport::compressor_factory::create_streaming_compressor
     std::unique_ptr<streaming_compressor> create_streaming_compressor(
-        std::shared_ptr<logging::logger> logger) override {
+        logging::labeled_logger logger) override {
         return create_zstd_streaming_compressor(logger, config_);
     }
 

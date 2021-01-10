@@ -54,7 +54,7 @@ static void echo_udp(benchmark::State& state) {
             mprpc::client_builder(logger).num_threads(2).connect_udp().create();
 
         auto echo_client =
-            mprpc::method_client<std::string(std::string)>(*client, "echo");
+            mprpc::method_client<std::string(std::string)>(client, "echo");
 
         for (auto _ : state) {
             const auto res = echo_client(data);
@@ -95,7 +95,7 @@ static void echo_udp_zstd(benchmark::State& state) {
                           .create();
 
         auto echo_client =
-            mprpc::method_client<std::string(std::string)>(*client, "echo");
+            mprpc::method_client<std::string(std::string)>(client, "echo");
 
         for (auto _ : state) {
             const auto res = echo_client(data);
