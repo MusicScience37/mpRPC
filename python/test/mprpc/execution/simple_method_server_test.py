@@ -4,11 +4,12 @@
 from threading import Event
 
 from mprpc_cpp_test import MockSession
+from mprpc.logging import PythonLogger
 from mprpc.message import (
     MsgType, Request, Notification, validate_message, unpack_object, MessageData,
 )
 from mprpc.execution import SimpleMethodServer, FunctionMethodExecutor
-from mprpc import ErrorInfo, ErrorCode
+from mprpc import ErrorInfo
 
 
 def add(left: int, right: int) -> int:
@@ -23,8 +24,8 @@ def test_simple_method_server_request():
     """
 
     name = 'test_method'
-    executor = FunctionMethodExecutor(name, add)
-    server = SimpleMethodServer([executor])
+    executor = FunctionMethodExecutor(PythonLogger(), name, add)
+    server = SimpleMethodServer(PythonLogger(), [executor])
 
     session = MockSession()
 
@@ -75,8 +76,8 @@ def test_simple_method_server_request_invalid_method():
     """
 
     name = 'test_method'
-    executor = FunctionMethodExecutor(name, add)
-    server = SimpleMethodServer([executor])
+    executor = FunctionMethodExecutor(PythonLogger(), name, add)
+    server = SimpleMethodServer(PythonLogger(), [executor])
 
     session = MockSession()
 
@@ -126,8 +127,8 @@ def test_simple_method_server_notification():
     """
 
     name = 'test_method'
-    executor = FunctionMethodExecutor(name, add)
-    server = SimpleMethodServer([executor])
+    executor = FunctionMethodExecutor(PythonLogger(), name, add)
+    server = SimpleMethodServer(PythonLogger(), [executor])
 
     session = MockSession()
 

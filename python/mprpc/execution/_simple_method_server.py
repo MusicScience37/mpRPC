@@ -4,8 +4,8 @@
 
 from typing import Union, Callable, Any, List
 from concurrent.futures import ThreadPoolExecutor, Future
-import logging
 
+from mprpc.logging import Logger, LabeledLogger
 from mprpc.transport import Session
 from mprpc.message import Request, Notification, MessageData, pack_response
 from mprpc import ErrorInfo, ErrorCode, MPRPCException
@@ -13,21 +13,22 @@ from mprpc import ErrorInfo, ErrorCode, MPRPCException
 from ._method_server import MethodServer
 from ._method_executor import MethodExecutor
 
-LOGGER = logging.getLogger('mprpc.simple_method_server')
-
 
 class SimpleMethodServer(MethodServer):
     """class of a simple server implementation to execute methods
 
     Parameters
     ----------
+    logger : Logger
+        logger
     num_threads : int
         number of threads
     methods : List[MethodExecutor]
         list of methods
     """
 
-    def __init__(self, methods: List[MethodExecutor]):
+    def __init__(self, logger: Logger, methods: List[MethodExecutor]):
+        self.__logger = LabeledLogger(logger, 'mprpc.simple_method_server')
         self.__methods = {
             method.name: method
             for method in methods
@@ -97,7 +98,7 @@ class SimpleMethodServer(MethodServer):
         try:
             if isinstance(msg, Request):
                 if msg.method not in self.__methods:
-                    LOGGER.error('method %s not found', msg.method)
+                    self.__logger.error('method %s not found', msg.method)
                     return pack_response(
                         msg.msgid, error='method {} not found'.format(msg.method))
 
@@ -106,7 +107,7 @@ class SimpleMethodServer(MethodServer):
 
             if isinstance(msg, Notification):
                 if msg.method not in self.__methods:
-                    LOGGER.error('method %s not found', msg.method)
+                    self.__logger.error('method %s not found', msg.method)
                     return None
 
                 self.__methods[msg.method].process_notification(session, msg)
@@ -115,9 +116,9 @@ class SimpleMethodServer(MethodServer):
             raise MPRPCException(
                 ErrorInfo(ErrorCode.INVALID_MESSAGE, 'message must be a request or response'))
         except MPRPCException as err:
-            LOGGER.error('%s', err)
+            self.__logger.error('%s', err)
             raise
         except Exception as err:
-            LOGGER.error('%s', err)
+            self.__logger.error('%s', err)
             raise MPRPCException(
                 ErrorInfo(ErrorCode.UNEXPECTED_ERROR, 'error in server: {}'.format(err))) from err

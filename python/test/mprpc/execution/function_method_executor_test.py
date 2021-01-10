@@ -2,6 +2,7 @@
 """
 
 from mprpc_cpp_test import MockSession
+from mprpc.logging import PythonLogger
 from mprpc.message import MsgType, Request, Notification, validate_message, unpack_object
 from mprpc.execution import FunctionMethodExecutor
 
@@ -19,7 +20,7 @@ def test_function_method_executor_request():
 
     name = 'test_method'
 
-    executor = FunctionMethodExecutor(name, add)
+    executor = FunctionMethodExecutor(PythonLogger(), name, add)
 
     assert executor.name == name
     assert executor.function == add  # pylint: disable=comparison-with-callable
@@ -56,7 +57,7 @@ def test_function_method_executor_notification():
 
     name = 'test_method'
 
-    executor = FunctionMethodExecutor(name, add)
+    executor = FunctionMethodExecutor(PythonLogger(), name, add)
 
     assert executor.name == name
     assert executor.function == add  # pylint: disable=comparison-with-callable

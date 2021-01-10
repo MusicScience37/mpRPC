@@ -2,10 +2,10 @@
 """
 
 from typing import Callable, Optional, List
-import logging
 
 import marshmallow
 
+from mprpc.logging import Logger, LabeledLogger
 from mprpc.transport import Session
 from mprpc.message import (
     Request, Notification, MessageData, validate_data_list, pack_response,
@@ -19,6 +19,8 @@ class FunctionMethodExecutor(MethodExecutor):
 
     Parameters
     ----------
+    logger : Logger
+        logger
     name : str
         method name
     function : Callable
@@ -33,14 +35,14 @@ class FunctionMethodExecutor(MethodExecutor):
         using this schema.
     """
 
-    def __init__(self, name: str, function: Callable, *,
+    def __init__(self, logger: Logger, name: str, function: Callable, *,
                  param_schemas: Optional[List[Optional[marshmallow.Schema]]] = None,
                  result_schema: Optional[marshmallow.Schema] = None):
         super().__init__(name)
         self.__function = function
         self.__param_schemas = param_schemas
         self.__result_schema = result_schema
-        self.__logger = logging.getLogger('mprpc.method.' + name)
+        self.__logger = LabeledLogger(logger, 'mprpc.method.' + name)
 
     @property
     def function(self) -> Callable:
